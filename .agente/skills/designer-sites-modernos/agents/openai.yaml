@@ -1,0 +1,4 @@
+interface:
+  display_name: "Designer de Sites Modernos"
+  short_description: "Design moderno para sites com alta conversao"
+  default_prompt: "Criar e implementar sites modernos, responsivos e orientados a conversao, com identidade visual premium."

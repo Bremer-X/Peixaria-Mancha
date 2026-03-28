@@ -1,0 +1,4 @@
+interface:
+  display_name: "Frontend Pro Engineer"
+  short_description: "Frontend senior para apps web de alta performance"
+  default_prompt: "Use $frontend-pro-engineer para projetar e implementar um frontend moderno, rapido, acessivel e escalavel."

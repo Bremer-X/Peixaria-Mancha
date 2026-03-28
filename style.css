@@ -1,0 +1,333 @@
+/* Custom CSS for additional effects beyond Tailwind */
+
+/* Material Symbols Adjustments */
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+/* Animations */
+.fade-up {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.fade-up.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.reveal-left {
+  opacity: 0;
+  transform: translateX(-40px);
+  transition: opacity 1s ease-out, transform 1s ease-out;
+}
+.reveal-left.visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.reveal-right {
+  opacity: 0;
+  transform: translateX(40px);
+  transition: opacity 1s ease-out, transform 1s ease-out;
+}
+.reveal-right.visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* Utilities */
+html {
+  scroll-padding-top: 72px;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar { width: 10px; }
+::-webkit-scrollbar-track { background: #f1f1f1; }
+::-webkit-scrollbar-thumb { background: #c4c7c7; border-radius: 5px; }
+::-webkit-scrollbar-thumb:hover { background: #0077b6; }
+
+/* =============================================
+   TICKER / MARQUEE DE EVENTOS
+   ============================================= */
+.ticker-wrapper {
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.ticker-track {
+  display: inline-flex;
+  gap: 0;
+  animation: ticker-scroll 30s linear infinite;
+}
+
+.ticker-track:hover {
+  animation-play-state: paused;
+}
+
+@keyframes ticker-scroll {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+/* =============================================
+   CARROSSEL DE EVENTOS
+   ============================================= */
+.eventos-slider {
+  position: relative;
+  overflow: hidden;
+}
+
+.eventos-track {
+  display: flex;
+  transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  will-change: transform;
+}
+
+.evento-card {
+  min-width: 100%;
+  position: relative;
+}
+
+@media (min-width: 768px) {
+  .evento-card {
+    min-width: calc(50% - 12px);
+    margin-right: 24px;
+  }
+  .evento-card:last-child {
+    margin-right: 0;
+  }
+}
+
+@media (min-width: 1024px) {
+  .evento-card {
+    min-width: calc(33.333% - 16px);
+  }
+}
+
+/* Drag support */
+.eventos-track.is-dragging {
+  transition: none;
+  cursor: grabbing;
+}
+
+/* Navigation dots */
+.slider-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.3);
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.slider-dot.active {
+  background: #FF5722;
+  width: 24px;
+  border-radius: 4px;
+}
+
+/* Slider arrows */
+.slider-arrow {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.2);
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(8px);
+  flex-shrink: 0;
+}
+.slider-arrow:hover {
+  background: #FF5722;
+  border-color: #FF5722;
+  transform: scale(1.1);
+}
+.slider-arrow:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+  transform: scale(1);
+}
+
+/* =============================================
+   EVENT CARD VISUAL
+   ============================================= */
+.evento-img-wrapper {
+  height: 320px;
+  position: relative;
+  overflow: hidden;
+  border-radius: 1.25rem;
+}
+
+.evento-img-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.7s ease;
+}
+
+.evento-card:hover .evento-img-wrapper img {
+  transform: scale(1.06);
+}
+
+.evento-img-wrapper .evento-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.4) 55%, rgba(0,0,0,0.1) 100%);
+  border-radius: 1.25rem;
+}
+
+.evento-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 9999px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.evento-badge.proxima-semana {
+  background: rgba(255, 87, 34, 0.9);
+  color: white;
+}
+
+.evento-badge.este-fds {
+  background: rgba(0, 200, 100, 0.9);
+  color: white;
+}
+
+.evento-badge.mensal {
+  background: rgba(0, 119, 182, 0.9);
+  color: white;
+}
+
+.evento-badge.especial {
+  background: rgba(255, 193, 7, 0.9);
+  color: #1a1a1a;
+}
+
+/* =============================================
+   BADGE ABERTO AGORA
+   ============================================= */
+#open-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  border-radius: 9999px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  transition: all 0.3s ease;
+}
+
+#open-status-badge.aberto {
+  background: rgba(34, 197, 94, 0.15);
+  color: #16a34a;
+  border: 1px solid rgba(34, 197, 94, 0.4);
+}
+
+#open-status-badge.fechado {
+  background: rgba(239, 68, 68, 0.1);
+  color: #dc2626;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+#open-status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+#open-status-badge.aberto #open-status-dot {
+  background: #16a34a;
+  animation: pulse-green 2s infinite;
+}
+
+#open-status-badge.fechado #open-status-dot {
+  background: #dc2626;
+}
+
+@keyframes pulse-green {
+  0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.4); }
+  50%       { opacity: 0.8; box-shadow: 0 0 0 5px rgba(34, 197, 94, 0); }
+}
+
+/* =============================================
+   LIGHTBOX DA GALERIA
+   ============================================= */
+#lightbox-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.95);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+#lightbox-overlay.active {
+  opacity: 1;
+  pointer-events: all;
+}
+
+#lightbox-img {
+  max-width: 90vw;
+  max-height: 85vh;
+  object-fit: contain;
+  border-radius: 0.75rem;
+  box-shadow: 0 25px 80px rgba(0,0,0,0.8);
+  transition: transform 0.3s ease;
+  transform: scale(0.95);
+}
+
+#lightbox-overlay.active #lightbox-img {
+  transform: scale(1);
+}
+
+#lightbox-caption {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: rgba(255,255,255,0.7);
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+#lightbox-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.2);
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+}
+#lightbox-close:hover { background: rgba(255,87,34,0.8); }
+
+/* Galeria — cursor pointer */
+.galeria-item {
+  cursor: pointer;
+}

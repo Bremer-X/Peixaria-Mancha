@@ -1,0 +1,1493 @@
+<!DOCTYPE html>
+<html class="light scroll-smooth" lang="pt-BR">
+
+<head>
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+  <title>Peixaria Mancha | Frutos do Mar em Belém</title>
+  <meta name="description"
+    content="A melhor peixaria e restaurante da Marambaia. Qualidade, sabor e tradição em peixes e frutos do mar frescos desde 2008. Peça online ou reserve sua mesa!">
+  <meta name="keywords"
+    content="peixaria, restaurante de frutos do mar, Marambaia, Belém, peixe frito, tambaqui, delivery, almoço">
+
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&amp;family=Manrope:wght@400;500;600;700&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+    rel="stylesheet" />
+
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          c<!DOCTYPE html>
+        <html class="light scroll-smooth" lang="pt-BR">
+
+          <head>
+            <meta charset="utf-8" />
+            <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+            <title>Peixaria Mancha | Frutos do Mar em Belém</title>
+            <meta name="description"
+              content="A melhor peixaria e restaurante da Marambaia. Qualidade, sabor e tradição em peixes e frutos do mar frescos desde 2008. Peça online ou reserve sua mesa!">
+              <meta name="keywords"
+                content="peixaria, restaurante de frutos do mar, Marambaia, Belém, peixe frito, tambaqui, delivery, almoço">
+
+                <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&amp;family=Manrope:wght@400;500;600;700&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+    rel="stylesheet" />
+
+  <script id="tailwind-config">
+                  tailwind.config = {
+                    darkMode: "class",
+                  theme: {
+                    extend: {
+                    colors: {
+                    "background": "#FFFFFF",
+                  "on-surface": "#1A1A1A",
+                  "surface": "#FFFFFF",
+                  "surface-container-low": "#F5F5F5",
+                  "surface-container-high": "#ebebeb",
+                  "primary": "#0077b6",        /* Azul mar - tema frutos do mar */
+                  "primary-dim": "#03045e",    /* Azul escuro */
+                  "on-primary": "#ffffff",
+                  "tertiary": "#FF5722",       /* Laranja - CTA/Quente */
+                  "on-surface-variant": "#444748",
+                  "outline-variant": "#c4c7c7",
+                  "surface-tint": "#0077b6"
+          },
+                  fontFamily: {
+                    "headline": ["Plus Jakarta Sans"],
+                  "body": ["Manrope"],
+                  "label": ["Manrope"]
+          },
+                  animation: {
+                    'blob': 'blob 7s infinite',
+          },
+                  keyframes: {
+                    blob: {
+                    '0%': {transform: 'translate(0px, 0px) scale(1)' },
+                  '33%': {transform: 'translate(30px, -50px) scale(1.1)' },
+                  '66%': {transform: 'translate(-20px, 20px) scale(0.9)' },
+                  '100%': {transform: 'translate(0px, 0px) scale(1)' },
+            }
+          }
+        },
+      },
+    }
+  </script>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body class="bg-background text-on-surface font-body selection:bg-primary selection:text-on-primary pt-[72px]">
+
+  <!-- Navbar -->
+  <header
+    class="fixed top-0 left-0 right-0 h-[72px] bg-white/80 backdrop-blur-md border-b border-outline-variant/20 z-50 transition-all duration-300"
+    id="navbar">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full flex items-center justify-between">
+      <a href="#" class="flex items-center gap-3 group">
+        <div
+          class="w-10 h-10 rounded-full overflow-hidden border-2 border-tertiary group-hover:scale-105 transition-transform">
+          <img src="Fotos/logo.png" alt="Logo Peixaria Mancha" class="w-full h-full object-cover">
+        </div>
+        <span class="font-headline font-bold text-lg tracking-tight text-primary-dim">Peixaria Mancha</span>
+      </a>
+
+      <!-- Desktop Menu -->
+      <nav class="hidden md:flex items-center gap-8 font-semibold text-sm">
+        <a href="#sobre" class="text-on-surface hover:text-primary transition-colors">Sobre Nós</a>
+        <a href="#cardapio" class="text-on-surface hover:text-primary transition-colors">Cardápio</a>
+        <a href="#eventos"
+          class="relative text-tertiary hover:text-[#e64a19] transition-colors flex items-center gap-1.5">
+          <span class="w-2 h-2 rounded-full bg-tertiary animate-pulse"></span>Eventos
+        </a>
+        <a href="#galeria" class="text-on-surface hover:text-primary transition-colors">Galeria</a>
+        <a href="#depoimentos" class="text-on-surface hover:text-primary transition-colors">Depoimentos</a>
+        <a href="#contato" class="text-on-surface hover:text-primary transition-colors">Contato</a>
+      </nav>
+
+      <!-- CTA Desktop -->
+      <div class="hidden md:flex items-center gap-3">
+        <span id="open-status-badge" class="isOpen fechado">
+          <span id="open-status-dot"></span>
+          <span id="open-status-text">Fechado agora</span>
+        </span>
+        <a href="https://wa.me/5591989379978" target="_blank" rel="noopener noreferrer"
+          class="flex h-10 px-5 bg-tertiary text-white items-center justify-center rounded-full font-bold text-sm hover:bg-[#e64a19] transition-colors shadow-lg shadow-tertiary/20">
+          <span class="material-symbols-outlined text-[18px] mr-2">delivery_dining</span>
+          Pedir Delivery
+        </a>
+      </div>
+
+      <!-- Mobile Menu Button -->
+      <button id="mobile-menu-btn"
+        class="md:hidden p-2 text-on-surface hover:text-primary transition-colors focus:outline-none rounded-lg"
+        aria-label="Abrir Menu">
+        <span class="material-symbols-outlined text-3xl">menu</span>
+      </button>
+    </div>
+
+    <!-- Mobile Menu Overlay -->
+    <div id="mobile-menu"
+      class="hidden md:hidden absolute top-[72px] left-0 right-0 bg-white border-b border-outline-variant/20 shadow-xl flex flex-col p-6 gap-6 font-semibold text-base min-h-[300px]">
+      <a href="#cardapio"
+        class="mobile-link w-full text-center hover:text-primary transition-colors p-2 text-on-surface">Cardápio</a>
+      <a href="#eventos"
+        class="mobile-link w-full text-center text-tertiary flex items-center justify-center gap-2 p-2">
+        <span class="w-2 h-2 rounded-full bg-tertiary animate-pulse"></span>Eventos
+      </a>
+      <a href="#sobre"
+        class="mobile-link w-full text-center hover:text-primary transition-colors p-2 text-on-surface">Sobre Nós</a>
+      <a href="#galeria"
+        class="mobile-link w-full text-center hover:text-primary transition-colors p-2 text-on-surface">Galeria</a>
+      <a href="#depoimentos"
+        class="mobile-link w-full text-center hover:text-primary transition-colors p-2 text-on-surface">Depoimentos</a>
+      <a href="#contato"
+        class="mobile-link w-full text-center hover:text-primary transition-colors p-2 text-on-surface">Contato</a>
+      <div class="h-px bg-outline-variant/20 w-full my-2"></div>
+      <a href="https://wa.me/5591989379978" target="_blank" rel="noopener noreferrer"
+        class="mobile-link w-full py-3 bg-tertiary text-white flex items-center justify-center rounded-lg font-bold">
+        <span class="material-symbols-outlined mr-2">restaurant_menu</span> Fazer Pedido
+      </a>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="relative min-h-[90vh] flex items-center overflow-hidden bg-cover bg-center"
+    style="background-image: url('Fotos/Feira05.jpeg');">
+    <!-- Dark overlay -->
+    <div class="absolute inset-0 bg-black/80"></div>
+
+    <div
+      class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full grid lg:grid-cols-2 gap-12 items-center relative z-10 py-12">
+      <!-- Text content -->
+      <div class="flex flex-col gap-6 text-center lg:text-left reveal-left">
+        <!-- Badges no topo -->
+        <div class="flex flex-wrap gap-2 justify-center lg:justify-start mb-2">
+          <div
+            class="inline-flex py-1.5 px-3 rounded-full bg-white/10 border border-white/20 text-white items-center w-max">
+            <span class="w-2 h-2 rounded-full bg-tertiary animate-pulse mr-2"></span>
+            <span class="text-xs font-bold tracking-wider uppercase">🐟 Preparado na Hora</span>
+          </div>
+          <div
+            class="inline-flex py-1.5 px-3 rounded-full bg-green-500/20 border border-green-400/30 text-green-300 items-center w-max">
+            <span class="text-xs font-bold tracking-wider uppercase">🌿 Destino MARAMBAIA — Culinária Amazônica</span>
+          </div>
+        </div>
+        <h1
+          class="font-headline font-extrabold text-4xl sm:text-5xl lg:text-6xl tracking-tight text-white leading-tight">
+          Sabor de <span class="text-tertiary">tradição</span> direto do Pará para a sua mesa
+        </h1>
+        <p class="text-lg text-white/90 font-medium max-w-2xl mx-auto lg:mx-0">
+          Escolha o peixe, a gente prepara na hora. Açaí batido na hora, culinária amazônica raiz e um ambiente
+          acolhedor longe do tumulto — para você e sua família.
+        </p>
+        <div class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start mt-4">
+          <a href="#cardapio"
+            class="px-8 py-3.5 bg-tertiary text-white font-bold rounded-lg hover:bg-[#e64a19] transition-all shadow-lg hover:shadow-tertiary/30 flex items-center justify-center gap-2">
+            Ver Cardápio <span class="material-symbols-outlined text-[20px]">menu_book</span>
+          </a>
+          <a href="https://wa.me/5591989379978" target="_blank" rel="noopener noreferrer"
+            class="px-8 py-3.5 bg-transparent text-white font-bold border-2 border-white/50 rounded-lg hover:border-white hover:bg-white/10 transition-all shadow-sm flex items-center justify-center gap-2">
+            Pedir no Delivery <span class="material-symbols-outlined text-[20px]">delivery_dining</span>
+          </a>
+        </div>
+
+        <div class="flex items-center gap-4 mt-8 pt-6 border-t border-white/20 justify-center lg:justify-start">
+          <div class="flex -space-x-3">
+            <img class="w-10 h-10 rounded-full border-2 border-white object-cover" src="Fotos/clientes/Carol.jpg"
+              alt="Carol">
+            <img class="w-10 h-10 rounded-full border-2 border-white object-cover" src="Fotos/clientes/João.jpg"
+              alt="João">
+            <img class="w-10 h-10 rounded-full border-2 border-white object-cover" src="Fotos/clientes/flavio.jpg"
+              alt="Flávio">
+          </div>
+          <p class="text-sm font-semibold text-white/90">Mais de <span class="text-tertiary font-bold">10.000
+              clientes</span> satisfeitos!</p>
+        </div>
+
+        <!-- Google Rating Badge -->
+        <div class="flex items-center gap-3 mt-4 justify-center lg:justify-start">
+          <div class="flex items-center gap-2 bg-white/10 backdrop-blur border border-white/20 rounded-xl px-4 py-2">
+            <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path
+                d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                fill="#4285F4" />
+              <path
+                d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                fill="#34A853" />
+              <path
+                d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+                fill="#FBBC05" />
+              <path
+                d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+                fill="#EA4335" />
+            </svg>
+            <div>
+              <div class="flex items-center gap-1">
+                <span class="text-yellow-400 text-sm">★★★★★</span>
+                <span class="text-white font-bold text-sm">4.8</span>
+              </div>
+              <p class="text-white/60 text-xs">Google Reviews</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Visual content -->
+      <div class="relative lg:h-[600px] flex justify-center items-center reveal-right mt-8 lg:mt-0">
+        <div
+          class="w-full max-w-lg aspect-square lg:aspect-[4/3] rounded-[2rem] overflow-hidden shadow-2xl relative translate-x-0 lg:translate-x-4">
+          <img src="Fotos/tambaqui.jpg" alt="Tambaqui Assado"
+            class="w-full h-full object-cover object-[30%_center] hover:scale-105 transition-transform duration-700">
+          <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+          <div class="absolute bottom-6 left-6 right-6 text-white">
+            <span class="bg-tertiary text-xs font-bold px-3 py-1 rounded-full mb-3 inline-block">Prato do Chef</span>
+            <h3 class="font-headline font-bold text-2xl">Tambaqui na Brasa</h3>
+            <p class="text-sm opacity-90 mt-1">Acompanha baião, farofa e vinagrete</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════
+       SEÇÃO DE DIFERENCIAIS
+       ═══════════════════════════════════════════ -->
+  <section class="py-14 bg-[#04060e] border-b border-white/5">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-10 fade-up">
+        <h2 class="text-white/40 font-bold tracking-widest text-xs uppercase mb-2">Por que nos escolher?</h2>
+        <h3 class="text-white text-2xl md:text-3xl font-extrabold">O que faz a Peixaria Mancha ser <span
+            class="text-tertiary">única</span></h3>
+      </div>
+      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+
+        <!-- 1 -->
+        <div
+          class="group flex flex-col items-center text-center gap-3 p-5 rounded-2xl border border-white/8 bg-white/4 hover:bg-tertiary/10 hover:border-tertiary/30 transition-all duration-300 fade-up">
+          <div class="w-14 h-14 rounded-2xl flex items-center justify-center text-3xl"
+            style="background: rgba(255,87,34,0.15);">🐟</div>
+          <div>
+            <p class="text-white font-bold text-sm">Peixe Escolhido</p>
+            <p class="text-white/50 text-xs mt-1">Você escolhe, a gente prepara na hora — limpo e cortado</p>
+          </div>
+        </div>
+
+        <!-- 2 -->
+        <div
+          class="group flex flex-col items-center text-center gap-3 p-5 rounded-2xl border border-white/8 bg-white/4 hover:bg-tertiary/10 hover:border-tertiary/30 transition-all duration-300 fade-up delay-100">
+          <div class="w-14 h-14 rounded-2xl flex items-center justify-center text-3xl"
+            style="background: rgba(88,28,200,0.15);">🥤</div>
+          <div>
+            <p class="text-white font-bold text-sm">Açaí Batido na Hora</p>
+            <p class="text-white/50 text-xs mt-1">Açaí fresco, tradicional do Pará — batido na hora</p>
+          </div>
+        </div>
+
+        <!-- 3 -->
+        <div
+          class="group flex flex-col items-center text-center gap-3 p-5 rounded-2xl border border-white/8 bg-white/4 hover:bg-tertiary/10 hover:border-tertiary/30 transition-all duration-300 fade-up delay-200">
+          <div class="w-14 h-14 rounded-2xl flex items-center justify-center text-3xl"
+            style="background: rgba(0,119,182,0.15);">🚗</div>
+          <div>
+            <p class="text-white font-bold text-sm">Estacionamento Gratuito</p>
+            <p class="text-white/50 text-xs mt-1">Amplo estacionamento — sem preocupação com vaga</p>
+          </div>
+        </div>
+
+        <!-- 4 -->
+        <div
+          class="group flex flex-col items-center text-center gap-3 p-5 rounded-2xl border border-white/8 bg-white/4 hover:bg-tertiary/10 hover:border-tertiary/30 transition-all duration-300 fade-up delay-300">
+          <div class="w-14 h-14 rounded-2xl flex items-center justify-center text-3xl"
+            style="background: rgba(34,197,94,0.12);">👨‍👩‍👧</div>
+          <div>
+            <p class="text-white font-bold text-sm">Espaço Kids</p>
+            <p class="text-white/50 text-xs mt-1">Brinquedoteca com assessoria — ideal para famílias</p>
+          </div>
+        </div>
+
+        <!-- 5 -->
+        <div
+          class="group flex flex-col items-center text-center gap-3 p-5 rounded-2xl border border-white/8 bg-white/4 hover:bg-tertiary/10 hover:border-tertiary/30 transition-all duration-300 fade-up delay-400">
+          <div class="w-14 h-14 rounded-2xl flex items-center justify-center text-3xl"
+            style="background: rgba(255,200,0,0.12);">🎵</div>
+          <div>
+            <p class="text-white font-bold text-sm">Show ao Vivo</p>
+            <p class="text-white/50 text-xs mt-1">Música regional todo sábado das 12h às 16h</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════
+       SEÇÃO DE EVENTOS
+       ═══════════════════════════════════════════ -->
+  <section id="eventos" class="py-16 relative overflow-hidden"
+    style="background: linear-gradient(135deg, #050810 0%, #0a0f1e 40%, #0d0a18 70%, #080c14 100%);">
+
+    <!-- 3D Mesh / Grid background -->
+    <div class="absolute inset-0 pointer-events-none" style="
+      background-image:
+        linear-gradient(rgba(0,119,182,0.07) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,119,182,0.07) 1px, transparent 1px);
+      background-size: 60px 60px;
+      transform: perspective(800px) rotateX(20deg) scale(1.4);
+      transform-origin: center top;
+      opacity: 0.6;
+    "></div>
+
+    <!-- Floating orbs for 3D depth -->
+    <div class="absolute left-1/4 top-10 w-72 h-72 rounded-full pointer-events-none"
+      style="background: radial-gradient(circle, rgba(0,119,182,0.18) 0%, transparent 70%); filter: blur(40px);"></div>
+    <div class="absolute right-1/4 bottom-10 w-80 h-80 rounded-full pointer-events-none"
+      style="background: radial-gradient(circle, rgba(255,87,34,0.15) 0%, transparent 70%); filter: blur(50px);"></div>
+    <div class="absolute left-10 bottom-1/3 w-48 h-48 rounded-full pointer-events-none"
+      style="background: radial-gradient(circle, rgba(120,50,200,0.12) 0%, transparent 70%); filter: blur(35px);"></div>
+
+    <!-- ── Ticker de avisos rápidos ───────────────────── -->
+    <div class="bg-tertiary/90 backdrop-blur py-2.5 mb-12 relative z-10">
+      <div class="ticker-wrapper">
+        <div class="ticker-track font-bold text-white text-sm tracking-wide">
+          <!-- Duplicado para loop contínuo -->
+          <span class="inline-flex items-center gap-2 px-8"><span class="text-white/70">🎵</span>&nbsp;Todo Sábado —
+            Show ao vivo com música regional! &nbsp;·&nbsp;</span>
+          <span class="inline-flex items-center gap-2 px-8"><span class="text-white/70">🍇</span>&nbsp;Seg a Sex — Prato
+            Executivo + Açaí Grátis! &nbsp;·&nbsp;</span>
+          <span class="inline-flex items-center gap-2 px-8"><span class="text-white/70">🎉</span>&nbsp;Sábados —
+            Qualquer prato + Açaí incluído! &nbsp;·&nbsp;</span>
+          <span class="inline-flex items-center gap-2 px-8"><span class="text-white/70">👨‍👩‍👧</span>&nbsp;Espaço Kids
+            disponível nos finais de semana &nbsp;·&nbsp;</span>
+          <span class="inline-flex items-center gap-2 px-8"><span class="text-white/70">📲</span>&nbsp;Reserve sua mesa
+            pelo WhatsApp agora! &nbsp;·&nbsp;</span>
+          <!-- Repeat para loop perfeito -->
+          <span class="inline-flex items-center gap-2 px-8"><span class="text-white/70">🎵</span>&nbsp;Todo Sábado —
+            Show ao vivo com música regional! &nbsp;·&nbsp;</span>
+          <span class="inline-flex items-center gap-2 px-8"><span class="text-white/70">🍇</span>&nbsp;Seg a Sex — Prato
+            Executivo + Açaí Grátis! &nbsp;·&nbsp;</span>
+          <span class="inline-flex items-center gap-2 px-8"><span class="text-white/70">🎉</span>&nbsp;Sábados —
+            Qualquer prato + Açaí incluído! &nbsp;·&nbsp;</span>
+          <span class="inline-flex items-center gap-2 px-8"><span class="text-white/70">👨‍👩‍👧</span>&nbsp;Espaço Kids
+            disponível nos finais de semana &nbsp;·&nbsp;</span>
+          <span class="inline-flex items-center gap-2 px-8"><span class="text-white/70">📲</span>&nbsp;Reserve sua mesa
+            pelo WhatsApp agora! &nbsp;·&nbsp;</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Cabeçalho da seção ─────────────────────────── -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+      <div class="flex flex-col sm:flex-row items-start sm:items-end justify-between mb-10 gap-4 fade-up">
+        <div>
+          <h2 class="font-headline text-tertiary font-bold tracking-widest text-sm uppercase mb-3">Programação</h2>
+          <h3 class="text-3xl md:text-4xl font-extrabold text-white tracking-tight">Promoções &amp; Eventos</h3>
+          <p class="mt-2 text-white/60 font-medium">Reserve sua mesa e aproveite com a família!</p>
+        </div>
+        <!-- Controles do slider -->
+        <div class="flex items-center gap-3">
+          <button id="slider-prev" class="slider-arrow" aria-label="Anterior">
+            <span class="material-symbols-outlined text-[20px]">arrow_back_ios_new</span>
+          </button>
+          <button id="slider-next" class="slider-arrow" aria-label="Próximo">
+            <span class="material-symbols-outlined text-[20px]">arrow_forward_ios</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- ── Slider de eventos ──────────────────────────── -->
+      <div class="eventos-slider">
+        <div class="eventos-track" id="eventos-track" style="display:flex; gap:24px;">
+
+          <!-- Card 1: Show ao Vivo Todo Sábado -->
+          <div class="evento-card">
+            <div class="evento-img-wrapper">
+              <img src="Fotos/cantor02.jpg" alt="Show ao Vivo Todo Sábado" loading="lazy">
+              <div class="evento-overlay"></div>
+              <div class="absolute inset-0 p-6 flex flex-col justify-between">
+                <span class="evento-badge este-fds self-start">
+                  <span class="material-symbols-outlined text-[14px]">mic</span>
+                  Todo Sábado
+                </span>
+                <div>
+                  <h4 class="font-headline font-bold text-white text-2xl mb-1">🎵 Show ao Vivo</h4>
+                  <p class="text-white/75 text-sm mb-4">Música regional e MPB das 12h às 16h.<br>Venha celebrar com a
+                    família!</p>
+                  <a href="https://wa.me/5591982696928?text=Ola!+Gostaria+de+reservar+mesa+para+o+show+de+sabado"
+                    target="_blank" rel="noopener noreferrer"
+                    class="inline-flex items-center gap-2 bg-tertiary hover:bg-[#e64a19] text-white font-bold text-sm px-5 py-2.5 rounded-lg transition-colors shadow-lg shadow-tertiary/30">
+                    <span class="material-symbols-outlined text-[16px]">calendar_month</span>
+                    Reservar Mesa
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 2: Promoção Seg-Sex — Executivo + Açaí Grátis -->
+          <div class="evento-card">
+            <div class="evento-img-wrapper">
+              <img src="Fotos/Executivo.jpg" alt="Prato Executivo + Açaí Grátis" loading="lazy">
+              <div class="evento-overlay"></div>
+              <!-- Badge especial de promoção -->
+              <div class="absolute inset-0 p-6 flex flex-col justify-between">
+                <div class="flex flex-col gap-2">
+                  <span class="evento-badge mensal self-start">
+                    <span class="material-symbols-outlined text-[14px]">schedule</span>
+                    Seg — Sex
+                  </span>
+                  <!-- Tag GRÁTIS destacada -->
+                  <span
+                    class="self-start inline-flex items-center gap-1 bg-green-500 text-white text-[10px] font-extrabold px-2.5 py-1 rounded-full uppercase tracking-wider shadow-md shadow-green-500/40">
+                    <span class="material-symbols-outlined text-[12px]">redeem</span>
+                    Acompanha Grátis
+                  </span>
+                </div>
+                <div>
+                  <h4 class="font-headline font-bold text-white text-2xl mb-1">🍇 Executivo + Açaí</h4>
+                  <p class="text-white/75 text-sm mb-4">De <strong class="text-tertiary">segunda a sexta</strong>, na
+                    compra de qualquer Prato Executivo, o <strong class="text-white">Açaí é por nossa conta!</strong>
+                  </p>
+                  <a href="https://wa.me/5591982696928?text=Ola!+Quero+saber+mais+sobre+a+promocao+do+prato+executivo+com+acai+gratis"
+                    target="_blank" rel="noopener noreferrer"
+                    class="inline-flex items-center gap-2 bg-tertiary hover:bg-[#e64a19] text-white font-bold text-sm px-5 py-2.5 rounded-lg transition-colors shadow-lg shadow-tertiary/30">
+                    <span class="material-symbols-outlined text-[16px]">lunch_dining</span>
+                    Quero Essa Promo!
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 3: Promoção Sábado — Qualquer Prato + Açaí -->
+          <div class="evento-card">
+            <div class="evento-img-wrapper">
+              <img src="Fotos/promo_acai_sabado.png" alt="Sábado - Qualquer Prato + Açaí" loading="lazy">
+              <div class="evento-overlay"></div>
+              <div class="absolute inset-0 p-6 flex flex-col justify-between">
+                <div class="flex flex-col gap-2">
+                  <span class="evento-badge este-fds self-start">
+                    <span class="material-symbols-outlined text-[14px]">today</span>
+                    Todo Sábado
+                  </span>
+                  <span
+                    class="self-start inline-flex items-center gap-1 bg-green-500 text-white text-[10px] font-extrabold px-2.5 py-1 rounded-full uppercase tracking-wider shadow-md shadow-green-500/40">
+                    <span class="material-symbols-outlined text-[12px]">redeem</span>
+                    Açaí Incluído
+                  </span>
+                </div>
+                <div>
+                  <h4 class="font-headline font-bold text-white text-2xl mb-1">🎉 Sábado com Açaí</h4>
+                  <p class="text-white/75 text-sm mb-4">Aos <strong class="text-tertiary">sábados</strong>, na compra de
+                    <strong class="text-white">qualquer prato</strong>, você já leva o <strong class="text-white">Açaí
+                      grátis!</strong>
+                  </p>
+                  <a href="https://wa.me/5591982696928?text=Ola!+Quero+reservar+uma+mesa+para+o+sabado+e+aproveitar+o+acai+gratis"
+                    target="_blank" rel="noopener noreferrer"
+                    class="inline-flex items-center gap-2 bg-tertiary hover:bg-[#e64a19] text-white font-bold text-sm px-5 py-2.5 rounded-lg transition-colors shadow-lg shadow-tertiary/30">
+                    <span class="material-symbols-outlined text-[16px]">restaurant</span>
+                    Reservar no Sábado
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 4: Espaço Kids -->
+          <div class="evento-card">
+            <div class="evento-img-wrapper">
+              <img src="Fotos/kids02.jpg" alt="Espaço Kids" loading="lazy">
+              <div class="evento-overlay"></div>
+              <div class="absolute inset-0 p-6 flex flex-col justify-between">
+                <span class="evento-badge proxima-semana self-start">
+                  <span class="material-symbols-outlined text-[14px]">child_care</span>
+                  Fins de Semana
+                </span>
+                <div>
+                  <h4 class="font-headline font-bold text-white text-2xl mb-1">👨‍👩‍👧 Espaço Kids</h4>
+                  <p class="text-white/75 text-sm mb-4">Brinquedoteca com assessoria nos fins de semana. Os pais curtem,
+                    as crianças adoram!</p>
+                  <a href="https://wa.me/5591982696928?text=Ola!+Tenho+criancas+e+gostaria+de+reservar+para+o+fim+de+semana"
+                    target="_blank" rel="noopener noreferrer"
+                    class="inline-flex items-center gap-2 bg-tertiary hover:bg-[#e64a19] text-white font-bold text-sm px-5 py-2.5 rounded-lg transition-colors shadow-lg shadow-tertiary/30">
+                    <span class="material-symbols-outlined text-[16px]">family_restroom</span>
+                    Reservar
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- /eventos-track -->
+      </div><!-- /eventos-slider -->
+
+      <!-- Dots de navegação -->
+      <div id="slider-dots" class="flex items-center justify-center gap-2 mt-8"></div>
+
+    </div><!-- /container -->
+  </section>
+
+  <!-- Cardápio / Highlights Section -->
+  <section id="cardapio" class="py-24 bg-white relative">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center max-w-2xl mx-auto mb-16 fade-up">
+        <h2 class="font-headline text-primary font-bold tracking-widest text-sm uppercase mb-3">Nosso Cardápio</h2>
+        <h3 class="text-3xl md:text-4xl font-extrabold text-primary-dim tracking-tight">Especialidades da Casa</h3>
+        <p class="mt-4 text-on-surface-variant font-medium">Os queridinhos dos nossos clientes. Preparados com
+          ingredientes altamente selecionados e muito carinho.</p>
+      </div>
+
+      <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
+        <!-- Card 1 -->
+        <div
+          class="group bg-surface-container-low rounded-2xl overflow-hidden hover:shadow-xl transition-all duration-300 border border-outline-variant/10 flex flex-col fade-up">
+          <div class="aspect-video relative overflow-hidden">
+            <img src="Fotos/Executivo.jpg" alt="Prato Executivo"
+              class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+            <div
+              class="absolute top-4 right-4 bg-white text-primary text-xs font-bold px-3 py-1 rounded-full shadow-md">
+              Mais Pedido</div>
+          </div>
+          <div class="p-6 flex-1 flex flex-col">
+            <h4 class="font-headline font-bold text-xl mb-2 group-hover:text-primary transition-colors">Pratos
+              Executivos</h4>
+            <p class="text-sm text-on-surface-variant mb-6 flex-1">Opções deliciosas e econômicas para o dia a dia.
+              Peixes fritinhos, pirão e aquele arroz branco soltinho.</p>
+            <div class="flex items-center justify-between mt-auto">
+              <span class="font-bold text-lg text-tertiary">Consultar</span>
+              <a href="https://wa.me/5591982696928?text=Ola, gostaria de ver os pratos executivos"
+                class="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center hover:bg-primary hover:text-white transition-colors">
+                <span class="material-symbols-outlined text-[20px]">add_shopping_cart</span>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 2 -->
+        <div
+          class="group bg-surface-container-low rounded-2xl overflow-hidden hover:shadow-xl transition-all duration-300 border border-outline-variant/10 flex flex-col fade-up delay-100">
+          <div class="aspect-video relative overflow-hidden">
+            <img src="Fotos/tambaqui.jpg" alt="Peixes Inteiros"
+              class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+          </div>
+          <div class="p-6 flex-1 flex flex-col">
+            <h4 class="font-headline font-bold text-xl mb-2 group-hover:text-primary transition-colors">Peixes na Brasa
+              / Fritos</h4>
+            <p class="text-sm text-on-surface-variant mb-6 flex-1">O carro-chefe da casa. Tampbqui, Filhote, Dourada.
+              Escolha o tamanho ideal para sua família.</p>
+            <div class="flex items-center justify-between mt-auto">
+              <span class="font-bold text-lg text-tertiary">Para a Famíla</span>
+              <a href="https://wa.me/5591989379978?text=Ola, gostaria da tabela de peixes inteiros"
+                class="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center hover:bg-primary hover:text-white transition-colors">
+                <span class="material-symbols-outlined text-[20px]">add_shopping_cart</span>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 3 -->
+        <div
+          class="group bg-surface-container-low rounded-2xl overflow-hidden hover:shadow-xl transition-all duration-300 border border-outline-variant/10 flex flex-col fade-up delay-200">
+          <div class="aspect-video relative overflow-hidden">
+            <img src="Fotos/Executivo02.jpg" alt="Porções e Entradas"
+              class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+            <div
+              class="absolute top-4 right-4 bg-white text-tertiary text-xs font-bold px-3 py-1 rounded-full shadow-md">
+              Para Dividir</div>
+          </div>
+          <div class="p-6 flex-1 flex flex-col">
+            <h4 class="font-headline font-bold text-xl mb-2 group-hover:text-primary transition-colors">Porções &amp;
+              Entradas</h4>
+            <p class="text-sm text-on-surface-variant mb-6 flex-1">Iscas de peixe, camarão empanado, bolinho de bacalhau
+              e fritas perfeitos para compartilhar.</p>
+            <div class="flex items-center justify-between mt-auto">
+              <span class="font-bold text-lg text-tertiary">Pra Começar</span>
+              <a href="https://wa.me/5591989379978?text=Ola, queria ver o cardapio de porcoes"
+                class="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center hover:bg-primary hover:text-white transition-colors">
+                <span class="material-symbols-outlined text-[20px]">add_shopping_cart</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- How to order Banner -->
+      <div
+        class="mt-16 bg-black/80 backdrop-blur-xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] border border-white/10 rounded-2xl p-8 lg:p-12 text-white flex flex-col lg:flex-row gap-8 items-center justify-between fade-up overflow-hidden relative">
+        <div
+          class="absolute -right-20 -top-20 w-64 h-64 bg-white/5 rounded-full blur-3xl opacity-50 pointer-events-none">
+        </div>
+        <div class="z-10 w-full lg:w-2/3">
+          <h3 class="font-headline font-bold text-2xl mb-4">Como deseja ser atendido?</h3>
+          <p class="text-white/80 mb-8 max-w-xl">Na Peixaria Mancha a comodidade é sua. Venha conhecer nosso salão,
+            retire seu pedido rápido ou peça no conforto de casa.</p>
+          <div class="grid sm:grid-cols-3 gap-6">
+            <div class="flex flex-col gap-2">
+              <div class="w-12 h-12 bg-white/10 rounded-lg flex items-center justify-center"><span
+                  class="material-symbols-outlined">restaurant</span></div>
+              <span class="font-bold text-sm">No Salão</span>
+              <span class="text-xs text-white/60">Ambiente familiar e climatizado para ótimos momentos.</span>
+            </div>
+            <div class="flex flex-col gap-2">
+              <div class="w-12 h-12 bg-white/10 rounded-lg flex items-center justify-center"><span
+                  class="material-symbols-outlined">directions_car</span></div>
+              <span class="font-bold text-sm">Retirada</span>
+              <span class="text-xs text-white/60">Ligue, peça, encoste o carro e leve para casa.</span>
+            </div>
+            <div class="flex flex-col gap-2">
+              <div class="w-12 h-12 bg-white/10 rounded-lg flex items-center justify-center"><span
+                  class="material-symbols-outlined">sports_motorsports</span></div>
+              <span class="font-bold text-sm">Delivery</span>
+              <span class="text-xs text-white/60">Entregamos fresquinho e rápido na sua porta.</span>
+            </div>
+          </div>
+        </div>
+        <div class="z-10 shrink-0">
+          <a href="https://wa.me/5591989379978" target="_blank" rel="noopener noreferrer"
+            class="px-8 py-4 bg-tertiary hover:bg-white hover:text-tertiary transition-colors rounded-xl font-bold text-sm flex items-center gap-3 w-full justify-center shadow-lg">
+            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path
+                d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z" />
+            </svg>
+            Faça seu Pedido Agora
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════
+       CARDÁPIO DO RESTAURANTE — REDESIGN PREMIUM
+       ═══════════════════════════════════════════ -->
+  <section id="cardapio-restaurante" class="menu-scene">
+
+    <!-- ── Fundo: textura de madeira escura + overlay quente ──────── -->
+    <div class="menu-scene-bg"></div>
+    <div class="menu-scene-overlay"></div>
+
+    <!-- ── Partículas de luz (fogões/brasa) ────────────────────────── -->
+    <div class="menu-ember menu-ember-1"></div>
+    <div class="menu-ember menu-ember-2"></div>
+    <div class="menu-ember menu-ember-3"></div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+
+      <!-- ── Cabeçalho da seção ──────────────────────────────────────── -->
+      <div class="text-center mb-12 fade-up">
+        <span class="inline-flex items-center gap-2 text-[#F5A623] font-bold text-xs uppercase tracking-[0.2em] mb-4">
+          <span class="w-8 h-px bg-[#F5A623]/60"></span>
+          Restaurante · Ter a Dom: 11h às 20h
+          <span class="w-8 h-px bg-[#F5A623]/60"></span>
+        </span>
+        <h3 class="font-headline font-extrabold text-3xl md:text-5xl text-white tracking-tight mb-3">
+          Nosso <span style="color:#F5A623;">Cardápio</span>
+        </h3>
+        <p class="text-white/55 max-w-lg mx-auto text-sm leading-relaxed">
+          Culinária amazônica de raiz · Todos os pratos acompanham baião, vinagrete e farofa
+        </p>
+      </div>
+
+      <!-- ══════════════════════════════════════════════════════════════
+           QUADRO DO CARDÁPIO — EFEITO 3D PREMIUM
+           ══════════════════════════════════════════════════════════════ -->
+      <div class="cardapio-wrapper fade-up">
+
+        <!-- Sombra "derramada" atrás do quadro -->
+        <div class="cardapio-shadow"></div>
+
+        <!-- O quadro em si -->
+        <div class="cardapio-card">
+
+          <!-- Topo amarelo (estilo faixa Devassa) -->
+          <div class="cardapio-top">
+            <div class="flex items-center gap-3">
+              <img src="Fotos/logo.png" alt="Peixaria Mancha" class="ct-logo">
+              <div>
+                <p class="ct-brand">PEIXARIA MANCHA</p>
+                <p class="ct-tagline">Qualidade Garantida desde 2008</p>
+              </div>
+            </div>
+            <div class="ct-devassa">
+              <p class="ct-devassa-name">DEVASSA</p>
+              <p class="ct-devassa-sub">PURO MALTE <span class="ct-devassa-italic">Tropical</span></p>
+            </div>
+          </div>
+
+          <!-- Faixa divisória decorativa -->
+          <div class="cardapio-stripe"></div>
+
+          <!-- CORPO: duas colunas -->
+          <div class="cardapio-body">
+
+            <!-- ─── COLUNA ESQUERDA ──────────────────────────── -->
+            <div class="c-col c-col-left">
+
+              <!-- ENTRADA -->
+              <div class="c-section">
+                <h4 class="c-title">ENTRADA</h4>
+                <div class="c-items">
+                  <div class="c-row"><span class="c-name">Pipoquinha de Dourada</span><span class="c-price">R$40</span></div>
+                  <div class="c-row"><span class="c-name">Casquinha de Caranguejo</span><span class="c-price">R$50</span></div>
+                  <div class="c-row"><span class="c-name">Camarão Empanado</span><span class="c-price">R$50</span></div>
+                  <div class="c-row"><span class="c-name">Camarão no Bafo</span><span class="c-price">R$40</span></div>
+                  <div class="c-row"><span class="c-name">Batata Frita</span><span class="c-price">R$15</span></div>
+                </div>
+              </div>
+
+              <!-- PRATOS 2 E 4 PESSOAS -->
+              <div class="c-section">
+                <h4 class="c-title">PRATOS PARA 2 E 4 PESSOAS</h4>
+                <div class="c-table-head">
+                  <span class="flex-1">Prato</span><span class="c-th">2p</span><span class="c-th">4p</span>
+                </div>
+                <div class="c-table-rows">
+                  <div class="c-trow"><div class="flex-1"><p class="c-name">Só o Creme</p><p class="c-sub">Filé de Dourada</p></div><span class="c-th c-price">R$130</span><span class="c-th c-price">R$230</span></div>
+                  <div class="c-trow"><div class="flex-1"><p class="c-name">Rapidola</p><p class="c-sub">Filé de Dourada</p></div><span class="c-th c-price">R$130</span><span class="c-th c-price">R$230</span></div>
+                  <div class="c-trow"><div class="flex-1"><p class="c-name">Sem Pavulagem</p><p class="c-sub">Filé de Gó</p></div><span class="c-th c-price">R$100</span><span class="c-th c-price">R$170</span></div>
+                  <div class="c-trow"><div class="flex-1"><p class="c-name">Toma-lhe-te</p><p class="c-sub">Filé de Pescada Amarela</p></div><span class="c-th c-price">R$160</span><span class="c-th c-price">R$250</span></div>
+                  <div class="c-trow"><div class="flex-1"><p class="c-name">Toma Sumano</p><p class="c-sub">Filé de Filhote</p></div><span class="c-th c-price">R$170</span><span class="c-th c-price">R$300</span></div>
+                  <div class="c-trow"><div class="flex-1"><p class="c-name">Não é Pão</p></div><span class="c-th c-price">R$160</span><span class="c-th c-price">R$250</span></div>
+                  <div class="c-trow c-trow-special"><div class="flex-1"><p class="c-name" style="color:#c0392b;font-weight:800;">TO BROCADO <small style="font-weight:500;color:#666;">Serve 6p</small></p><p class="c-sub">Gó 200g · Dourada 100g · Filhote 100g · Pirarucu 200g · Pescada 200g · 2 jarras de Açaí</p></div><span class="c-th c-price" style="white-space:nowrap;">R$400</span><span class="c-th"></span></div>
+                </div>
+                <p class="c-note">Todos acompanham baião ou feijão, vinagrete e farofa</p>
+              </div>
+
+              <!-- CALDEIRADAS -->
+              <div class="c-section">
+                <h4 class="c-title">CALDEIRADAS</h4>
+                <div class="c-table-head"><span class="flex-1">Prato</span><span class="c-th">2p</span><span class="c-th">4p</span></div>
+                <div class="c-table-rows">
+                  <div class="c-trow"><div class="flex-1"><p class="c-name">Caldeirada Cametaense</p><p class="c-sub">Filé de Filhote · arroz branco e pão</p></div><span class="c-th c-price">R$150</span><span class="c-th c-price">R$260</span></div>
+                  <div class="c-trow"><div class="flex-1"><p class="c-name">Caldeirada Paraense</p><p class="c-sub">Filhote no tucupi · 2 patas de caranguejo</p></div><span class="c-th c-price">R$180</span><span class="c-th c-price">R$320</span></div>
+                  <div class="c-trow"><div class="flex-1"><p class="c-name">Moqueca à Moda do Mancha</p><p class="c-sub">Filhote no leite de coco · caranguejo · camarão · arroz</p></div><span class="c-th c-price">R$200</span><span class="c-th c-price">R$380</span></div>
+                </div>
+              </div>
+
+              <!-- GRELHADOS -->
+              <div class="c-section">
+                <h4 class="c-title">GRELHADOS</h4>
+                <div class="c-table-head"><span class="flex-1">Prato</span><span class="c-th">2p</span><span class="c-th">4p</span></div>
+                <div class="c-table-rows">
+                  <div class="c-trow"><div class="flex-1"><p class="c-name">Filhote na Brasa</p></div><span class="c-th c-price">R$180</span><span class="c-th c-price">R$320</span></div>
+                  <div class="c-trow"><div class="flex-1"><p class="c-name">Cametá <small style="color:#888;">(Mapará Assado)</small></p></div><span class="c-th c-price">R$50</span><span class="c-th c-price">—</span></div>
+                  <div class="c-trow"><div class="flex-1"><p class="c-name">Picanha c/ Fritas</p></div><span class="c-th c-price">R$150</span><span class="c-th c-price">R$270</span></div>
+                  <div class="c-trow"><div class="flex-1"><p class="c-name">Tambaqui sem Espinha</p></div><span class="c-th c-price">R$150</span><span class="c-th c-price">R$280</span></div>
+                </div>
+                <p class="c-note">Peso dos produtos in natura</p>
+              </div>
+
+            </div><!-- /c-col-left -->
+
+            <!-- ─── COLUNA DIREITA ──────────────────────────── -->
+            <div class="c-col c-col-right">
+
+              <!-- EXECUTIVO -->
+              <div class="c-section">
+                <h4 class="c-title">EXECUTIVO <small class="c-title-note">de Ter a Sex · exceto feriado</small></h4>
+                <div class="c-items">
+                  <div class="c-row"><span class="c-name">Filé de Dourada <small class="c-small">(Frita)</small></span><span class="c-price">R$45</span></div>
+                  <div class="c-row"><span class="c-name">Filé de Gó <small class="c-small">(Frito)</small></span><span class="c-price">R$40</span></div>
+                  <div class="c-row"><span class="c-name">Filé de Filhote <small class="c-small">(Frita)</small></span><span class="c-price">R$95</span></div>
+                  <div class="c-row"><span class="c-name">Filé de Pirarucu Salgado <small class="c-small">(Frito)</small></span><span class="c-price">R$60</span></div>
+                  <div class="c-row"><span class="c-name">Picanha Assado de Brasa</span><span class="c-price">R$55</span></div>
+                  <div class="c-row"><span class="c-name">Charque <small class="c-small">(Frito)</small></span><span class="c-price">R$60</span></div>
+                </div>
+                <p class="c-note">Todos acompanham arroz, baião, vinagrete e farofa</p>
+              </div>
+
+              <!-- PORÇÃO EXTRA — box em destaque -->
+              <div class="c-section">
+                <h4 class="c-title c-title-red">PORÇÃO EXTRA</h4>
+                <div class="c-extra-box">
+                  <div class="c-row"><span class="c-name">Baião</span><span class="c-price">R$15</span></div>
+                  <div class="c-row"><span class="c-name">Arroz</span><span class="c-price">R$10</span></div>
+                  <div class="c-row"><span class="c-name">Farofa</span><span class="c-price">R$12</span></div>
+                  <div class="c-row"><span class="c-name">Vinagrete</span><span class="c-price">R$10</span></div>
+                  <div class="c-row"><span class="c-name">Feijão <small class="c-small">(fim de semana)</small></span><span class="c-price">R$10</span></div>
+                </div>
+              </div>
+
+              <!-- SOBREMESA -->
+              <div class="c-section">
+                <h4 class="c-title">SOBREMESA</h4>
+                <div class="c-items">
+                  <div class="c-row"><span class="c-name">Sorvete Taça</span><span class="c-price">R$35</span></div>
+                  <div class="c-row"><span class="c-name">Picolé</span><span class="c-price">R$10</span></div>
+                </div>
+              </div>
+
+              <!-- AÇAÍ -->
+              <div class="c-section">
+                <h4 class="c-title">AÇAÍ</h4>
+                <div class="c-items">
+                  <div class="c-row"><span class="c-name">Dose 300ml</span><span class="c-price">R$20</span></div>
+                  <div class="c-row"><span class="c-name">Jarra 1L</span><span class="c-price">R$50</span></div>
+                </div>
+              </div>
+
+              <!-- BEBIDAS -->
+              <div class="c-section">
+                <h4 class="c-title">BEBIDAS</h4>
+
+                <p class="c-category">Cervejas Puro Malte</p>
+                <div class="c-items">
+                  <div class="c-row"><span class="c-name">Heineken</span><span class="c-price">R$18</span></div>
+                  <div class="c-row"><span class="c-name">Amstel</span><span class="c-price">R$14</span></div>
+                  <div class="c-row"><span class="c-name">Devassa</span><span class="c-price">R$12</span></div>
+                </div>
+
+                <p class="c-category">Longneck</p>
+                <div class="c-items">
+                  <div class="c-row"><span class="c-name">Heineken / Zero</span><span class="c-price">R$12</span></div>
+                  <div class="c-row"><span class="c-name">Cerpa Export</span><span class="c-price">R$12</span></div>
+                  <div class="c-row"><span class="c-name">Budweiser</span><span class="c-price">R$10</span></div>
+                </div>
+
+                <p class="c-category">Não Alcoólicos</p>
+                <div class="c-items">
+                  <div class="c-row"><span class="c-name">Guaraná 1L</span><span class="c-price">R$12</span></div>
+                  <div class="c-row"><span class="c-name">Coca Lata / Zero</span><span class="c-price">R$7 / R$8</span></div>
+                  <div class="c-row"><span class="c-name">Guaraná Lata</span><span class="c-price">R$7</span></div>
+                  <div class="c-row"><span class="c-name">Água s/ Gás</span><span class="c-price">R$5</span></div>
+                  <div class="c-row"><span class="c-name">Água c/ Gás</span><span class="c-price">R$6</span></div>
+                  <div class="c-row"><span class="c-name">H2OH Limão / Limoneto</span><span class="c-price">R$7</span></div>
+                </div>
+
+                <p class="c-category">Suco 340ml</p>
+                <div class="c-items">
+                  <div class="c-row"><span class="c-name">Manga / Cupuaçu</span><span class="c-price">R$10</span></div>
+                  <div class="c-row"><span class="c-name">Laranja / Morango</span><span class="c-price">R$12</span></div>
+                  <div class="c-row"><span class="c-name">Goiaba</span><span class="c-price">R$10</span></div>
+                </div>
+              </div>
+
+            </div><!-- /c-col-right -->
+
+          </div><!-- /cardapio-body -->
+
+          <!-- Rodapé do cartão -->
+          <div class="cardapio-bottom">
+            <span>🐟 Peixes selecionados diariamente, sempre frescos</span>
+            <span>📍 Marambaia · Belém — PA</span>
+          </div>
+
+        </div><!-- /cardapio-card -->
+      </div><!-- /cardapio-wrapper -->
+
+      <!-- CTA -->
+      <div class="mt-12 flex flex-col sm:flex-row items-center justify-center gap-5 fade-up">
+        <a href="https://wa.me/5591982696928?text=Ola!+Quero+reservar+uma+mesa" target="_blank" rel="noopener noreferrer"
+          class="inline-flex items-center gap-3 bg-[#FF5722] hover:bg-[#e64a19] text-white font-bold px-10 py-4 rounded-2xl transition-all shadow-2xl shadow-[#FF5722]/40 hover:shadow-[#FF5722]/60 hover:-translate-y-1 text-base">
+          <span class="material-symbols-outlined">restaurant</span>
+          Reservar Mesa pelo WhatsApp
+        </a>
+        <div class="text-white/40 text-sm text-center">Restaurante aberto:<br>Ter–Dom · 11h às 20h</div>
+      </div>
+
+    </div><!-- /container -->
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════════════════
+       ESTILOS DO CARDÁPIO PREMIUM
+       ══════════════════════════════════════════════════════════════════ -->
+  <style>
+    /* ── Cena de fundo ─────────────────────────────────────────────── */
+    .menu-scene {
+      position: relative;
+      padding: 80px 0 100px;
+      overflow: hidden;
+    }
+    .menu-scene-bg {
+      position: absolute;
+      inset: 0;
+      /* Fundo: madeira escura queimada — simulada com gradientes e padrão */
+      background:
+        repeating-linear-gradient(
+          92deg,
+          rgba(255,255,255,0.012) 0px,
+          rgba(255,255,255,0.012) 1px,
+          transparent  1px,
+          transparent 80px
+        ),
+        repeating-linear-gradient(
+          180deg,
+          rgba(0,0,0,0.18) 0px,
+          rgba(0,0,0,0.18) 1px,
+          transparent  1px,
+          transparent 6px
+        ),
+        linear-gradient(160deg,
+          #1a0e08 0%,
+          #2c1a0e 25%,
+          #1e1208 50%,
+          #2a1a0a 75%,
+          #160b05 100%
+        );
+      z-index: 0;
+    }
+    .menu-scene-overlay {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 70% 50% at 50% 0%, rgba(245,166,35,0.08) 0%, transparent 70%),
+        radial-gradient(ellipse 50% 60% at 100% 80%, rgba(255,87,34,0.07) 0%, transparent 70%),
+        radial-gradient(ellipse 40% 40% at 0% 50%, rgba(180,80,20,0.06) 0%, transparent 60%);
+      z-index: 1;
+    }
+    /* Brasas flutuantes */
+    .menu-ember {
+      position: absolute;
+      border-radius: 50%;
+      pointer-events: none;
+      animation: ember-float 8s ease-in-out infinite;
+      z-index: 2;
+    }
+    .menu-ember-1 {
+      width: 180px; height: 180px;
+      top: 10%; left: 5%;
+      background: radial-gradient(circle, rgba(255,160,40,0.15) 0%, transparent 70%);
+      filter: blur(30px);
+      animation-duration: 9s;
+    }
+    .menu-ember-2 {
+      width: 280px; height: 280px;
+      top: 50%; right: 3%;
+      background: radial-gradient(circle, rgba(255,87,34,0.12) 0%, transparent 70%);
+      filter: blur(50px);
+      animation-duration: 12s;
+      animation-delay: -3s;
+    }
+    .menu-ember-3 {
+      width: 140px; height: 140px;
+      bottom: 10%; left: 30%;
+      background: radial-gradient(circle, rgba(240,140,20,0.10) 0%, transparent 70%);
+      filter: blur(25px);
+      animation-duration: 7s;
+      animation-delay: -5s;
+    }
+    @keyframes ember-float {
+      0%, 100% { transform: translateY(0) scale(1); opacity: 0.7; }
+      50% { transform: translateY(-30px) scale(1.15); opacity: 1; }
+    }
+
+    /* ── Wrapper + sombra do cardápio ──────────────────────────────── */
+    .cardapio-wrapper {
+      position: relative;
+      max-width: 960px;
+      margin: 0 auto;
+      z-index: 10;
+    }
+    /* Sombra "derramada" na superfície abaixo do cardápio */
+    .cardapio-shadow {
+      position: absolute;
+      bottom: -28px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 88%;
+      height: 60px;
+      background: rgba(0,0,0,0.55);
+      filter: blur(28px);
+      border-radius: 50%;
+      z-index: 0;
+    }
+
+    /* ── O Cardápio ─────────────────────────────────────────────────── */
+    .cardapio-card {
+      position: relative;
+      z-index: 1;
+      border-radius: 16px;
+      overflow: hidden;
+      /* Textura de papel envelhecido */
+      background:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.06'/%3E%3C/svg%3E"),
+        linear-gradient(160deg, #fdf8f0 0%, #faf3e2 40%, #f8efd8 70%, #f4e8cc 100%);
+      /* Efeito 3D em camadas */
+      box-shadow:
+        0 1px 0   1px #d4a84b,
+        0 3px 0   1px #c49540,
+        0 5px 0   1px #b48030,
+        0 7px 0   1px #a06820,
+        0 10px 0  1px #8a5510,
+        0 14px 30px rgba(0,0,0,0.65),
+        0 28px 60px rgba(0,0,0,0.45),
+        0 50px 90px rgba(0,0,0,0.25),
+        inset 0 1px 0 rgba(255,255,255,0.95);
+      transform: perspective(2000px) rotateX(1.8deg);
+      transform-origin: top center;
+      transition: transform 0.5s cubic-bezier(0.23,1,0.32,1),
+                  box-shadow 0.5s cubic-bezier(0.23,1,0.32,1);
+      border: 1.5px solid rgba(200,160,80,0.6);
+    }
+    .cardapio-card:hover {
+      transform: perspective(2000px) rotateX(0deg) translateY(-6px);
+      box-shadow:
+        0 1px 0   1px #d4a84b,
+        0 3px 0   1px #c49540,
+        0 5px 0   1px #b48030,
+        0 7px 0   1px #a06820,
+        0 10px 0  1px #8a5510,
+        0 20px 40px rgba(0,0,0,0.70),
+        0 36px 72px rgba(0,0,0,0.52),
+        0 64px 110px rgba(0,0,0,0.30);
+    }
+
+    /* ── Topo do cardápio (faixa amarela) ─────────────────────────── */
+    .cardapio-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 28px 14px;
+      background: linear-gradient(135deg, #F5A623 0%, #e89218 50%, #d4820c 100%);
+      border-bottom: 3px solid rgba(0,0,0,0.15);
+    }
+    .ct-logo {
+      width: 56px; height: 56px;
+      object-fit: contain;
+      border-radius: 8px;
+      background: rgba(255,255,255,0.85);
+      padding: 4px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    }
+    .ct-brand {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 15px;
+      font-weight: 900;
+      color: #1a0a00;
+      letter-spacing: 0.04em;
+      line-height: 1.2;
+    }
+    .ct-tagline {
+      font-size: 9px;
+      font-weight: 700;
+      color: rgba(0,0,0,0.55);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-top: 1px;
+    }
+    .ct-devassa { text-align: right; }
+    .ct-devassa-name {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 22px;
+      font-weight: 900;
+      color: #1a0a00;
+      letter-spacing: 0.06em;
+      line-height: 1;
+    }
+    .ct-devassa-sub {
+      font-size: 9px;
+      font-weight: 700;
+      color: rgba(0,0,0,0.6);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+    }
+    .ct-devassa-italic { font-style: italic; color: rgba(0,0,0,0.45); }
+
+    /* ── Faixa decorativa ─────────────────────────────────────────── */
+    .cardapio-stripe {
+      height: 4px;
+      background: repeating-linear-gradient(
+        90deg,
+        #c0392b 0px, #c0392b 20px,
+        #F5A623 20px, #F5A623 40px,
+        #1a0a00 40px, #1a0a00 60px
+      );
+      opacity: 0.85;
+    }
+
+    /* ── Corpo do cardápio ─────────────────────────────────────────── */
+    .cardapio-body {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+    }
+    @media (max-width: 700px) {
+      .cardapio-body { grid-template-columns: 1fr; }
+    }
+    .c-col {
+      padding: 20px 22px 24px;
+    }
+    .c-col-left {
+      border-right: 1.5px solid rgba(180,130,60,0.25);
+    }
+
+    /* ── Seções ─────────────────────────────────────────────────────── */
+    .c-section { margin-bottom: 16px; }
+    .c-title {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 0.10em;
+      text-transform: uppercase;
+      color: #1a0a00;
+      padding-bottom: 5px;
+      margin-bottom: 7px;
+      border-bottom: 2px solid #c0392b;
+      display: flex;
+      align-items: baseline;
+      gap: 6px;
+    }
+    .c-title-note {
+      font-size: 8px;
+      font-weight: 500;
+      text-transform: none;
+      letter-spacing: 0.03em;
+      color: #888;
+    }
+    .c-title-red { color: #c0392b; border-color: #c0392b; }
+    .c-category {
+      font-size: 8.5px;
+      font-weight: 800;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: #c0392b;
+      margin: 8px 0 3px;
+    }
+
+    /* ── Linhas de item ─────────────────────────────────────────────── */
+    .c-items { display: flex; flex-direction: column; gap: 0; }
+    .c-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 6px;
+      padding: 3px 0;
+      border-bottom: 1px dashed rgba(170,120,50,0.22);
+    }
+    .c-row:last-child { border-bottom: none; }
+    .c-name {
+      font-size: 11px;
+      font-weight: 600;
+      color: #1c1008;
+      flex: 1;
+      line-height: 1.3;
+    }
+    .c-sub {
+      font-size: 9px;
+      color: #998060;
+      font-style: italic;
+      line-height: 1.2;
+    }
+    .c-price {
+      font-size: 11px;
+      font-weight: 900;
+      color: #c0392b;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .c-small { font-size: 9px; color: #888; font-style: normal; }
+    .c-note {
+      font-size: 8.5px;
+      color: #a89070;
+      font-style: italic;
+      margin-top: 4px;
+    }
+
+    /* ── Tabela 2p / 4p ─────────────────────────────────────────────── */
+    .c-table-head {
+      display: flex;
+      align-items: center;
+      font-size: 8px;
+      font-weight: 900;
+      color: #c0392b;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding-bottom: 4px;
+      border-bottom: 1px solid rgba(170,120,50,0.3);
+      margin-bottom: 3px;
+    }
+    .c-th { width: 40px; text-align: right; flex-shrink: 0; }
+    .c-table-rows { display: flex; flex-direction: column; gap: 0; }
+    .c-trow {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 0;
+      border-bottom: 1px dashed rgba(170,120,50,0.18);
+    }
+    .c-trow:last-child { border-bottom: none; }
+    .c-trow-special { background: rgba(245,166,35,0.06); border-radius: 4px; padding: 4px 4px; }
+
+    /* ── Porção Extra: caixa destacada ──────────────────────────────── */
+    .c-extra-box {
+      background: linear-gradient(135deg, rgba(245,166,35,0.10) 0%, rgba(245,166,35,0.04) 100%);
+      border: 1px solid rgba(192,57,43,0.18);
+      border-radius: 8px;
+      padding: 10px 12px;
+    }
+
+    /* ── Rodapé do cartão ────────────────────────────────────────────── */
+    .cardapio-bottom {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 4px;
+      padding: 10px 24px;
+      background: linear-gradient(135deg, #eeddc0, #f5e8cc);
+      border-top: 2px solid rgba(180,130,60,0.3);
+      font-size: 10px;
+      font-weight: 700;
+      color: #7a5c20;
+      letter-spacing: 0.03em;
+    }
+  </style>
+
+  <!-- ══ SOBRE NÓS ══════════════════════════════════════════════════════ -->
+  <section id="sobre" class="py-24 bg-surface-container-low border-y border-outline-variant/10 relative">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid md:grid-cols-2 gap-12 items-center">
+      <div class="order-2 md:order-1 relative rounded-[2rem] overflow-hidden shadow-2xl h-[500px] fade-up">
+        <img src="Fotos/Donos.jpg" alt="Equipe Peixaria Mancha" class="w-full h-full object-cover">
+        <div class="absolute bottom-6 right-6 bg-white p-4 rounded-xl shadow-lg border border-outline-variant/10 max-w-xs rotate-2">
+          <p class="font-headline font-bold text-primary-dim italic text-sm">"Trabalhamos duro para servir a sua família com o mesmo amor que servimos a nossa."</p>
+        </div>
+      </div>
+      <div class="order-1 md:order-2 fade-up">
+        <span class="inline-block font-bold text-xs uppercase tracking-widest text-tertiary mb-4">Nossa História</span>
+        <h2 class="font-headline font-extrabold text-4xl md:text-5xl tracking-tight text-primary-dim mb-6">Tradição <span class="text-tertiary">Peixaria Mancha</span></h2>
+        <p class="text-on-surface-variant leading-relaxed mb-4">
+          Desde 2008 servindo o melhor para você! Nosso compromisso começou em uma pequena feira na Marambaia e, através do sabor inconfundível, do frescor diário e de muita dedicação, conquistamos o coração de quem prova nossa comida.
+        </p>
+        <p class="text-on-surface-variant leading-relaxed mb-8">
+          Buscamos não apenas saciar a fome, mas proporcionar uma experiência gastronômica agradável, combinando o dom culinário regional com um atendimento amigável e atencioso.
+        </p>
+        <div class="flex flex-col gap-3">
+          <div class="flex items-center gap-3 text-sm font-semibold text-on-surface">
+            <span class="material-symbols-outlined text-tertiary text-[20px]">check_circle</span>
+            Selecionamos o melhor peixe para você
+          </div>
+          <div class="flex items-center gap-3 text-sm font-semibold text-on-surface">
+            <span class="material-symbols-outlined text-tertiary text-[20px]">groups</span>
+            Ambiente pensado para receber toda a família
+          </div>
+          <div class="flex items-center gap-3 text-sm font-semibold text-on-surface">
+            <span class="material-symbols-outlined text-tertiary text-[20px]">workspace_premium</span>
+            Tradição comprovada por gerações
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ GALERIA ════════════════════════════════════════════════════════ -->
+  <section id="galeria" class="py-24 bg-surface">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-14 fade-up">
+        <span class="inline-block font-bold text-xs uppercase tracking-widest text-tertiary mb-4">Nossa Galeria</span>
+        <h2 class="font-headline font-extrabold text-4xl md:text-5xl tracking-tight text-primary-dim">Momentos que <span class="text-tertiary">encantam</span></h2>
+        <p class="text-on-surface-variant mt-4 max-w-xl mx-auto">Veja de perto a qualidade dos nossos peixes, o ambiente acolhedor e os pratos que fazem de cada refeição uma experiência única.</p>
+      </div>
+      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 fade-up">
+        <div class="relative rounded-2xl overflow-hidden h-52 group cursor-pointer col-span-2 row-span-2">
+          <img src="Fotos/tambaqui.jpg" alt="Tambaqui na brasa" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+          <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
+            <span class="text-white font-bold text-sm">Tambaqui na Brasa</span>
+          </div>
+        </div>
+        <div class="relative rounded-2xl overflow-hidden h-52 group cursor-pointer">
+          <img src="Fotos/Executivo.jpg" alt="Prato Executivo" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+        </div>
+        <div class="relative rounded-2xl overflow-hidden h-52 group cursor-pointer">
+          <img src="Fotos/EspaçoExterno.jpg" alt="Espaço externo" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+        </div>
+        <div class="relative rounded-2xl overflow-hidden h-52 group cursor-pointer">
+          <img src="Fotos/Feira01.jpeg" alt="Feira da Mancha" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+        </div>
+        <div class="relative rounded-2xl overflow-hidden h-52 group cursor-pointer">
+          <img src="Fotos/Restaurante01.jpg" alt="Ambiente do restaurante" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+        </div>
+        <div class="relative rounded-2xl overflow-hidden h-52 group cursor-pointer">
+          <img src="Fotos/Executivo02.jpg" alt="Pratos do dia" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+        </div>
+        <div class="relative rounded-2xl overflow-hidden h-52 group cursor-pointer">
+          <img src="Fotos/Feira03.jpeg" alt="Seleção de peixes" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ DEPOIMENTOS ════════════════════════════════════════════════════ -->
+  <section id="depoimentos" class="py-24 bg-surface-container-low">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-14 fade-up">
+        <span class="inline-block font-bold text-xs uppercase tracking-widest text-tertiary mb-4">Depoimentos</span>
+        <h2 class="font-headline font-extrabold text-4xl md:text-5xl tracking-tight text-primary-dim">O que nossos <span class="text-tertiary">clientes dizem</span></h2>
+        <div class="flex items-center justify-center gap-2 mt-4">
+          <div class="flex gap-0.5">
+            <span class="material-symbols-outlined text-amber-400 text-[18px]" style="font-variation-settings:'FILL' 1">star</span>
+            <span class="material-symbols-outlined text-amber-400 text-[18px]" style="font-variation-settings:'FILL' 1">star</span>
+            <span class="material-symbols-outlined text-amber-400 text-[18px]" style="font-variation-settings:'FILL' 1">star</span>
+            <span class="material-symbols-outlined text-amber-400 text-[18px]" style="font-variation-settings:'FILL' 1">star</span>
+            <span class="material-symbols-outlined text-amber-400 text-[18px]" style="font-variation-settings:'FILL' 1">star</span>
+          </div>
+          <span class="font-bold text-primary-dim">4.9 no Google</span>
+          <span class="text-on-surface-variant text-sm">· +500 avaliações</span>
+        </div>
+      </div>
+      <div class="grid md:grid-cols-3 gap-6 fade-up">
+        <div class="bg-white rounded-2xl p-6 shadow-sm border border-outline-variant/10 flex flex-col gap-4">
+          <div class="flex gap-0.5">
+            <span class="material-symbols-outlined text-amber-400 text-[16px]" style="font-variation-settings:'FILL' 1">star</span>
+            <span class="material-symbols-outlined text-amber-400 text-[16px]" style="font-variation-settings:'FILL' 1">star</span>
+            <span class="material-symbols-outlined text-amber-400 text-[16px]" style="font-variation-settings:'FILL' 1">star</span>
+            <span class="material-symbols-outlined text-amber-400 text-[16px]" style="font-variation-settings:'FILL' 1">star</span>
+            <span class="material-symbols-outlined text-amber-400 text-[16px]" style="font-variation-settings:'FILL' 1">star</span>
+          </div>
+          <p class="text-on-surface-variant text-sm leading-relaxed">"Melhor peixaria de Belém! O Filé de Dourada Caldeirada é simplesmente incrível, e o ambiente é muito familiar. Já virei cliente fiel!"</p>
+          <div class="flex items-center gap-3 mt-auto">
+            <img src="Fotos/clientes/Carol.jpg" alt="Carolina" class="w-10 h-10 rounded-full object-cover border-2 border-tertiary/30">
+            <div><p class="font-bold text-sm text-on-surface">Carolina S.</p><p class="text-xs text-on-surface-variant">Google Reviews</p></div>
+          </div>
+        </div>
+        <div class="bg-white rounded-2xl p-6 shadow-sm border border-outline-variant/10 flex flex-col gap-4">
+          <div class="flex gap-0.5">
+            <span class="material-symbols-outlined text-amber-400 text-[16px]" style="font-variation-settings:'FILL' 1">star</span>
+            <span class="material-symbols-outlined text-amber-400 text-[16px]" style="font-variation-settings:'FILL' 1">star</span>
+            <span class="material-symbols-outlined text-amber-400 text-[16px]" style="font-variation-settings:'FILL' 1">star</span>
+            <span class="material-symbols-outlined text-amber-400 text-[16px]" style="font-variation-settings:'FILL' 1">star</span>
+            <span class="material-symbols-outlined text-amber-400 text-[16px]" style="font-variation-settings:'FILL' 1">star</span>
+          </div>
+          <p class="text-on-surface-variant text-sm leading-relaxed">"Fui com a família no sábado e foi uma experiência incrível. Show ao vivo, açaí incluso e um Tambaqui na Brasa que eu não vou esquecer tão cedo. Top demais!"</p>
+          <div class="flex items-center gap-3 mt-auto">
+            <img src="Fotos/clientes/Manoel.jpg" alt="Manoel" class="w-10 h-10 rounded-full object-cover border-2 border-tertiary/30">
+            <div><p class="font-bold text-sm text-on-surface">Manoel R.</p><p class="text-xs text-on-surface-variant">Google Reviews</p></div>
+          </div>
+        </div>
+        <div class="bg-white rounded-2xl p-6 shadow-sm border border-outline-variant/10 flex flex-col gap-4">
+          <div class="flex gap-0.5">
+            <span class="material-symbols-outlined text-amber-400 text-[16px]" style="font-variation-settings:'FILL' 1">star</span>
+            <span class="material-symbols-outlined text-amber-400 text-[16px]" style="font-variation-settings:'FILL' 1">star</span>
+            <span class="material-symbols-outlined text-amber-400 text-[16px]" style="font-variation-settings:'FILL' 1">star</span>
+            <span class="material-symbols-outlined text-amber-400 text-[16px]" style="font-variation-settings:'FILL' 1">star</span>
+            <span class="material-symbols-outlined text-amber-400 text-[16px]" style="font-variation-settings:'FILL' 1">star</span>
+          </div>
+          <p class="text-on-surface-variant text-sm leading-relaxed">"Atendimento excelente e peixe muito fresco. O Prato Executivo é um custo-benefício absurdo. Recomendo para toda a família e amigos!"</p>
+          <div class="flex items-center gap-3 mt-auto">
+            <img src="Fotos/clientes/Bia.jpg" alt="Beatriz" class="w-10 h-10 rounded-full object-cover border-2 border-tertiary/30">
+            <div><p class="font-bold text-sm text-on-surface">Beatriz M.</p><p class="text-xs text-on-surface-variant">Google Reviews</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ CONTATO ════════════════════════════════════════════════════════ -->
+  <section id="contato" class="py-24 bg-surface">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid md:grid-cols-2 gap-12 items-start">
+      <div class="fade-up">
+        <span class="inline-block font-bold text-xs uppercase tracking-widest text-tertiary mb-4">Contato & Localização</span>
+        <h2 class="font-headline font-extrabold text-4xl md:text-5xl tracking-tight text-primary-dim mb-6">Venha <span class="text-tertiary">nos visitar</span></h2>
+        <div class="flex flex-col gap-5 mt-8">
+          <div class="flex items-start gap-4">
+            <div class="w-12 h-12 rounded-xl bg-tertiary/10 flex items-center justify-center shrink-0">
+              <span class="material-symbols-outlined text-tertiary">location_on</span>
+            </div>
+            <div>
+              <p class="font-bold text-on-surface mb-1">Endereço</p>
+              <p class="text-on-surface-variant text-sm">R. dos Mundurucus, 2576 — Loja 1<br>Marambaia, Belém — PA</p>
+            </div>
+          </div>
+          <div class="flex items-start gap-4">
+            <div class="w-12 h-12 rounded-xl bg-tertiary/10 flex items-center justify-center shrink-0">
+              <span class="material-symbols-outlined text-tertiary">schedule</span>
+            </div>
+            <div>
+              <p class="font-bold text-on-surface mb-1">Horários</p>
+              <p class="text-on-surface-variant text-sm"><strong>Restaurante:</strong> Ter–Dom · 11h às 20h<br><strong>Delivery:</strong> Seg–Dom · 10h às 22h</p>
+            </div>
+          </div>
+          <div class="flex items-start gap-4">
+            <div class="w-12 h-12 rounded-xl bg-tertiary/10 flex items-center justify-center shrink-0">
+              <span class="material-symbols-outlined text-tertiary">phone</span>
+            </div>
+            <div>
+              <p class="font-bold text-on-surface mb-1">Telefone / WhatsApp</p>
+              <a href="https://wa.me/5591982696928" target="_blank" rel="noopener noreferrer" class="text-tertiary font-semibold text-sm hover:underline">(91) 98269-6928</a>
+            </div>
+          </div>
+        </div>
+        <a href="https://wa.me/5591982696928?text=Ola!+Quero+reservar+uma+mesa" target="_blank" rel="noopener noreferrer"
+          class="mt-8 inline-flex items-center gap-3 bg-tertiary hover:bg-[#e64a19] text-white font-bold px-8 py-4 rounded-xl transition-all shadow-lg hover:-translate-y-0.5">
+          <span class="material-symbols-outlined">restaurant</span>
+          Quero reservar uma mesa
+        </a>
+      </div>
+      <div class="fade-up rounded-2xl overflow-hidden shadow-xl h-96 border border-outline-variant/10">
+        <iframe
+          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3988.5!2d-48.5!3d-1.45!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zPeixaria+Mancha!5e0!3m2!1spt-BR!2sbr!4v1"
+          width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"
+          referrerpolicy="no-referrer-when-downgrade" title="Localização Peixaria Mancha">
+        </iframe>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ FOOTER ════════════════════════════════════════════════════════ -->
+  <footer class="bg-primary-dim text-white py-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid md:grid-cols-3 gap-10 pb-10 border-b border-white/10">
+        <div>
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-10 h-10 rounded-full overflow-hidden border-2 border-tertiary">
+              <img src="Fotos/logo.png" alt="Logo" class="w-full h-full object-cover">
+            </div>
+            <span class="font-headline font-extrabold text-xl">Peixaria Mancha</span>
+          </div>
+          <p class="text-white/60 text-sm leading-relaxed">Culinária amazônica de raiz desde 2008. Qualidade, sabor e tradição em cada prato.</p>
+        </div>
+        <div>
+          <p class="font-bold uppercase tracking-widest text-xs text-white/40 mb-4">Navegação</p>
+          <div class="flex flex-col gap-2">
+            <a href="#sobre" class="text-white/70 hover:text-white text-sm transition-colors">Sobre Nós</a>
+            <a href="#cardapio-restaurante" class="text-white/70 hover:text-white text-sm transition-colors">Cardápio</a>
+            <a href="#eventos" class="text-white/70 hover:text-white text-sm transition-colors">Eventos</a>
+            <a href="#galeria" class="text-white/70 hover:text-white text-sm transition-colors">Galeria</a>
+            <a href="#depoimentos" class="text-white/70 hover:text-white text-sm transition-colors">Depoimentos</a>
+            <a href="#contato" class="text-white/70 hover:text-white text-sm transition-colors">Contato</a>
+          </div>
+        </div>
+        <div>
+          <p class="font-bold uppercase tracking-widest text-xs text-white/40 mb-4">Horários</p>
+          <div class="flex flex-col gap-1 text-sm text-white/70">
+            <p><strong class="text-white">Restaurante:</strong> Ter–Dom · 11h–20h</p>
+            <p><strong class="text-white">Delivery:</strong> Seg–Dom · 10h–22h</p>
+            <p class="mt-3"><strong class="text-white">Endereço:</strong></p>
+            <p>R. dos Mundurucus, 2576 — Loja 1<br>Marambaia, Belém — PA</p>
+          </div>
+          <div class="flex gap-3 mt-6">
+            <a href="https://wa.me/5591982696928" target="_blank" rel="noopener noreferrer"
+              class="w-10 h-10 rounded-full bg-white/10 hover:bg-tertiary flex items-center justify-center transition-colors"
+              aria-label="WhatsApp">
+              <span class="material-symbols-outlined text-[20px]">chat</span>
+            </a>
+            <a href="https://www.instagram.com/peixariamancha" target="_blank" rel="noopener noreferrer"
+              class="w-10 h-10 rounded-full bg-white/10 hover:bg-tertiary flex items-center justify-center transition-colors"
+              aria-label="Instagram">
+              <span class="material-symbols-outlined text-[20px]">photo_camera</span>
+            </a>
+          </div>
+        </div>
+      </div>
+      <div class="pt-8 flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-white/40">
+        <p>© 2025 Peixaria Mancha. Todos os direitos reservados.</p>
+        <div class="flex gap-4">
+          <a href="/privacidade.html" class="hover:text-white/70 transition-colors">Política de Privacidade</a>
+          <a href="/termos.html" class="hover:text-white/70 transition-colors">Termos de Uso</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- WhatsApp flutuante -->
+  <a href="https://wa.me/5591982696928" target="_blank" rel="noopener noreferrer"
+    class="fixed bottom-6 right-6 z-50 w-14 h-14 bg-[#25D366] rounded-full flex items-center justify-center shadow-xl hover:scale-110 transition-transform"
+    aria-label="Falar no WhatsApp">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white" class="w-7 h-7">
+      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+    </svg>
+  </a>
+
+  <script src="script.js"></script>
+</body>
+</html>
