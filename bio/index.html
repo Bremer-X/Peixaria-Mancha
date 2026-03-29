@@ -55,13 +55,16 @@
       height: 78px;
       margin: 0 auto 12px;
       border-radius: 22px;
-      display: grid;
-      place-items: center;
-      color: #fff;
-      font-size: 33px;
-      font-weight: 800;
-      background: linear-gradient(135deg, var(--accent), #ff8a33);
+      overflow: hidden;
+      background: #fff;
       box-shadow: 0 12px 28px rgba(255, 106, 45, .35);
+    }
+
+    .logo img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
     }
 
     h1 {
@@ -200,7 +203,9 @@
   -->
   <main class="container">
     <section class="hero">
-      <div class="logo">PM</div>
+      <div class="logo">
+        <img src="../Fotos/logo2.jpg" alt="Logo Peixaria Mancha" />
+      </div>
       <h1>Peixaria Mancha</h1>
       <p class="subtitle">Tudo em um clique para quem veio do Instagram.</p>
     </section>
