@@ -331,3 +331,38 @@ html {
 .galeria-item {
   cursor: pointer;
 }
+
+/* =============================================
+   MOBILE NAV - ALINHADO AO PADRÃO DESKTOP
+   ============================================= */
+#mobile-menu {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-color: rgba(196, 199, 199, 0.35);
+}
+
+#mobile-menu-btn {
+  color: #1a1a1a;
+}
+
+#mobile-menu-btn:hover,
+#mobile-menu-btn:focus-visible {
+  color: #0077b6;
+  background: rgba(0, 119, 182, 0.08);
+}
+
+#mobile-menu .mobile-link:not(.bg-tertiary) {
+  color: #1a1a1a;
+  border-radius: 0.5rem;
+}
+
+#mobile-menu .mobile-link:not(.bg-tertiary):hover,
+#mobile-menu .mobile-link:not(.bg-tertiary):focus-visible {
+  color: #0077b6;
+  background: rgba(0, 119, 182, 0.08);
+}
+
+#mobile-menu .mobile-link.text-tertiary {
+  color: #FF5722;
+}
