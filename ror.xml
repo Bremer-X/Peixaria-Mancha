@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:ror="http://rorweb.com/0.1/" >
+<channel>
+  <title>ROR Sitemap for https://peixariamancha.com/</title>
+  <link>https://peixariamancha.com/</link>
+
+<item>
+     <link>https://peixariamancha.com/</link>
+     <title>Peixaria Mancha | Frutos do Mar em Belém</title>
+     <description>A melhor peixaria e restaurante da Marambaia. Qualidade, sabor e tradição em peixes e frutos do mar frescos desde 2008. Peça online ou reserve sua mesa!</description>
+     <ror:updatePeriod></ror:updatePeriod>
+     <ror:sortOrder>0</ror:sortOrder>
+     <ror:resourceOf>sitemap</ror:resourceOf>
+</item>
+<item>
+     <link>https://peixariamancha.com/privacidade.html</link>
+     <title>Política de Privacidade | Peixaria Mancha</title>
+     <description>Política de Privacidade | Peixaria Mancha</description>
+     <ror:updatePeriod></ror:updatePeriod>
+     <ror:sortOrder>1</ror:sortOrder>
+     <ror:resourceOf>sitemap</ror:resourceOf>
+</item>
+<item>
+     <link>https://peixariamancha.com/termos.html</link>
+     <title>Termos de Uso | Peixaria Mancha</title>
+     <description>Termos de Uso | Peixaria Mancha</description>
+     <ror:updatePeriod></ror:updatePeriod>
+     <ror:sortOrder>1</ror:sortOrder>
+     <ror:resourceOf>sitemap</ror:resourceOf>
+</item>
+<item>
+     <link>https://peixariamancha.com/index.html</link>
+     <title>Peixaria Mancha | Frutos do Mar em Belém</title>
+     <description>A melhor peixaria e restaurante da Marambaia. Qualidade, sabor e tradição em peixes e frutos do mar frescos desde 2008. Peça online ou reserve sua mesa!</description>
+     <ror:updatePeriod></ror:updatePeriod>
+     <ror:sortOrder>2</ror:sortOrder>
+     <ror:resourceOf>sitemap</ror:resourceOf>
+</item>
+</channel>
+</rss>
+  
