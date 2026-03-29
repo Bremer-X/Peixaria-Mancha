@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Peixaria Mancha | Link da Bio</title>
+  <meta name="description" content="Delivery, reserva de mesa e acesso rápido ao site da Peixaria Mancha." />
+  <style>
+    :root {
+      --bg: #fff7ef;
+      --bg-soft: #ffe8d3;
+      --text: #18212b;
+      --muted: #4c5a68;
+      --accent: #ff6a2d;
+      --accent-dark: #e3551c;
+      --card: #ffffff;
+      --line: #ffd7bf;
+      --shadow: 0 20px 45px rgba(24, 33, 43, 0.14);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Segoe UI", "Manrope", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 5% 0%, #ffe4d0 0%, transparent 36%),
+        radial-gradient(circle at 95% 100%, #ffe9d7 0%, transparent 40%),
+        linear-gradient(160deg, var(--bg) 0%, #fff 100%);
+      padding: 24px 16px 42px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 520px;
+      margin: 0 auto;
+      display: grid;
+      gap: 18px;
+    }
+
+    .hero {
+      background: linear-gradient(145deg, #fff, var(--bg-soft));
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      padding: 26px 22px;
+      box-shadow: var(--shadow);
+      text-align: center;
+      animation: rise .7s ease-out both;
+    }
+
+    .logo {
+      width: 78px;
+      height: 78px;
+      margin: 0 auto 12px;
+      border-radius: 22px;
+      display: grid;
+      place-items: center;
+      color: #fff;
+      font-size: 33px;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--accent), #ff8a33);
+      box-shadow: 0 12px 28px rgba(255, 106, 45, .35);
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 1.7rem;
+      letter-spacing: -0.02em;
+    }
+
+    .subtitle {
+      margin: 8px 0 0;
+      color: var(--muted);
+      line-height: 1.5;
+      font-size: .98rem;
+    }
+
+    .actions {
+      display: grid;
+      gap: 12px;
+      animation: rise .85s ease-out both;
+    }
+
+    .button {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      text-decoration: none;
+      border-radius: 16px;
+      border: 1px solid transparent;
+      font-weight: 700;
+      font-size: 1rem;
+      padding: 16px 18px;
+      transition: transform .18s ease, box-shadow .2s ease, background-color .2s ease, border-color .2s ease;
+    }
+
+    .button:hover {
+      transform: translateY(-2px);
+    }
+
+    .button-primary {
+      background: linear-gradient(135deg, var(--accent), #ff8345);
+      color: #fff;
+      box-shadow: 0 14px 25px rgba(255, 106, 45, 0.28);
+    }
+
+    .button-primary:hover {
+      background: linear-gradient(135deg, var(--accent-dark), #ff7a3b);
+    }
+
+    .button-secondary {
+      background: #fff;
+      color: var(--text);
+      border-color: var(--line);
+      box-shadow: 0 10px 20px rgba(25, 34, 43, 0.08);
+    }
+
+    .button-secondary:hover {
+      border-color: #ffc2a0;
+    }
+
+    .map-card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      animation: rise 1s ease-out both;
+    }
+
+    .map-header {
+      padding: 16px 18px;
+      border-bottom: 1px solid #ffe4d2;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .map-header h2 {
+      margin: 0;
+      font-size: 1.05rem;
+    }
+
+    .map-header p {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: .92rem;
+    }
+
+    iframe {
+      width: 100%;
+      height: 320px;
+      border: 0;
+      display: block;
+    }
+
+    .open-maps {
+      text-decoration: none;
+      color: var(--accent-dark);
+      font-weight: 700;
+      font-size: .88rem;
+      white-space: nowrap;
+    }
+
+    .open-maps:hover {
+      text-decoration: underline;
+    }
+
+    footer {
+      text-align: center;
+      color: #6a7480;
+      font-size: .84rem;
+      margin-top: 6px;
+      animation: rise 1.1s ease-out both;
+    }
+
+    @keyframes rise {
+      from {
+        opacity: 0;
+        transform: translateY(14px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+</head>
+<body>
+  <!--
+    Ajuste rápido dos links:
+    - Delivery: botão de pedido
+    - Reserva: botão de reserva de mesa
+    - Site: domínio principal
+  -->
+  <main class="container">
+    <section class="hero">
+      <div class="logo">PM</div>
+      <h1>Peixaria Mancha</h1>
+      <p class="subtitle">Tudo em um clique para quem veio do Instagram.</p>
+    </section>
+
+    <section class="actions" aria-label="Links principais">
+      <a class="button button-primary" href="https://wa.me/5591989379978?text=Ola!+Quero+fazer+um+pedido+no+delivery" target="_blank" rel="noopener noreferrer">Delivery</a>
+      <a class="button button-secondary" href="https://wa.me/5591989379978?text=Ola!+Quero+reservar+uma+mesa" target="_blank" rel="noopener noreferrer">Reservar uma mesa</a>
+      <a class="button button-secondary" href="https://peixariamancha.com.br" target="_blank" rel="noopener noreferrer">Site oficial</a>
+    </section>
+
+    <section class="map-card" aria-label="Localização">
+      <div class="map-header">
+        <div>
+          <h2>Nosso espaço</h2>
+          <p>R. Outeiro, 200 - Marambaia, Belém - PA</p>
+        </div>
+        <a class="open-maps" href="https://maps.google.com/?q=Restaurante+Peixaria+Mancha,+R.+Outeiro,+200+-+Marambaia,+Belém+-+PA,+66613-455" target="_blank" rel="noopener noreferrer">Abrir no Google Maps</a>
+      </div>
+      <iframe
+        src="https://maps.google.com/maps?q=Restaurante+Peixaria+Mancha,+R.+Outeiro,+200+-+Marambaia,+Belém+-+PA,+66613-455&hl=pt-BR&z=17&output=embed"
+        loading="lazy"
+        referrerpolicy="no-referrer-when-downgrade"
+        title="Localização Peixaria Mancha"></iframe>
+    </section>
+
+    <footer>
+      © 2026 Peixaria Mancha
+    </footer>
+  </main>
+</body>
+</html>
