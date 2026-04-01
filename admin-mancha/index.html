@@ -3,17 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self' https://kgyhrapfhfkwgejquyjx.supabase.co; script-src 'self' https://cdn.tailwindcss.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://kgyhrapfhfkwgejquyjx.supabase.co;">
   <title>Admin Nuvem - Assistente Peixaria Mancha</title>
   <meta name="robots" content="noindex,nofollow,noarchive,nosnippet" />
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="../style.css">
-  
-  <!-- Supabase JS Client -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body class="bg-[#050810] text-white min-h-screen flex items-center justify-center p-6 font-sans">
   
-  <!-- Decoration -->
   <div class="fixed inset-0 pointer-events-none opacity-20" style="background: radial-gradient(circle at 50% -20%, #ff5722 0%, transparent 60%); blur(60px);"></div>
 
   <main class="w-full max-w-2xl bg-white/5 border border-white/10 p-8 rounded-3xl backdrop-blur-xl shadow-2xl relative z-10 fade-up">
@@ -31,42 +28,41 @@
     <form id="login-form" class="flex flex-col gap-5">
       <div>
         <label class="block text-sm font-bold text-white/70 mb-2 uppercase tracking-wide">E-mail Administrativo</label>
-        <input type="email" id="email" required class="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#ff5722] transition-colors">
+        <input type="email" id="email" required autocomplete="username" class="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#ff5722] transition-colors">
       </div>
       <div>
-        <label class="block text-sm font-bold text-white/70 mb-2 uppercase tracking-wide">Senha Forte</label>
-        <input type="password" id="password" required class="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#ff5722] transition-colors">
+        <label class="block text-sm font-bold text-white/70 mb-2 uppercase tracking-wide">Senha</label>
+        <input type="password" id="password" required autocomplete="current-password" class="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#ff5722] transition-colors">
       </div>
       
-      <div id="login-error" class="text-red-400 text-sm font-bold hidden"></div>      
+      <div id="login-error" class="text-red-400 text-sm font-bold hidden" role="alert"></div>      
       <button type="submit" id="btn-login" class="mt-2 bg-[#ff5722] text-white font-bold uppercase tracking-wider text-sm px-6 py-4 rounded-xl hover:bg-[#ff7043] transition-all shadow-[0_4px_15px_rgba(255,87,34,0.4)]">
-        Fazer Login (Supabase Cloud)
+        Fazer Login
       </button>
-      <button type="button" id="btn-signup" class="bg-black/40 border border-[#ff5722]/50 text-[#ff5722] font-bold uppercase tracking-wider text-sm px-6 py-4 rounded-xl hover:bg-[#ff5722]/10 transition-all shadow-sm">
-        Cadastrar Primeiro Admin
-      </button>
+      <p class="text-xs text-white/30 text-center mt-2">Acesso restrito. Contate o administrador para obter credenciais.</p>
     </form>
 
     <!-- TELA 2: CONFIGURAÇÃO NUVEM -->
     <form id="ai-settings-form" class="flex flex-col gap-6 hidden">
       <div>
         <label for="apikey" class="block text-sm font-bold text-white/70 mb-2 uppercase tracking-wide">Chave da LLM API (OpenRouter):</label>
-        <input type="password" id="apikey" required placeholder="sk-or-v1-..."
-          class="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#ff5722] transition-colors">
-        <p class="text-xs text-[#ff7043] mt-2 font-medium">✔️ Chave de Nuvem Supabase. Nenhum código no lado do cliente terá acesso à mesma.</p>
+        <input type="password" id="apikey" autocomplete="off"
+          class="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#ff5722] transition-colors"
+          placeholder="sk-or-v1-...">
+        <p class="text-xs text-white/40 mt-2 font-medium">A chave é armazenada de forma segura no servidor. Nenhum código do cliente terá acesso direto.</p>
       </div>
 
       <div>
         <label for="sysprompt" class="block text-sm font-bold text-white/70 mb-2 uppercase tracking-wide">Comportamento (Instruções):</label>
-        <textarea id="sysprompt" rows="8" required
+        <textarea id="sysprompt" rows="8"
           class="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#ff5722] transition-colors resize-y leading-relaxed"
           placeholder="Você é a assistente da Peixaria..."></textarea>
       </div>
 
       <button type="submit" id="save-btn" class="mt-4 bg-[#ff5722] hover:bg-[#ff7043] text-white font-bold uppercase tracking-wider text-sm px-6 py-4 rounded-xl transition-all shadow-[0_2px_10px_rgba(255,87,34,0.3)]">
-        Assinar Chaves e Proteger na Nuvem
+        Salvar Configurações
       </button>
-      <div id="status-message" class="text-sm font-bold mt-2 text-green-400 hidden"></div>
+      <div id="status-message" class="text-sm font-bold mt-2 hidden" role="status"></div>
     </form>
     
     <div class="mt-10 pt-4 border-t border-white/10 text-center">
@@ -75,137 +71,6 @@
 
   </main>
 
-  <script>
-    // Conexões Nativas do Painel de Autenticação Supabase
-    const _supabaseUrl = 'https://kgyhrapfhfkwgejquyjx.supabase.co';
-    const _supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtneWhyYXBmaGZrd2dlanF1eWp4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3Mzc0NTksImV4cCI6MjA5MDMxMzQ1OX0.w44D9PksTIcPFIPXr5WKZEK1ljvdKxKs4lOXz3ZfrAg';
-    const supabase = window.supabase.createClient(_supabaseUrl, _supabaseAnonKey);
-
-    const loginForm = document.getElementById("login-form");
-    const settingsForm = document.getElementById("ai-settings-form");
-    const errorMsg = document.getElementById("login-error");
-    const statusMsg = document.getElementById("status-message");
-    const title = document.getElementById("panel-title");
-    const subtitle = document.getElementById("panel-subtitle");
-    const logoutBtn = document.getElementById("logout-btn");
-
-    async function checkAuth() {
-      const { data: { session } } = await supabase.auth.getSession();
-      if(session) {
-        showSettings();
-      } else {
-        showLogin();
-      }
-    }
-
-    function showLogin() {
-      loginForm.classList.remove("hidden");
-      settingsForm.classList.add("hidden");
-      logoutBtn.classList.add("hidden");
-      title.innerText = "Reconhecimento Admin";
-      subtitle.innerText = "Controle Máximo e Central de Autenticação Edge.";
-    }
-
-    async function showSettings() {
-      loginForm.classList.add("hidden");
-      settingsForm.classList.remove("hidden");
-      logoutBtn.classList.remove("hidden");
-      title.innerText = "Configuração Cérebro LLM";
-      subtitle.innerText = "Área segura. Nenhum visitante vê essa central.";
-
-      // Carregar os dados que você possivelmente setou direto pelo Dashboard Supabase :)
-      const { data, error } = await supabase.from('bot_config').select('*').eq('id', 1).single();
-      if(!error && data) {
-        document.getElementById('apikey').value = data.api_key;
-        document.getElementById('sysprompt').value = data.system_prompt;
-      }
-    }
-
-    // Ação do Submite do Login
-    loginForm.addEventListener("submit", async(e) => {
-      e.preventDefault();
-      errorMsg.classList.add('hidden');
-      const email = document.getElementById("email").value;
-      const pass = document.getElementById("password").value;
-
-      document.getElementById("btn-login").innerText = "Procurando Credenciais...";
-      const { data, error } = await supabase.auth.signInWithPassword({ email, password: pass });
-      document.getElementById("btn-login").innerText = "Fazer Login (Supabase Cloud)";
-
-      if(error) {
-        errorMsg.innerText = "Chaves incorretas, ou usuário Supabase inexistente!";
-        errorMsg.classList.remove('hidden');
-      } else {
-        showSettings();
-      }
-    });
-
-    // Ação de Criar a Conta de Estudo Primordial
-    document.getElementById("btn-signup").addEventListener("click", async () => {
-      errorMsg.classList.add('hidden');
-      const email = document.getElementById("email").value;
-      const pass = document.getElementById("password").value;
-
-      if(pass.length < 6) {
-        errorMsg.innerText = "Senha deve ter pelo menos 6 caracteres.";
-        errorMsg.classList.remove('hidden');
-        return;
-      }
-
-      document.getElementById("btn-signup").innerText = "Registrando Nuvem...";
-      const { data, error } = await supabase.auth.signUp({ email, password: pass });
-      document.getElementById("btn-signup").innerText = "Cadastrar Primeiro Admin";
-
-      if(error) {
-        errorMsg.innerText = "Não foi possível perfilar este admin: " + error.message;
-        errorMsg.classList.remove('hidden');
-      } else {
-        if(data.session) showSettings();
-        else {
-           errorMsg.innerText = "Conta estabelecida com sucesso! Prossiga com o 'Fazer Login' para começar.";
-           errorMsg.classList.remove('text-red-400');
-           errorMsg.classList.add('text-green-400', 'block');
-           errorMsg.classList.remove('hidden');
-        }
-      }
-    });
-
-    // Logout
-    logoutBtn.addEventListener("click", async () => {
-      await supabase.auth.signOut();
-      showLogin();
-    });
-
-    // Atualiza a Master Tabela Secreta do Supabase a partir daqui
-    settingsForm.addEventListener("submit", async(e) => {
-      e.preventDefault();
-      statusMsg.classList.add("hidden");
-      const btn = document.getElementById("save-btn");
-      btn.innerText = "Conectando ao Supabase...";
-
-      const apiKey = document.getElementById("apikey").value.trim();
-      const sysPrompt = document.getElementById("sysprompt").value.trim();
-
-      const { error } = await supabase.from('bot_config').update({ 
-        api_key: apiKey, 
-        system_prompt: sysPrompt 
-      }).eq('id', 1);
-
-      btn.innerText = "Assinar Chaves e Proteger na Nuvem";
-      
-      if(error) {
-        statusMsg.classList.replace("text-green-400", "text-red-400");
-        statusMsg.innerText = "ERRO FATAL: Permissão de Row Level Security rejeitada.";
-      } else {
-        statusMsg.classList.replace("text-red-400", "text-green-400");
-        statusMsg.innerText = "✓ Credenciais de Backend gravadas com Sucesso. A Edge Function está armada para a IA!";
-      }
-      statusMsg.classList.remove("hidden");
-      setTimeout(() => statusMsg.classList.add("hidden"), 5000);
-    });
-
-    checkAuth();
-
-  </script>
+  <script src="admin.js"></script>
 </body>
 </html>

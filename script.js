@@ -274,11 +274,19 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!chatMessages) return;
       const wrapper = document.createElement('div');
       wrapper.className = `max-w-[85%] p-3 text-sm leading-relaxed shadow-sm ${isUser ? 'self-end bg-tertiary text-white rounded-2xl rounded-tr-sm' : 'self-start bg-white/10 border border-white/5 text-white/90 rounded-2xl rounded-tl-sm backdrop-blur-md'}`;
-      const formatted = text.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
-      wrapper.innerHTML = formatted;
+      const formatted = sanitizeHTML(text).replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = formatted;
+      wrapper.appendChild(tempDiv);
       chatMessages.appendChild(wrapper);
       chatMessages.scrollTop = chatMessages.scrollHeight;
       return wrapper;
+    }
+
+    function sanitizeHTML(str) {
+      const temp = document.createElement('div');
+      temp.textContent = str;
+      return temp.innerHTML;
     }
 
     function showLoaderUI() {
@@ -296,17 +304,44 @@ document.addEventListener("DOMContentLoaded", () => {
       if (loader) loader.remove();
     }
 
+    function sanitizeInput(str) {
+      return str.replace(/<[^>]*>/g, '').replace(/[&<>"']/g, function(m) {
+        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[m];
+      });
+    }
+
+    // Rate limiting: max 10 messages per minute
+    let messageTimestamps = [];
+    const MAX_MESSAGES_PER_MINUTE = 10;
+
+    function checkRateLimit() {
+      const now = Date.now();
+      messageTimestamps = messageTimestamps.filter(t => now - t < 60000);
+      if (messageTimestamps.length >= MAX_MESSAGES_PER_MINUTE) {
+        return false;
+      }
+      messageTimestamps.push(now);
+      return true;
+    }
+
     // Chamada Segura para Supabase Edge Function
     async function handleSend() {
       if (!chatInput || !sendChatBtn) return;
-      const text = chatInput.value.trim();
-      if (!text) return;
+      const rawText = chatInput.value.trim();
+      if (!rawText) return;
+
+      if (!checkRateLimit()) {
+        addMessageUI("⚠️ Aguarde um momento antes de enviar outra mensagem.", false);
+        return;
+      }
+
+      const text = sanitizeInput(rawText);
 
       chatInput.value = '';
       sendChatBtn.disabled = true;
       chatInput.disabled = true;
 
-      addMessageUI(text, true);
+      addMessageUI(rawText, true);
       showLoaderUI();
 
       chatHistory.push({ role: "user", content: text });
