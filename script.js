@@ -41,66 +41,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // ── "Aberto Agora" Badge ────────────────────────────────────────────
-  // Funcionamento: Ter(2)–Dom(0) · 11h às 15h30
-  function updateOpenStatus() {
-    const badge = document.getElementById('open-status-badge');
-    const text  = document.getElementById('open-status-text');
-    if (!badge || !text) return;
-
-    let year;
-    let month;
-    let dayOfMonth;
-    let day;
-    let hour;
-    let min;
-
-    try {
-      const dateParts = new Intl.DateTimeFormat('en-CA', {
-        timeZone: 'America/Belem',
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: false
-      }).formatToParts(new Date()).reduce((acc, part) => {
-        if (part.type !== 'literal') acc[part.type] = part.value;
-        return acc;
-      }, {});
-
-      year = Number(dateParts.year);
-      month = Number(dateParts.month);
-      dayOfMonth = Number(dateParts.day);
-      hour = Number(dateParts.hour);
-      min = Number(dateParts.minute);
-      // Descobre o dia da semana para Belém com base na data local da cidade.
-      day = new Date(Date.UTC(year, month - 1, dayOfMonth)).getUTCDay();
-    } catch {
-      const now = new Date();
-      year = now.getFullYear();
-      month = now.getMonth() + 1;
-      dayOfMonth = now.getDate();
-      day = now.getDay();
-      hour = now.getHours();
-      min = now.getMinutes();
-    }
-
-    const timeDecimal = hour + min / 60;
-
-    const openDays  = [0, 2, 3, 4, 5, 6]; // Dom, Ter, Qua, Qui, Sex, Sab
-    const isOpenDay  = openDays.includes(day);
-    const isOpenTime = timeDecimal >= 11 && timeDecimal < 15.5; // 11h às 15:30
-    const isOpen     = isOpenDay && isOpenTime;
-
-    badge.className = 'isOpen' + (isOpen ? ' aberto' : ' fechado');
-    text.textContent = isOpen ? 'Aberto agora' : 'Fechado agora';
-  }
-  updateOpenStatus();
-  // Atualiza a cada minuto
-  setInterval(updateOpenStatus, 60000);
-
-
   // ── Carrossel de Eventos ────────────────────────────────────────────
   const sliderTrack  = document.getElementById('eventos-track');
   const prevBtn      = document.getElementById('slider-prev');
