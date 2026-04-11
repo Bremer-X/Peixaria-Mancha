@@ -82,6 +82,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const timeDecimal = hour + min / 60;
 
+    const isSpecialClosure = year === 2026 && month === 4 && dayOfMonth >= 11 && dayOfMonth <= 14;
+    if (isSpecialClosure) {
+      badge.className = 'isOpen fechado';
+      text.textContent = 'Fechado. Voltamos na Quarta-Feira.';
+      return;
+    }
+
     const openDays  = [0, 2, 3, 4, 5, 6]; // Dom, Ter, Qua, Qui, Sex, Sab
     const isOpenDay  = openDays.includes(day);
     const isOpenTime = timeDecimal >= 11 && timeDecimal < 15.5; // 11h às 15:30
