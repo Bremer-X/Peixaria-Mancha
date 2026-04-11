@@ -293,23 +293,46 @@ document.addEventListener("DOMContentLoaded", () => {
       chatHistory.push({ role: "user", content: text });
 
       try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 20000);
         const response = await fetch(_supabaseUrl, {
           method: "POST",
           headers: {
             "Content-Type": "application/json"
           },
+          signal: controller.signal,
           body: JSON.stringify({
             history: chatHistory.slice(0, -1),
             userMessage: text
           })
         });
+        clearTimeout(timeoutId);
 
         hideLoaderUI();
-        const data = await response.json();
+        const rawResponse = await response.text();
+        let data = {};
+        try {
+          data = rawResponse ? JSON.parse(rawResponse) : {};
+        } catch {
+          data = { raw: rawResponse };
+        }
 
         if (!response.ok) {
-          console.error("Erro da Inteligência Artificial:", data);
-          throw new Error(data.error || "Ocorreu um erro no servidor Inteligente.");
+          console.error("Erro da Inteligência Artificial:", {
+            status: response.status,
+            statusText: response.statusText,
+            data
+          });
+
+          if (response.status === 401 || response.status === 403) {
+            throw new Error("A função de chat recusou a requisição (autorização).");
+          }
+
+          if (response.status >= 500) {
+            throw new Error("A função de chat está indisponível no momento.");
+          }
+
+          throw new Error(data.error || "Falha na comunicação com o assistente.");
         }
 
         const botReply = data.reply;
@@ -319,7 +342,13 @@ document.addEventListener("DOMContentLoaded", () => {
       } catch (error) {
         hideLoaderUI();
         console.error("Supabase Func Fetch Error:", error);
-        addMessageUI("⚠️ Nossa assistente está sobrecarregada no momento. Tente novamente mais tarde.", false);
+        if (error && error.name === "AbortError") {
+          addMessageUI("⚠️ A assistente demorou para responder. Tente novamente em alguns segundos.", false);
+        } else if (error && error.message && error.message.includes("autorização")) {
+          addMessageUI("⚠️ Assistente indisponível por configuração de acesso da API.", false);
+        } else {
+          addMessageUI("⚠️ Nossa assistente está sobrecarregada no momento. Tente novamente mais tarde.", false);
+        }
       } finally {
         sendChatBtn.disabled = false;
         chatInput.disabled = false;
