@@ -48,6 +48,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const text  = document.getElementById('open-status-text');
     if (!badge || !text) return;
 
+    let year;
+    let month;
+    let dayOfMonth;
     let day;
     let hour;
     let min;
@@ -66,15 +69,18 @@ document.addEventListener("DOMContentLoaded", () => {
         return acc;
       }, {});
 
-      const year = Number(dateParts.year);
-      const month = Number(dateParts.month);
-      const dayOfMonth = Number(dateParts.day);
+      year = Number(dateParts.year);
+      month = Number(dateParts.month);
+      dayOfMonth = Number(dateParts.day);
       hour = Number(dateParts.hour);
       min = Number(dateParts.minute);
       // Descobre o dia da semana para Belém com base na data local da cidade.
       day = new Date(Date.UTC(year, month - 1, dayOfMonth)).getUTCDay();
     } catch {
       const now = new Date();
+      year = now.getFullYear();
+      month = now.getMonth() + 1;
+      dayOfMonth = now.getDate();
       day = now.getDay();
       hour = now.getHours();
       min = now.getMinutes();
