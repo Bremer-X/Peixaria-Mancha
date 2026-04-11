@@ -197,7 +197,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (toggleChatBtn && chatWidget) {
     let chatHistory = [];
-    const _supabaseUrl = "https://kgyhrapfhfkwgejquyjx.supabase.co/functions/v1/chat-handler";
+    const chatWebhookUrl = "https://n8n.vps7767.panel.icontainer.cloud/webhook/peixaria-mancha/chat";
 
     // Toggle UI
     function toggleChat() {
@@ -270,7 +270,7 @@ document.addEventListener("DOMContentLoaded", () => {
       return true;
     }
 
-    // Chamada Segura para Supabase Edge Function
+    // Chamada para o webhook do n8n
     async function handleSend() {
       if (!chatInput || !sendChatBtn) return;
       const rawText = chatInput.value.trim();
@@ -295,7 +295,7 @@ document.addEventListener("DOMContentLoaded", () => {
       try {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 20000);
-        const response = await fetch(_supabaseUrl, {
+        const response = await fetch(chatWebhookUrl, {
           method: "POST",
           headers: {
             "Content-Type": "application/json"
@@ -335,13 +335,16 @@ document.addEventListener("DOMContentLoaded", () => {
           throw new Error(data.error || "Falha na comunicação com o assistente.");
         }
 
-        const botReply = data.reply;
+        const botReply = data.reply || data.message || "";
+        if (!botReply) {
+          throw new Error("A API respondeu sem texto de resposta.");
+        }
         chatHistory.push({ role: "assistant", content: botReply });
         addMessageUI(botReply, false);
 
       } catch (error) {
         hideLoaderUI();
-        console.error("Supabase Func Fetch Error:", error);
+        console.error("Webhook Chat Fetch Error:", error);
         if (error && error.name === "AbortError") {
           addMessageUI("⚠️ A assistente demorou para responder. Tente novamente em alguns segundos.", false);
         } else if (error && error.message && error.message.includes("autorização")) {
