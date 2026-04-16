@@ -33,6 +33,42 @@ document.addEventListener("DOMContentLoaded", () => {
   const yearEl = document.getElementById('year');
   if (yearEl) yearEl.textContent = new Date().getFullYear();
 
+  // ── Open/Closed status badge ─────────────────────────────────────────
+  const openStatusBadge = document.getElementById('open-status-badge');
+  const openStatusText = document.getElementById('open-status-text');
+
+  const operatingHours = {
+    0: { open: 11, close: 20 }, // Domingo
+    1: null,                    // Segunda-feira fechado
+    2: { open: 11, close: 20 }, // Terça-feira
+    3: { open: 11, close: 20 }, // Quarta-feira
+    4: { open: 11, close: 20 }, // Quinta-feira
+    5: { open: 11, close: 20 }, // Sexta-feira
+    6: { open: 11, close: 20 }  // Sábado
+  };
+
+  function isOpenNow() {
+    if (!openStatusBadge || !openStatusText) return false;
+    const now = new Date();
+    const hours = operatingHours[now.getDay()];
+    if (!hours) return false;
+    const minutes = now.getHours() * 60 + now.getMinutes();
+    const openMinutes = hours.open * 60;
+    const closeMinutes = hours.close * 60;
+    return minutes >= openMinutes && minutes < closeMinutes;
+  }
+
+  function updateOpenStatus() {
+    if (!openStatusBadge || !openStatusText) return;
+    const open = isOpenNow();
+    openStatusBadge.classList.toggle('aberto', open);
+    openStatusBadge.classList.toggle('fechado', !open);
+    openStatusText.textContent = open ? 'Aberto agora' : 'Fechado agora';
+  }
+
+  updateOpenStatus();
+  setInterval(updateOpenStatus, 60 * 1000);
+
   // ── Navbar shadow on scroll ─────────────────────────────────────────
   const navbar = document.getElementById('navbar');
   if (navbar) {
