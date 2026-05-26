@@ -1,0 +1,6 @@
+.agente/
+.vscode/
+temp_info.txt
+test_git.py
+*.pyc
+__pycache__/
