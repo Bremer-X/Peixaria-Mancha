@@ -50,7 +50,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       if (data.config) {
-        document.getElementById('apikey').value = data.config.api_key || '';
+        // document.getElementById('apikey').value = data.config.api_key || ''; // [AEGIS] Removido para evitar exposição da API Key no frontend
         document.getElementById('sysprompt').value = data.config.system_prompt || '';
       }
     } catch (error) {
