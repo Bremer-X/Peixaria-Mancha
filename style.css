@@ -265,6 +265,94 @@ html {
 }
 
 /* =============================================
+   LIGHTBOX DE VIDEO INICIAL
+   ============================================= */
+.startup-video-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(2, 8, 23, 0.34);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+
+.startup-video-lightbox.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.startup-video-panel {
+  position: relative;
+  width: min(430px, calc((100vh - 32px) * 0.5625), calc(100vw - 24px));
+  aspect-ratio: 9 / 16;
+  max-height: calc(100vh - 32px);
+  overflow: hidden;
+  border-radius: 8px;
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.16);
+  box-shadow: 0 28px 90px rgba(0,0,0,0.55);
+  transform: translateY(14px) scale(0.98);
+  transition: transform 0.25s ease;
+}
+
+.startup-video-lightbox.active .startup-video-panel {
+  transform: translateY(0) scale(1);
+}
+
+.startup-video-frame {
+  width: 100%;
+  height: 100%;
+  aspect-ratio: 9 / 16;
+  background: transparent;
+}
+
+.startup-video-frame video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  background: #000;
+}
+
+.startup-video-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 2;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  background: rgba(0,0,0,0.58);
+  border: 1px solid rgba(255,255,255,0.24);
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.startup-video-close:hover,
+.startup-video-close:focus-visible {
+  background: rgba(255,87,34,0.92);
+  transform: scale(1.05);
+  outline: none;
+}
+
+@media (max-width: 640px) {
+  .startup-video-lightbox {
+    padding: 12px;
+  }
+}
+
+/* =============================================
    LIGHTBOX DA GALERIA
    ============================================= */
 #lightbox-overlay {

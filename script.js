@@ -69,6 +69,50 @@ document.addEventListener("DOMContentLoaded", () => {
   updateOpenStatus();
   setInterval(updateOpenStatus, 60 * 1000);
 
+  // ── Lightbox de Video Inicial ───────────────────────────────────────
+  const startupVideoLightbox = document.getElementById('startup-video-lightbox');
+  const startupVideo = document.getElementById('startup-video');
+  const startupVideoClose = document.getElementById('startup-video-close');
+
+  function openStartupVideo() {
+    if (!startupVideoLightbox) return;
+    startupVideoLightbox.classList.add('active');
+    startupVideoLightbox.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+
+    if (startupVideo) {
+      startupVideo.defaultMuted = false;
+      startupVideo.muted = false;
+      startupVideo.volume = 1;
+      startupVideo.load();
+      const playPromise = startupVideo.play();
+      if (playPromise && typeof playPromise.catch === 'function') {
+        playPromise.catch(() => {});
+      }
+    }
+  }
+
+  function closeStartupVideo() {
+    if (!startupVideoLightbox) return;
+    startupVideoLightbox.classList.remove('active');
+    startupVideoLightbox.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+
+    if (startupVideo) {
+      startupVideo.pause();
+      startupVideo.currentTime = 0;
+    }
+  }
+
+  if (startupVideoLightbox) {
+    window.setTimeout(openStartupVideo, 350);
+    startupVideoLightbox.addEventListener('click', e => {
+      if (e.target === startupVideoLightbox) closeStartupVideo();
+    });
+  }
+
+  if (startupVideoClose) startupVideoClose.addEventListener('click', closeStartupVideo);
+
   // ── Navbar shadow on scroll ─────────────────────────────────────────
   const navbar = document.getElementById('navbar');
   if (navbar) {
@@ -220,7 +264,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (lightboxClose) lightboxClose.addEventListener('click', closeLightbox);
   if (lightbox)      lightbox.addEventListener('click', e => { if (e.target === lightbox) closeLightbox(); });
-  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox(); });
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') {
+      closeStartupVideo();
+      closeLightbox();
+    }
+  });
 
 
   // ── Chatbot Assistente Peixaria Mancha (Supabase Edge Function) ──
