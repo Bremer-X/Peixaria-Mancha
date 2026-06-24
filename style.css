@@ -290,12 +290,12 @@ html {
 
 .startup-video-panel {
   position: relative;
-  width: 430px;
-  max-width: calc(100vw - 24px);
+  width: min(90vw, 800px);
+  max-width: 90vw;
   max-height: calc(100vh - 32px);
   overflow: hidden;
-  border-radius: 8px;
-  background: transparent;
+  border-radius: 12px;
+  background: #000;
   border: 1px solid rgba(255,255,255,0.16);
   box-shadow: 0 28px 90px rgba(0,0,0,0.55);
   transform: translateY(14px) scale(0.98);
@@ -308,52 +308,70 @@ html {
 
 .startup-video-frame {
   width: 100%;
-  aspect-ratio: 9 / 16;
-  background: transparent;
+  aspect-ratio: 16 / 9;
+  background: #000;
+  border-radius: 6px;
+  overflow: hidden;
 }
 
 .startup-video-frame video {
   display: block;
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
   background: #000;
 }
 
 .startup-video-close {
   position: absolute;
-  top: 12px;
-  right: 12px;
+  top: 16px;
+  right: 16px;
   z-index: 2;
-  width: 42px;
-  height: 42px;
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   color: white;
-  background: rgba(0,0,0,0.58);
+  background: rgba(0,0,0,0.7);
   border: 1px solid rgba(255,255,255,0.24);
   cursor: pointer;
-  transition: background 0.2s ease, transform 0.2s ease;
+  transition: all 0.2s ease;
+  font-size: 24px;
 }
 
 .startup-video-close:hover,
 .startup-video-close:focus-visible {
   background: rgba(255,87,34,0.92);
-  transform: scale(1.05);
+  transform: scale(1.1);
   outline: none;
+  border-color: rgba(255,255,255,0.4);
 }
 
 @media (max-width: 640px) {
   .startup-video-lightbox {
-    padding: 12px;
+    padding: 16px;
+  }
+  
+  .startup-video-panel {
+    width: 100%;
+    border-radius: 8px;
+  }
+  
+  .startup-video-close {
+    top: 8px;
+    right: 8px;
+    width: 40px;
+    height: 40px;
   }
 }
 
 @media (max-height: 820px) and (min-width: 641px) {
   .startup-video-panel {
-    width: calc(56.25vh - 18px);
+    width: auto;
+    height: calc(100vh - 60px);
+    aspect-ratio: 16 / 9;
   }
 }
 
