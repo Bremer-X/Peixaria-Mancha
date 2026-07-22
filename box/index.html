@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html class="light scroll-smooth" lang="pt-BR">
+
+<head>
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+  <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+  <meta http-equiv="X-Frame-Options" content="SAMEORIGIN" />
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
+  <title>Box da Peixaria Mancha | Como Chegar — Belém, PA</title>
+  <meta name="description"
+    content="Encontre o Box da Peixaria Mancha em Belém. Veja o mapa, rotas e instruções detalhadas de como chegar até nós. Peixes e frutos do mar frescos na Marambaia.">
+  <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1" />
+  <meta name="keywords"
+    content="box peixaria mancha, como chegar peixaria mancha, peixaria belém, marambaia, frutos do mar belém, endereço peixaria mancha">
+  <meta name="author" content="Peixaria Mancha" />
+  <meta name="theme-color" content="#0077b6" />
+  <link rel="canonical" href="https://peixariamancha.com/box/" />
+  <link rel="icon" href="https://peixariamancha.com/Fotos/logo.png" type="image/png" />
+  <link rel="sitemap" type="application/xml" title="Sitemap" href="https://peixariamancha.com/sitemap.xml" />
+
+  <meta property="og:type" content="website" />
+  <meta property="og:locale" content="pt_BR" />
+  <meta property="og:site_name" content="Peixaria Mancha" />
+  <meta property="og:title" content="Box da Peixaria Mancha | Como Chegar" />
+  <meta property="og:description"
+    content="Venha nos visitar! Encontre o Box da Peixaria Mancha em Belém e descubra como chegar com rotas fáceis." />
+  <meta property="og:url" content="https://peixariamancha.com/box" />
+  <meta property="og:image" content="https://peixariamancha.com/Fotos/Feira05.jpeg" />
+
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SeafoodRestaurant",
+      "name": "Box da Peixaria Mancha",
+      "url": "https://peixariamancha.com/box",
+      "image": "https://peixariamancha.com/Fotos/Feira05.jpeg",
+      "telephone": "+55 91 98937-9978",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Rua Outeiro, nº 200 — Conj. Médici II",
+        "addressLocality": "Belém",
+        "addressRegion": "PA",
+        "postalCode": "66613-455",
+        "addressCountry": "BR"
+      },
+      "geo": {
+        "@type": "GeoCoordinates",
+        "latitude": -1.4017424,
+        "longitude": -48.4563081
+      },
+      "hasMap": "https://maps.app.goo.gl/BhnFQmixnRKVWeAX7",
+      "openingHoursSpecification": [
+        {
+          "@type": "OpeningHoursSpecification",
+          "dayOfWeek": ["Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"],
+          "opens": "11:00",
+          "closes": "20:00"
+        }
+      ]
+    }
+  </script>
+
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Manrope:wght@400;500;600;700&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+    rel="stylesheet" />
+
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "background": "#FFFFFF",
+            "on-surface": "#1A1A1A",
+            "surface": "#FFFFFF",
+            "surface-container-low": "#F5F5F5",
+            "surface-container-high": "#ebebeb",
+            "primary": "#0077b6",
+            "primary-dim": "#03045e",
+            "on-primary": "#ffffff",
+            "tertiary": "#FF5722",
+            "on-surface-variant": "#444748",
+            "outline-variant": "#c4c7c7",
+            "surface-tint": "#0077b6"
+          },
+          fontFamily: {
+            "headline": ["Plus Jakarta Sans"],
+            "body": ["Manrope"],
+            "label": ["Manrope"]
+          },
+        },
+      },
+    }
+  </script>
+  <link rel="stylesheet" href="style.css">
+
+  <style>
+    @keyframes ping-slow {
+      0% {
+        transform: scale(1);
+        opacity: 1;
+      }
+
+      75%,
+      100% {
+        transform: scale(2.2);
+        opacity: 0;
+      }
+    }
+
+    .ping-slow {
+      animation: ping-slow 2s cubic-bezier(0, 0, 0.2, 1) infinite;
+    }
+
+    .route-card {
+      transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .route-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 20px 40px rgba(0, 119, 182, 0.14);
+    }
+
+    .gallery-thumb {
+      overflow: hidden;
+      border-radius: 1rem;
+      cursor: pointer;
+    }
+
+    .gallery-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.6s ease;
+    }
+
+    .gallery-thumb:hover img {
+      transform: scale(1.08);
+    }
+
+    .map-glow {
+      box-shadow: 0 0 0 4px rgba(0, 119, 182, 0.1), 0 20px 60px rgba(0, 0, 0, 0.15);
+    }
+
+    @keyframes float-badge {
+
+      0%,
+      100% {
+        transform: translateY(0);
+      }
+
+      50% {
+        transform: translateY(-8px);
+      }
+    }
+
+    .float-badge {
+      animation: float-badge 3s ease-in-out infinite;
+    }
+
+    .hero-wave {
+      position: absolute;
+      bottom: -1px;
+      left: 0;
+      width: 100%;
+      overflow: hidden;
+      line-height: 0;
+    }
+
+    @keyframes scroll-bounce {
+
+      0%,
+      100% {
+        transform: translateY(0);
+        opacity: 1;
+      }
+
+      50% {
+        transform: translateY(8px);
+        opacity: 0.5;
+      }
+    }
+
+    .scroll-indicator {
+      animation: scroll-bounce 1.8s ease-in-out infinite;
+    }
+  </style>
+</head>
+
+<body class="bg-background text-on-surface font-body selection:bg-primary selection:text-on-primary">
+
+
+  <!-- HERO -->
+  <section class="relative min-h-[88vh] flex items-center overflow-hidden bg-cover bg-center"
+    style="background-image: url('Fotos/Feira05.jpeg');">
+    <div class="absolute inset-0 bg-gradient-to-br from-black/85 via-primary-dim/70 to-black/75"></div>
+    <div class="absolute top-20 right-20 w-96 h-96 bg-primary/10 rounded-full blur-3xl pointer-events-none"></div>
+    <div class="absolute bottom-20 left-10 w-64 h-64 bg-tertiary/10 rounded-full blur-3xl pointer-events-none"></div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full relative z-10 py-16">
+      <div class="max-w-3xl mx-auto text-center">
+
+        <nav class="flex justify-center mb-6 fade-up" aria-label="Breadcrumb">
+          <ol class="flex items-center gap-2 text-white/60 text-sm font-label">
+            <li><a href="/" class="hover:text-white transition-colors">Início</a></li>
+            <li><span class="material-symbols-outlined text-[14px]">chevron_right</span></li>
+            <li class="text-white font-semibold">Box da Peixaria</li>
+          </ol>
+        </nav>
+
+        <div class="flex justify-center mb-5 fade-up" style="transition-delay:0.1s">
+          <span
+            class="inline-flex items-center gap-2 bg-tertiary/20 border border-tertiary/40 text-tertiary text-xs font-bold tracking-widest uppercase rounded-full px-4 py-2 backdrop-blur-sm">
+            <span class="w-2 h-2 rounded-full bg-tertiary animate-pulse"></span>
+            Localização Oficial
+          </span>
+        </div>
+
+        <h1 class="font-headline font-extrabold text-4xl sm:text-5xl md:text-6xl text-white leading-tight mb-6 fade-up"
+          style="transition-delay:0.2s">
+          Venha nos
+          <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#48cae4] to-[#0077b6]">visitar!</span><br>
+          Box da Peixaria Mancha
+        </h1>
+
+        <p class="text-white/80 text-lg md:text-xl mb-10 leading-relaxed fade-up" style="transition-delay:0.3s">
+          Estamos em Belém, PA. Aqui você encontra os melhores peixes e frutos do mar frescos da região,
+          com a qualidade e tradição do Mancha desde 2008.
+        </p>
+
+        <div class="flex flex-col sm:flex-row gap-4 justify-center fade-up" style="transition-delay:0.4s">
+          <a href="https://maps.app.goo.gl/BhnFQmixnRKVWeAX7" target="_blank" rel="noopener noreferrer"
+            id="hero-btn-maps"
+            class="inline-flex items-center justify-center gap-3 bg-primary text-white px-8 py-4 rounded-full font-bold text-base hover:bg-primary-dim transition-all duration-300 shadow-xl shadow-primary/30 hover:scale-105">
+            <span class="material-symbols-outlined">directions</span>
+            Abrir no Google Maps
+          </a>
+          <a href="#como-chegar"
+            class="inline-flex items-center justify-center gap-3 bg-white/10 border border-white/25 text-white px-8 py-4 rounded-full font-bold text-base backdrop-blur-sm hover:bg-white/20 transition-all duration-300">
+            <span class="material-symbols-outlined">near_me</span>
+            Ver Rotas
+          </a>
+        </div>
+
+        <div class="mt-16 flex justify-center fade-up" style="transition-delay:0.55s">
+          <div class="scroll-indicator flex flex-col items-center gap-2 text-white/40">
+            <span class="text-xs font-label tracking-widest uppercase">Rolar para baixo</span>
+            <span class="material-symbols-outlined text-2xl">keyboard_arrow_down</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero-wave">
+      <svg viewBox="0 0 1200 80" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+        <path d="M0,40 C300,80 900,0 1200,40 L1200,80 L0,80 Z" fill="#ffffff" />
+      </svg>
+    </div>
+  </section>
+
+  <!-- INFO CARDS -->
+  <section class="py-14 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+
+        <div
+          class="route-card bg-surface-container-low rounded-2xl p-6 flex items-start gap-4 fade-up border border-outline-variant/30">
+          <div class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
+            <span class="material-symbols-outlined text-primary text-2xl">location_on</span>
+          </div>
+          <div>
+            <p class="font-headline font-bold text-on-surface text-base mb-1">Endereço</p>
+            <p class="text-on-surface-variant text-sm leading-relaxed">
+              Rua Outeiro, nº 200<br>Conj. Médici II — Belém, PA<br>CEP 66613-455
+            </p>
+          </div>
+        </div>
+
+        <div
+          class="route-card bg-surface-container-low rounded-2xl p-6 flex items-start gap-4 fade-up border border-outline-variant/30"
+          style="transition-delay:0.1s">
+          <div class="w-12 h-12 rounded-xl bg-tertiary/10 flex items-center justify-center flex-shrink-0">
+            <span class="material-symbols-outlined text-tertiary text-2xl">schedule</span>
+          </div>
+          <div>
+            <p class="font-headline font-bold text-on-surface text-base mb-1">Horário de Funcionamento</p>
+            <p class="text-on-surface-variant text-sm leading-relaxed">
+              Ter — Dom: <strong class="text-on-surface">11h às 20h</strong><br>
+              Segunda: <strong class="text-on-surface">Fechado</strong>
+            </p>
+          </div>
+        </div>
+
+        <div
+          class="route-card bg-surface-container-low rounded-2xl p-6 flex items-start gap-4 fade-up border border-outline-variant/30"
+          style="transition-delay:0.2s">
+          <div class="w-12 h-12 rounded-xl bg-green-500/10 flex items-center justify-center flex-shrink-0">
+            <span class="material-symbols-outlined text-green-600 text-2xl">phone_in_talk</span>
+          </div>
+          <div>
+            <p class="font-headline font-bold text-on-surface text-base mb-1">WhatsApp</p>
+            <a href="https://wa.me/5591989379978" target="_blank" rel="noopener noreferrer"
+              class="text-on-surface-variant text-sm hover:text-primary transition-colors">
+              (91) 98937-9978
+            </a>
+            <p class="text-on-surface-variant/60 text-xs mt-1">Pedidos · Reservas · Dúvidas</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- MAPA -->
+  <section id="mapa" class="py-20 bg-surface-container-low">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+      <div class="text-center mb-12 fade-up">
+        <span class="inline-block text-xs font-bold tracking-widest uppercase text-primary mb-3">Nossa
+          Localização</span>
+        <h2 class="font-headline font-extrabold text-3xl md:text-4xl text-on-surface mb-4">
+          Encontre o Box da<br>
+          <span class="text-primary">Peixaria Mancha</span>
+        </h2>
+        <p class="text-on-surface-variant text-base max-w-xl mx-auto">
+          Veja exatamente onde estamos no mapa. Clique em "Abrir no Google Maps" para obter rotas diretamente no seu
+          celular.
+        </p>
+      </div>
+
+      <div class="grid lg:grid-cols-5 gap-8 items-stretch">
+
+        <div class="lg:col-span-3 fade-up reveal-left">
+          <div class="map-glow rounded-3xl overflow-hidden h-[420px] relative">
+            <div
+              class="float-badge absolute top-4 left-4 z-10 bg-white rounded-xl px-3 py-2 shadow-lg flex items-center gap-2">
+              <img src="Fotos/logo.png" alt="Logo" class="w-8 h-8 rounded-full object-cover border-2 border-tertiary">
+              <div>
+                <p class="font-headline font-bold text-xs text-on-surface">Peixaria Mancha</p>
+                <p class="text-[10px] text-on-surface-variant">Box Oficial</p>
+              </div>
+            </div>
+            <iframe title="Mapa do Box da Peixaria Mancha"
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3988.624!2d-48.4563081!3d-1.4017424!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x92a48b126b205e7b%3A0x3b07639861bb22b9!2sPeixaria%20do%20mancha!5e0!3m2!1spt-BR!2sbr!4v1700000000000!5m2!1spt-BR!2sbr"
+              width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"
+              referrerpolicy="no-referrer-when-downgrade">
+            </iframe>
+          </div>
+        </div>
+
+        <div class="lg:col-span-2 flex flex-col gap-5 fade-up reveal-right">
+
+          <div class="bg-white rounded-2xl p-6 border border-outline-variant/30 shadow-sm">
+            <div class="flex items-center gap-3 mb-4">
+              <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center">
+                <span class="material-symbols-outlined text-white text-xl">store</span>
+              </div>
+              <div>
+                <p class="font-headline font-bold text-on-surface">Box da Peixaria Mancha</p>
+                <p class="text-xs text-on-surface-variant">Ponto oficial de venda</p>
+              </div>
+            </div>
+            <div class="space-y-3 text-sm text-on-surface-variant">
+              <div class="flex items-start gap-2">
+                <span class="material-symbols-outlined text-primary text-base mt-0.5">location_on</span>
+                <span>Rua Outeiro, nº 200 — Conj. Médici II<br>Belém, PA · CEP 66613-455</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-tertiary text-base">schedule</span>
+                <span>Ter–Dom: <strong class="text-on-surface">11h às 20h</strong></span>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-green-500 text-base">phone_iphone</span>
+                <a href="https://wa.me/5591989379978" target="_blank" rel="noopener noreferrer"
+                  class="hover:text-primary transition-colors">(91) 98937-9978</a>
+              </div>
+            </div>
+          </div>
+
+          <a href="https://maps.app.goo.gl/BhnFQmixnRKVWeAX7" target="_blank" rel="noopener noreferrer"
+            id="map-btn-primary"
+            class="flex items-center justify-center gap-3 bg-primary text-white rounded-2xl px-6 py-4 font-bold text-sm hover:bg-primary-dim transition-all duration-300 shadow-lg shadow-primary/20 hover:scale-[1.02]">
+            <span class="material-symbols-outlined">open_in_new</span>
+            Abrir no Google Maps
+          </a>
+
+          <a href="https://wa.me/5591989379978?text=Ol%C3%A1!%20Gostaria%20de%20saber%20mais%20sobre%20o%20Box%20da%20Peixaria%20Mancha."
+            target="_blank" rel="noopener noreferrer" id="map-btn-whatsapp"
+            class="flex items-center justify-center gap-3 bg-green-500 text-white rounded-2xl px-6 py-4 font-bold text-sm hover:bg-green-600 transition-all duration-300 shadow-lg shadow-green-500/20 hover:scale-[1.02]">
+            <svg class="w-5 h-5 fill-white flex-shrink-0" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true">
+              <path
+                d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z" />
+            </svg>
+            Falar pelo WhatsApp
+          </a>
+
+          <div class="bg-primary/5 border border-primary/10 rounded-xl p-4 text-center">
+            <p class="text-xs text-on-surface-variant font-label">Coordenadas GPS</p>
+            <p class="text-sm font-mono font-semibold text-primary mt-1">-1.4017°, -48.4563°</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- COMO CHEGAR -->
+  <section id="como-chegar" class="py-20 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+      <div class="text-center mb-14 fade-up">
+        <span class="inline-block text-xs font-bold tracking-widest uppercase text-tertiary mb-3">Rotas</span>
+        <h2 class="font-headline font-extrabold text-3xl md:text-4xl text-on-surface mb-4">
+          Como Chegar ao<br>
+          <span class="text-primary">Box da Peixaria</span>
+        </h2>
+        <p class="text-on-surface-variant text-base max-w-xl mx-auto">
+          Escolha o melhor meio de transporte. Estamos bem localizados no Conjunto Médici II, fácil de encontrar.
+        </p>
+      </div>
+
+      <div class="grid md:grid-cols-3 gap-6 mb-16">
+
+        <div class="route-card bg-white border border-outline-variant/30 rounded-3xl p-8 shadow-sm fade-up">
+          <div class="w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center mb-5">
+            <span class="material-symbols-outlined text-primary text-3xl">directions_car</span>
+          </div>
+          <h3 class="font-headline font-bold text-lg text-on-surface mb-3">De Carro</h3>
+          <ul class="space-y-3 text-sm text-on-surface-variant">
+            <li class="flex items-start gap-3">
+              <span
+                class="w-5 h-5 rounded-full bg-primary/10 text-primary text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5">1</span>
+              Acesse a <strong class="text-on-surface">Av. Augusto Montenegro</strong> sentido Icoaraci
+            </li>
+            <li class="flex items-start gap-3">
+              <span
+                class="w-5 h-5 rounded-full bg-primary/10 text-primary text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5">2</span>
+              Siga até a entrada do <strong class="text-on-surface">Conj. Médici II</strong>
+            </li>
+            <li class="flex items-start gap-3">
+              <span
+                class="w-5 h-5 rounded-full bg-primary/10 text-primary text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5">3</span>
+              Acesse a <strong class="text-on-surface">Rua Outeiro, nº 200</strong>
+            </li>
+            <li class="flex items-start gap-3">
+              <span
+                class="w-5 h-5 rounded-full bg-primary/10 text-primary text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5">4</span>
+              Estacionamento disponível na região
+            </li>
+          </ul>
+        </div>
+
+        <div class="route-card bg-white border border-outline-variant/30 rounded-3xl p-8 shadow-sm fade-up"
+          style="transition-delay:0.1s">
+          <div class="w-14 h-14 bg-tertiary/10 rounded-2xl flex items-center justify-center mb-5">
+            <span class="material-symbols-outlined text-tertiary text-3xl">directions_bus</span>
+          </div>
+          <h3 class="font-headline font-bold text-lg text-on-surface mb-3">De Ônibus</h3>
+          <ul class="space-y-3 text-sm text-on-surface-variant">
+            <li class="flex items-start gap-3">
+              <span
+                class="w-5 h-5 rounded-full bg-tertiary/10 text-tertiary text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5">1</span>
+              Pegue ônibus com destino à <strong class="text-on-surface">Marambaia</strong> ou <strong
+                class="text-on-surface">Médici</strong>
+            </li>
+            <li class="flex items-start gap-3">
+              <span
+                class="w-5 h-5 rounded-full bg-tertiary/10 text-tertiary text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5">2</span>
+              Desembarque no <strong class="text-on-surface">Conj. Médici II</strong>
+            </li>
+            <li class="flex items-start gap-3">
+              <span
+                class="w-5 h-5 rounded-full bg-tertiary/10 text-tertiary text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5">3</span>
+              Caminhe até a <strong class="text-on-surface">Rua Outeiro, 200</strong>
+            </li>
+          </ul>
+        </div>
+
+        <div class="route-card bg-white border border-outline-variant/30 rounded-3xl p-8 shadow-sm fade-up"
+          style="transition-delay:0.2s">
+          <div class="w-14 h-14 bg-green-500/10 rounded-2xl flex items-center justify-center mb-5">
+            <span class="material-symbols-outlined text-green-600 text-3xl">local_taxi</span>
+          </div>
+          <h3 class="font-headline font-bold text-lg text-on-surface mb-3">App / Taxi / Mototaxi</h3>
+          <ul class="space-y-3 text-sm text-on-surface-variant">
+            <li class="flex items-start gap-3">
+              <span
+                class="w-5 h-5 rounded-full bg-green-500/10 text-green-600 text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5">1</span>
+              Abra seu app de transporte preferido
+            </li>
+            <li class="flex items-start gap-3">
+              <span
+                class="w-5 h-5 rounded-full bg-green-500/10 text-green-600 text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5">2</span>
+              Pesquise: <strong class="text-on-surface">"Peixaria do Mancha, Médici II"</strong>
+            </li>
+            <li class="flex items-start gap-3">
+              <span
+                class="w-5 h-5 rounded-full bg-green-500/10 text-green-600 text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5">3</span>
+              Ou informe: <strong class="text-on-surface">Rua Outeiro, 200</strong>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+
+      <!-- Big Maps CTA -->
+      <div
+        class="bg-gradient-to-br from-primary-dim to-primary rounded-3xl p-8 md:p-12 flex flex-col md:flex-row items-center justify-between gap-8 fade-up shadow-2xl shadow-primary/30">
+        <div class="text-center md:text-left">
+          <div class="flex items-center gap-3 mb-3 justify-center md:justify-start">
+            <div class="relative">
+              <span class="material-symbols-outlined text-white text-4xl">location_on</span>
+              <span class="ping-slow absolute top-0 left-0 w-full h-full rounded-full bg-white/30"></span>
+            </div>
+            <h3 class="font-headline font-bold text-2xl md:text-3xl text-white">Abra no Google Maps</h3>
+          </div>
+          <p class="text-white/75 text-sm md:text-base max-w-lg">
+            Clique no botão ao lado para abrir nossa localização no Google Maps com a rota completa até o Box.
+          </p>
+        </div>
+        <a href="https://maps.app.goo.gl/BhnFQmixnRKVWeAX7" target="_blank" rel="noopener noreferrer"
+          id="cta-maps-section"
+          class="flex-shrink-0 inline-flex items-center gap-3 bg-white text-primary px-8 py-4 rounded-full font-bold text-base hover:bg-white/90 transition-all duration-300 shadow-xl hover:scale-105">
+          <span class="material-symbols-outlined">directions</span>
+          Traçar Rota Agora
+        </a>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- GALERIA DO BOX -->
+  <section id="galeria-box" class="py-20 bg-surface-container-low">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+      <div class="text-center mb-12 fade-up">
+        <span class="inline-block text-xs font-bold tracking-widest uppercase text-primary mb-3">Ambiente</span>
+        <h2 class="font-headline font-extrabold text-3xl md:text-4xl text-on-surface mb-4">
+          Conheça o Nosso <span class="text-primary">Box</span>
+        </h2>
+        <p class="text-on-surface-variant text-base max-w-xl mx-auto">
+          Um espaço aconchegante com produtos frescos, atendimento de qualidade e o melhor da culinária amazônica.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-4">
+        <div class="gallery-thumb col-span-2 row-span-2 h-72 fade-up reveal-left">
+          <img src="Fotos/Feira01.jpeg" alt="Box da Peixaria Mancha — Vista geral" loading="lazy">
+        </div>
+        <div class="gallery-thumb h-36 fade-up" style="transition-delay:0.1s">
+          <img src="Fotos/Feira02.jpeg" alt="Peixes frescos no Box" loading="lazy">
+        </div>
+        <div class="gallery-thumb h-36 fade-up" style="transition-delay:0.15s">
+          <img src="Fotos/Feira03.jpeg" alt="Frutos do mar no Box" loading="lazy">
+        </div>
+        <div class="gallery-thumb h-36 fade-up" style="transition-delay:0.2s">
+          <img src="Fotos/Feira04.jpeg" alt="Produtos selecionados" loading="lazy">
+        </div>
+        <div class="gallery-thumb h-36 fade-up" style="transition-delay:0.25s">
+          <img src="Fotos/Feira05.jpeg" alt="Ambiente do Box" loading="lazy">
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div class="gallery-thumb col-span-2 h-44 fade-up reveal-left" style="transition-delay:0.3s">
+          <img src="Fotos/Feira06.jpeg" alt="Vista do Box Peixaria Mancha" loading="lazy">
+        </div>
+        <div class="gallery-thumb h-44 fade-up" style="transition-delay:0.35s">
+          <img src="Fotos/Feira07.jpeg" alt="Peixes frescos" loading="lazy">
+        </div>
+        <div class="gallery-thumb h-44 fade-up" style="transition-delay:0.4s">
+          <img src="Fotos/Feira08.jpeg" alt="Variedade de frutos do mar" loading="lazy">
+        </div>
+        <div class="gallery-thumb h-44 fade-up" style="transition-delay:0.45s">
+          <img src="Fotos/Feira09.jpeg" alt="Produtos do Box" loading="lazy">
+        </div>
+        <div class="gallery-thumb h-44 fade-up" style="transition-delay:0.5s">
+          <img src="Fotos/Feira10.jpeg" alt="Box da Peixaria Mancha" loading="lazy">
+        </div>
+        <div class="gallery-thumb h-44 fade-up" style="transition-delay:0.55s">
+          <img src="Fotos/Feira11.jpeg" alt="Peixaria Mancha — Box" loading="lazy">
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- RESTAURANTE LINK -->
+  <section class="py-20 bg-white">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid md:grid-cols-2 gap-10 items-center">
+
+        <div class="fade-up reveal-left">
+          <span class="inline-block text-xs font-bold tracking-widest uppercase text-tertiary mb-4">Também nos
+            visite</span>
+          <h2 class="font-headline font-extrabold text-3xl md:text-4xl text-on-surface mb-5 leading-tight">
+            Além do Box,<br>temos o nosso <span class="text-primary">Restaurante</span>
+          </h2>
+          <p class="text-on-surface-variant text-base mb-8 leading-relaxed">
+            Na Peixaria Mancha você compra peixe fresco no Box e ainda pode almoçar ou jantar com pratos executivos,
+            tambaqui na brasa, e muito mais!
+          </p>
+          <div class="flex flex-wrap gap-3">
+            <a href="/" id="link-restaurante"
+              class="inline-flex items-center gap-2 bg-primary text-white px-6 py-3 rounded-full font-bold text-sm hover:bg-primary-dim transition-all duration-300 shadow-lg shadow-primary/20 hover:scale-105">
+              <span class="material-symbols-outlined text-[18px]">restaurant</span>
+              Ver o Restaurante
+            </a>
+            <a href="https://wa.me/5591989379978?text=Quero%20fazer%20uma%20reserva%20na%20Peixaria%20Mancha!"
+              target="_blank" rel="noopener noreferrer"
+              class="inline-flex items-center gap-2 border border-outline-variant text-on-surface px-6 py-3 rounded-full font-bold text-sm hover:border-primary hover:text-primary transition-all duration-300">
+              <span class="material-symbols-outlined text-[18px]">event_seat</span>
+              Fazer Reserva
+            </a>
+          </div>
+        </div>
+
+        <div class="fade-up reveal-right grid grid-cols-2 gap-4">
+          <div class="gallery-thumb rounded-2xl h-52 col-span-2">
+            <img src="Fotos/Restaurante01.jpg" alt="Restaurante da Peixaria Mancha" loading="lazy">
+          </div>
+          <div class="gallery-thumb rounded-2xl h-36">
+            <img src="Fotos/tambaqui.jpg" alt="Tambaqui na Peixaria Mancha" loading="lazy">
+          </div>
+          <div class="gallery-thumb rounded-2xl h-36">
+            <img src="Fotos/Executivo.jpg" alt="Prato executivo Peixaria Mancha" loading="lazy">
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA FINAL -->
+  <section class="py-20 bg-gradient-to-br from-primary-dim via-primary to-[#0096c7] relative overflow-hidden">
+    <div
+      class="absolute top-0 left-0 w-80 h-80 bg-white/5 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2 pointer-events-none">
+    </div>
+    <div
+      class="absolute bottom-0 right-0 w-80 h-80 bg-tertiary/10 rounded-full blur-3xl translate-x-1/2 translate-y-1/2 pointer-events-none">
+    </div>
+
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10 fade-up">
+      <div class="w-20 h-20 rounded-full overflow-hidden border-4 border-white/30 mx-auto mb-6 shadow-xl">
+        <img src="Fotos/logo.png" alt="Peixaria Mancha" class="w-full h-full object-cover">
+      </div>
+      <h2 class="font-headline font-extrabold text-3xl md:text-4xl text-white mb-4">
+        Te esperamos no Box!
+      </h2>
+      <p class="text-white/80 text-lg mb-10 max-w-xl mx-auto">
+        Venha escolher o peixe mais fresco de Belém diretamente com a gente. Qualidade e tradição desde 2008.
+      </p>
+      <div class="flex flex-col sm:flex-row gap-4 justify-center">
+        <a href="https://maps.app.goo.gl/BhnFQmixnRKVWeAX7" target="_blank" rel="noopener noreferrer"
+          id="cta-final-maps"
+          class="inline-flex items-center justify-center gap-3 bg-white text-primary px-8 py-4 rounded-full font-bold text-base hover:bg-white/90 transition-all duration-300 shadow-xl hover:scale-105">
+          <span class="material-symbols-outlined">directions</span>
+          Ir para o Box agora
+        </a>
+        <a href="https://wa.me/5591989379978" target="_blank" rel="noopener noreferrer"
+          class="inline-flex items-center justify-center gap-3 bg-white/10 border border-white/25 text-white px-8 py-4 rounded-full font-bold text-base backdrop-blur-sm hover:bg-white/20 transition-all duration-300">
+          <span class="material-symbols-outlined">chat</span>
+          Falar com a Mancha
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="bg-on-surface text-white py-10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-full overflow-hidden border-2 border-tertiary">
+            <img src="Fotos/logo.png" alt="Peixaria Mancha" class="w-full h-full object-cover">
+          </div>
+          <div>
+            <p class="font-headline font-bold text-white">Peixaria Mancha</p>
+            <p class="text-white/50 text-xs">Box Oficial · Belém, PA</p>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-6 text-sm text-white/60">
+          <a href="/" class="hover:text-white transition-colors">Início</a>
+          <a href="/#cardapio-restaurante" class="hover:text-white transition-colors">Cardápio</a>
+          <a href="#mapa" class="hover:text-white transition-colors">Mapa</a>
+          <a href="https://wa.me/5591989379978" target="_blank" rel="noopener noreferrer"
+            class="hover:text-white transition-colors">WhatsApp</a>
+        </div>
+
+        <p class="text-white/40 text-xs text-center">
+          &copy; 2025 Peixaria Mancha &middot; Todos os direitos reservados
+        </p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Lightbox Overlay -->
+  <div id="lightbox-overlay" role="dialog" aria-modal="true" aria-label="Visualizador de imagem">
+    <button id="lightbox-close" aria-label="Fechar">
+      <span class="material-symbols-outlined">close</span>
+    </button>
+    <img id="lightbox-img" src="" alt="Foto ampliada" />
+    <p id="lightbox-caption"></p>
+  </div>
+
+  <script>
+    // MOBILE MENU
+    const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+    const mobileMenu = document.getElementById('mobile-menu');
+    mobileMenuBtn.addEventListener('click', () => {
+      mobileMenu.classList.toggle('hidden');
+    });
+    mobileMenu.querySelectorAll('a').forEach(link => {
+      link.addEventListener('click', () => mobileMenu.classList.add('hidden'));
+    });
+
+    // SCROLL ANIMATIONS
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12 });
+    document.querySelectorAll('.fade-up, .reveal-left, .reveal-right').forEach(el => observer.observe(el));
+
+    // LIGHTBOX
+    const lightboxOverlay = document.getElementById('lightbox-overlay');
+    const lightboxImg = document.getElementById('lightbox-img');
+    const lightboxCaption = document.getElementById('lightbox-caption');
+    const lightboxClose = document.getElementById('lightbox-close');
+
+    document.querySelectorAll('.gallery-thumb').forEach(thumb => {
+      thumb.addEventListener('click', () => {
+        const img = thumb.querySelector('img');
+        lightboxImg.src = img.src;
+        lightboxImg.alt = img.alt;
+        lightboxCaption.textContent = img.alt;
+        lightboxOverlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
+      });
+    });
+
+    function closeLightbox() {
+      lightboxOverlay.classList.remove('active');
+      document.body.style.overflow = '';
+    }
+
+    lightboxClose.addEventListener('click', closeLightbox);
+    lightboxOverlay.addEventListener('click', (e) => {
+      if (e.target === lightboxOverlay) closeLightbox();
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeLightbox();
+    });
+
+    // NAVBAR SCROLL EFFECT
+    const navbar = document.getElementById('navbar');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 20) {
+        navbar.classList.add('shadow-md');
+      } else {
+        navbar.classList.remove('shadow-md');
+      }
+    });
+  </script>
+
+</body>
+
+</html>
