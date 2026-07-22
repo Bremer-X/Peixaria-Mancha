@@ -189,65 +189,8 @@
   </style>
 </head>
 
-<body class="bg-background text-on-surface font-body selection:bg-primary selection:text-on-primary pt-[72px]">
+<body class="bg-background text-on-surface font-body selection:bg-primary selection:text-on-primary">
 
-  <!-- NAVBAR -->
-  <header
-    class="fixed top-0 left-0 right-0 h-[72px] bg-white/80 backdrop-blur-md border-b border-outline-variant/20 z-50 transition-all duration-300"
-    id="navbar">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full flex items-center justify-between">
-      <a href="/" class="flex items-center gap-3 group">
-        <div
-          class="w-10 h-10 rounded-full overflow-hidden border-2 border-tertiary group-hover:scale-105 transition-transform">
-          <img src="Fotos/logo.png" alt="Logo Peixaria Mancha" class="w-full h-full object-cover">
-        </div>
-        <span class="font-headline font-bold text-lg tracking-tight text-primary-dim">Peixaria Mancha</span>
-      </a>
-
-      <nav class="hidden md:flex items-center gap-8 font-semibold text-sm">
-        <a href="/" class="text-on-surface hover:text-primary transition-colors">Início</a>
-        <a href="/#sobre" class="text-on-surface hover:text-primary transition-colors">Sobre Nós</a>
-        <a href="/#cardapio-restaurante" class="text-on-surface hover:text-primary transition-colors">Cardápio</a>
-        <a href="/#galeria" class="text-on-surface hover:text-primary transition-colors">Galeria</a>
-        <a href="#mapa" class="relative text-primary font-bold flex items-center gap-1.5">
-          <span class="material-symbols-outlined text-[18px]">location_on</span>Como Chegar
-        </a>
-      </nav>
-
-      <div class="hidden md:flex items-center gap-3">
-        <a href="https://wa.me/5591989379978" target="_blank" rel="noopener noreferrer"
-          class="flex h-10 px-5 bg-tertiary text-white items-center justify-center rounded-full font-bold text-sm hover:bg-[#e64a19] transition-colors shadow-lg shadow-tertiary/20">
-          <span class="material-symbols-outlined text-[18px] mr-2">delivery_dining</span>
-          Pedir Delivery
-        </a>
-      </div>
-
-      <button id="mobile-menu-btn"
-        class="md:hidden p-2 text-on-surface hover:text-primary transition-colors focus:outline-none rounded-lg"
-        aria-label="Abrir Menu">
-        <span class="material-symbols-outlined text-3xl">menu</span>
-      </button>
-    </div>
-
-    <div id="mobile-menu"
-      class="hidden md:hidden absolute top-[72px] left-0 right-0 bg-white/80 backdrop-blur-md border-b border-outline-variant/20 shadow-xl flex flex-col p-6 gap-6 font-semibold text-base min-h-[240px]">
-      <a href="/"
-        class="mobile-link w-full text-center hover:text-primary transition-colors p-2 text-on-surface">Início</a>
-      <a href="/#cardapio-restaurante"
-        class="mobile-link w-full text-center hover:text-primary transition-colors p-2 text-on-surface">Cardápio</a>
-      <a href="/#galeria"
-        class="mobile-link w-full text-center hover:text-primary transition-colors p-2 text-on-surface">Galeria</a>
-      <a href="#mapa"
-        class="mobile-link w-full text-center text-primary font-bold p-2 flex items-center justify-center gap-2">
-        <span class="material-symbols-outlined text-[18px]">location_on</span>Como Chegar
-      </a>
-      <div class="h-px bg-outline-variant/20 w-full my-2"></div>
-      <a href="https://wa.me/5591989379978" target="_blank" rel="noopener noreferrer"
-        class="mobile-link w-full py-3 bg-tertiary text-white flex items-center justify-center rounded-lg font-bold">
-        <span class="material-symbols-outlined mr-2">restaurant_menu</span> Fazer Pedido
-      </a>
-    </div>
-  </header>
 
   <!-- HERO -->
   <section class="relative min-h-[88vh] flex items-center overflow-hidden bg-cover bg-center"
