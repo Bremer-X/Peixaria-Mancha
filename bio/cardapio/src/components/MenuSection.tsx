@@ -1,13 +1,11 @@
-import { Plus } from 'lucide-react';
-import { MenuCategory, MenuItem } from '../types';
+import { MenuCategory } from '../types';
 
 interface MenuSectionProps {
   key?: string;
   category: MenuCategory;
-  onSelectItem: (item: MenuItem, defaultPortion?: '2P' | '4P') => void;
 }
 
-export default function MenuSection({ category, onSelectItem }: MenuSectionProps) {
+export default function MenuSection({ category }: MenuSectionProps) {
   const isPortionColumns = category.type === 'portion-columns';
   const isGrid = category.type === 'grid';
 
@@ -52,8 +50,7 @@ export default function MenuSection({ category, onSelectItem }: MenuSectionProps
                     <div
                       key={item.id}
                       id={`item-card-${item.id}`}
-                      onClick={() => onSelectItem(item)}
-                      className="my-3 p-3.5 bg-gradient-to-br from-[#fff2cc] to-[#ffe599] border-2 border-[#d8a832] rounded-xl shadow-md cursor-pointer hover:shadow-lg transition-all hover:scale-[1.01]"
+                      className="my-3 p-3.5 bg-gradient-to-br from-[#fff2cc] to-[#ffe599] border-2 border-[#d8a832] rounded-xl shadow-md"
                     >
                       <div className="flex items-center justify-between gap-2 mb-1.5 flex-wrap">
                         <span className="bg-[#b21818] text-white text-xs font-montserrat font-extrabold px-2.5 py-0.5 rounded-full uppercase tracking-wider shadow-sm flex items-center gap-1">
@@ -79,13 +76,6 @@ export default function MenuSection({ category, onSelectItem }: MenuSectionProps
                           <span className="font-montserrat font-black text-lg sm:text-xl text-[#b21818]">
                             {item.priceFormatted}
                           </span>
-                          <button
-                            id={`add-btn-${item.id}`}
-                            aria-label={`Adicionar ${item.name}`}
-                            className="bg-[#b21818] hover:bg-[#8f1212] text-white p-1.5 rounded-full shadow-sm"
-                          >
-                            <Plus className="w-4 h-4" />
-                          </button>
                         </div>
                       </div>
                     </div>
@@ -117,38 +107,26 @@ export default function MenuSection({ category, onSelectItem }: MenuSectionProps
                       )}
                     </div>
 
-                    {/* 2P and 4P Price Buttons */}
-                    <div className="flex items-center gap-2 sm:gap-4 flex-shrink-0">
-                      {/* 2P button */}
+                    {/* 2P and 4P Price Badges */}
+                    <div className="flex items-center gap-3 sm:gap-6 flex-shrink-0">
+                      {/* 2P price */}
                       {item.price2PFormatted ? (
-                        <button
-                          id={`btn-2p-${item.id}`}
-                          onClick={() => onSelectItem(item, '2P')}
-                          className="min-w-[84px] sm:min-w-[96px] text-right font-montserrat font-black text-xs sm:text-sm text-[#b21818] hover:bg-[#b21818]/10 py-1 px-1.5 rounded transition-all flex items-center justify-end gap-1 group"
-                          title="Adicionar porção 2P"
-                        >
-                          <span>{item.price2PFormatted}</span>
-                          <Plus className="w-3 h-3 text-[#b21818] opacity-60 group-hover:opacity-100" />
-                        </button>
+                        <span className="min-w-[60px] sm:min-w-[70px] text-right font-montserrat font-black text-xs sm:text-sm text-[#b21818] py-1 px-1.5">
+                          {item.price2PFormatted}
+                        </span>
                       ) : (
-                        <span className="min-w-[84px] sm:min-w-[96px] text-center text-stone-400 font-bold text-xs">
+                        <span className="min-w-[60px] sm:min-w-[70px] text-center text-stone-400 font-bold text-xs">
                           ---
                         </span>
                       )}
 
-                      {/* 4P button */}
+                      {/* 4P price */}
                       {item.price4PFormatted ? (
-                        <button
-                          id={`btn-4p-${item.id}`}
-                          onClick={() => onSelectItem(item, '4P')}
-                          className="min-w-[84px] sm:min-w-[96px] text-right font-montserrat font-black text-xs sm:text-sm text-[#b21818] hover:bg-[#b21818]/10 py-1 px-1.5 rounded transition-all flex items-center justify-end gap-1 group"
-                          title="Adicionar porção 4P"
-                        >
-                          <span>{item.price4PFormatted}</span>
-                          <Plus className="w-3 h-3 text-[#b21818] opacity-60 group-hover:opacity-100" />
-                        </button>
+                        <span className="min-w-[60px] sm:min-w-[70px] text-right font-montserrat font-black text-xs sm:text-sm text-[#b21818] py-1 px-1.5">
+                          {item.price4PFormatted}
+                        </span>
                       ) : (
-                        <span className="min-w-[84px] sm:min-w-[96px] text-center text-stone-400 font-bold text-xs">
+                        <span className="min-w-[60px] sm:min-w-[70px] text-center text-stone-400 font-bold text-xs">
                           ---
                         </span>
                       )}
@@ -167,8 +145,7 @@ export default function MenuSection({ category, onSelectItem }: MenuSectionProps
               <div
                 key={item.id}
                 id={`item-grid-${item.id}`}
-                onClick={() => onSelectItem(item)}
-                className="flex items-center justify-between gap-2 p-1.5 rounded-lg hover:bg-[#fff7d9] transition-colors cursor-pointer group"
+                className="flex items-center justify-between gap-2 p-1.5 rounded-lg hover:bg-[#fff7d9]/60 transition-colors"
               >
                 <span className="font-montserrat font-black text-stone-900 text-xs sm:text-sm uppercase tracking-wide">
                   {item.name}
@@ -180,13 +157,6 @@ export default function MenuSection({ category, onSelectItem }: MenuSectionProps
                   <span className="font-montserrat font-black text-xs sm:text-sm text-[#b21818]">
                     {item.priceFormatted}
                   </span>
-                  <button
-                    id={`add-extra-${item.id}`}
-                    aria-label={`Adicionar ${item.name}`}
-                    className="p-1 text-[#b21818] bg-white border border-[#ecd596] rounded-full group-hover:bg-[#b21818] group-hover:text-white transition-colors"
-                  >
-                    <Plus className="w-3 h-3" />
-                  </button>
                 </div>
               </div>
             ))}
@@ -200,8 +170,7 @@ export default function MenuSection({ category, onSelectItem }: MenuSectionProps
               <div
                 key={item.id}
                 id={`item-single-${item.id}`}
-                onClick={() => onSelectItem(item)}
-                className="py-2.5 flex items-center justify-between gap-2 hover:bg-[#fff7d9]/60 rounded-lg px-1 transition-colors cursor-pointer group"
+                className="py-2.5 flex items-center justify-between gap-2 hover:bg-[#fff7d9]/60 rounded-lg px-1 transition-colors"
               >
                 <div className="flex-1 pr-1">
                   <div className="flex items-baseline flex-wrap gap-x-1.5">
@@ -227,13 +196,6 @@ export default function MenuSection({ category, onSelectItem }: MenuSectionProps
                   <span className="font-montserrat font-black text-xs sm:text-sm text-[#b21818]">
                     {item.priceFormatted}
                   </span>
-                  <button
-                    id={`add-single-${item.id}`}
-                    aria-label={`Adicionar ${item.name}`}
-                    className="p-1 text-[#b21818] bg-white border border-[#ecd596] rounded-full group-hover:bg-[#b21818] group-hover:text-white transition-colors shadow-xs"
-                  >
-                    <Plus className="w-3.5 h-3.5" />
-                  </button>
                 </div>
               </div>
             ))}

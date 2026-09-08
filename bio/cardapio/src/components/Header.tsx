@@ -1,21 +1,15 @@
-import { Search, ShoppingBag, PhoneCall, X } from 'lucide-react';
+import { Search, PhoneCall, X } from 'lucide-react';
 import FishLogo from './FishLogo';
 import { RESTAURANT_INFO } from '../data/menuData';
 
 interface HeaderProps {
   searchQuery: string;
   onSearchChange: (query: string) => void;
-  cartItemCount: number;
-  cartTotal: number;
-  onOpenCart: () => void;
 }
 
 export default function Header({
   searchQuery,
   onSearchChange,
-  cartItemCount,
-  cartTotal,
-  onOpenCart,
 }: HeaderProps) {
   return (
     <header className="w-full pt-6 pb-2 text-center relative z-20">
@@ -43,20 +37,6 @@ export default function Header({
             <span className="sm:hidden">WhatsApp</span>
           </a>
         </div>
-
-        {cartItemCount > 0 && (
-          <button
-            id="header-cart-button"
-            onClick={onOpenCart}
-            className="inline-flex items-center gap-2 bg-[#b21818] hover:bg-[#8f1212] text-white px-3.5 py-1.5 rounded-full font-bold text-xs sm:text-sm shadow-md transition-all active:scale-95 animate-pulse"
-          >
-            <ShoppingBag className="w-4 h-4" />
-            <span>
-              {cartItemCount} {cartItemCount === 1 ? 'item' : 'itens'} • R${' '}
-              {cartTotal.toFixed(2).replace('.', ',')}
-            </span>
-          </button>
-        )}
       </div>
 
       {/* Main Brand Oval Logo */}
