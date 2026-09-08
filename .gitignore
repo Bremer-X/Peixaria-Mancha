@@ -4,3 +4,4 @@ temp_info.txt
 test_git.py
 *.pyc
 __pycache__/
+**/node_modules/

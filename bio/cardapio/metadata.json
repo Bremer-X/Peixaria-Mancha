@@ -1,0 +1,6 @@
+{
+  "name": "Peixaria Mancha - Cardápio Digital",
+  "description": "Cardápio digital e pedidos da Peixaria Mancha com tradição paraense, peixes nobres e caldeiradas.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
