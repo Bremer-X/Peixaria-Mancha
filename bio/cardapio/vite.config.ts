@@ -5,12 +5,22 @@ import path from 'path';
 import {defineConfig} from 'vite';
 
 export default defineConfig(() => {
+  const isDelivery = process.env.VITE_PAGE === 'delivery';
+
   return {
     base: './',
     plugins: [react(), tailwindcss(), viteSingleFile()],
     resolve: {
       alias: {
         '@': path.resolve(__dirname, '.'),
+      },
+    },
+    build: {
+      emptyOutDir: !isDelivery,
+      rollupOptions: {
+        input: isDelivery
+          ? path.resolve(__dirname, 'index2.html')
+          : path.resolve(__dirname, 'index.html'),
       },
     },
     server: {

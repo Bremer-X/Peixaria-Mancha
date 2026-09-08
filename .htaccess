@@ -32,10 +32,16 @@ Options -Indexes
     Deny from all
 </FilesMatch>
 
-# Force HTTPS redirect (uncomment if needed)
-# RewriteEngine On
-# RewriteCond %{HTTPS} off
-# RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+# URL Rewriting for Clean Cardápio URLs
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Cardápio Delivery
+    RewriteRule ^cardapio-delivery/?$ cardapio-delivery/index.html [L]
+
+    # Cardápio Restaurante
+    RewriteRule ^cardapio-restaurante/?$ cardapio-restaurante/index.html [L]
+</IfModule>
 
 # Cache control for static assets
 <IfModule mod_expires.c>
