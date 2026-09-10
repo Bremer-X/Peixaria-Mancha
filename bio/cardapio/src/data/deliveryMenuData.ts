@@ -83,6 +83,7 @@ export const DELIVERY_MENU_CATEGORIES: DeliveryCategory[] = [
         price: 76.0,
         priceFormatted: 'R$ 76,00',
         unitType: 'KG',
+        allowWeightChoice: true,
       },
       {
         id: 'frito-pescada-amarela',
