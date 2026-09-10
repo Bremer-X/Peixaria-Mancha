@@ -11,6 +11,8 @@ export interface DeliveryMenuItem {
   price500ml?: number;
   price500mlFormatted?: string;
   unitType?: 'KG' | 'UNIDADE' | 'BANDA' | 'PORÇÃO';
+  /** Se true, ao adicionar o cliente escolhe entre 1 Kg ou Meio Quilo (500g) */
+  allowWeightChoice?: boolean;
 }
 
 export interface DeliveryCategory {
@@ -25,7 +27,7 @@ export interface DeliveryCartItem {
   id: string;
   menuItemId: string;
   name: string;
-  portion?: '250ml' | '500ml' | '1 KG' | 'Unidade' | 'Banda';
+  portion?: '250ml' | '500ml' | '1 KG' | '500g' | 'Unidade' | 'Banda';
   price: number;
   quantity: number;
   notes?: string;
@@ -59,6 +61,7 @@ export const DELIVERY_MENU_CATEGORIES: DeliveryCategory[] = [
         price: 74.0,
         priceFormatted: 'R$ 74,00',
         unitType: 'KG',
+        allowWeightChoice: true,
       },
       {
         id: 'frito-isca-dourada',
@@ -69,6 +72,7 @@ export const DELIVERY_MENU_CATEGORIES: DeliveryCategory[] = [
         price: 74.0,
         priceFormatted: 'R$ 74,00',
         unitType: 'KG',
+        allowWeightChoice: true,
       },
       {
         id: 'frito-file-dourada',
@@ -79,6 +83,7 @@ export const DELIVERY_MENU_CATEGORIES: DeliveryCategory[] = [
         price: 76.0,
         priceFormatted: 'R$ 76,00',
         unitType: 'KG',
+        allowWeightChoice: true,
       },
       {
         id: 'frito-pescada-amarela',
@@ -89,6 +94,7 @@ export const DELIVERY_MENU_CATEGORIES: DeliveryCategory[] = [
         price: 82.0,
         priceFormatted: 'R$ 82,00',
         unitType: 'KG',
+        allowWeightChoice: true,
       },
       {
         id: 'frito-filhote',
@@ -99,6 +105,7 @@ export const DELIVERY_MENU_CATEGORIES: DeliveryCategory[] = [
         price: 88.0,
         priceFormatted: 'R$ 88,00',
         unitType: 'KG',
+        allowWeightChoice: true,
       },
       {
         id: 'frito-pirarucu',
@@ -109,6 +116,7 @@ export const DELIVERY_MENU_CATEGORIES: DeliveryCategory[] = [
         price: 85.0,
         priceFormatted: 'R$ 85,00',
         unitType: 'KG',
+        allowWeightChoice: true,
       },
       {
         id: 'frito-go-inteira',
@@ -167,6 +175,7 @@ export const DELIVERY_MENU_CATEGORIES: DeliveryCategory[] = [
         price: 90.0,
         priceFormatted: 'R$ 90,00',
         unitType: 'KG',
+        allowWeightChoice: true,
       },
     ],
   },
