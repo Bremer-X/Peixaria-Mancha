@@ -17,14 +17,14 @@ export default function DeliveryItemModal({
 }: DeliveryItemModalProps) {
   const [quantity, setQuantity] = useState(1);
   const [selectedPortion, setSelectedPortion] = useState<'250ml' | '500ml'>('250ml');
+  const [weightChoice, setWeightChoice] = useState<'1kg' | '500g'>('1kg');
   const [notes, setNotes] = useState('');
-
-  const hasPortions = Boolean(item?.price250ml && item?.price500ml);
 
   useEffect(() => {
     if (item) {
       setQuantity(1);
       setNotes('');
+      setWeightChoice('1kg');
       if (defaultPortion) {
         setSelectedPortion(defaultPortion);
       } else if (item.price250ml) {
@@ -37,6 +37,9 @@ export default function DeliveryItemModal({
 
   if (!item) return null;
 
+  const hasPortions = Boolean(item?.price250ml && item?.price500ml);
+  const hasWeightChoice = Boolean(item?.allowWeightChoice && item?.unitType === 'KG');
+
   // Calculate unit price
   let unitPrice = item.price || 0;
   if (hasPortions) {
@@ -45,12 +48,19 @@ export default function DeliveryItemModal({
     unitPrice = item.price500ml;
   }
 
-  const totalPrice = unitPrice * quantity;
+  // Para itens com escolha de peso, metade do preço quando 500g
+  const effectivePrice = hasWeightChoice && weightChoice === '500g'
+    ? unitPrice / 2
+    : unitPrice;
+
+  const totalPrice = effectivePrice * quantity;
 
   const handleConfirm = () => {
-    let portionLabel: '250ml' | '500ml' | '1 KG' | 'Unidade' | 'Banda' | undefined = undefined;
+    let portionLabel: '250ml' | '500ml' | '1 KG' | '500g' | 'Unidade' | 'Banda' | undefined = undefined;
     if (hasPortions || item.price250ml || item.price500ml) {
       portionLabel = selectedPortion;
+    } else if (hasWeightChoice) {
+      portionLabel = weightChoice === '1kg' ? '1 KG' : '500g';
     } else if (item.unitType === 'KG') {
       portionLabel = '1 KG';
     } else if (item.unitType === 'UNIDADE') {
@@ -66,7 +76,7 @@ export default function DeliveryItemModal({
       menuItemId: item.id,
       name: item.name,
       portion: portionLabel,
-      price: unitPrice,
+      price: effectivePrice,
       quantity,
       notes: notes.trim() || undefined,
     });
@@ -103,7 +113,51 @@ export default function DeliveryItemModal({
             </p>
           )}
 
-          {/* Portion selection if item has 250ml / 500ml options */}
+          {/* Seleção de peso: 1 KG ou 500g — apenas para itens KG com allowWeightChoice */}
+          {hasWeightChoice && (
+            <div className="space-y-2">
+              <label className="text-xs font-montserrat font-black uppercase text-stone-800 tracking-wide block">
+                Escolha a quantidade:
+              </label>
+              <div className="grid grid-cols-2 gap-3">
+                {/* 1 KG */}
+                <button
+                  type="button"
+                  onClick={() => setWeightChoice('1kg')}
+                  className={`p-3 rounded-2xl border-2 font-montserrat font-bold flex flex-col items-center justify-center gap-0.5 transition-all ${
+                    weightChoice === '1kg'
+                      ? 'border-[#b21818] bg-[#b21818]/10 shadow-md scale-105'
+                      : 'border-[#ecd596] bg-white text-stone-700 hover:bg-[#fff9e6] hover:border-[#d8a832]'
+                  }`}
+                >
+                  <span className={`text-2xl font-black leading-none ${weightChoice === '1kg' ? 'text-[#b21818]' : 'text-stone-900'}`}>1 KG</span>
+                  <span className="text-[10px] uppercase font-extrabold text-stone-400 tracking-wide">Peso completo</span>
+                  <span className={`font-black text-sm mt-1 ${weightChoice === '1kg' ? 'text-[#b21818]' : 'text-stone-800'}`}>
+                    R$ {unitPrice.toFixed(2).replace('.', ',')}
+                  </span>
+                </button>
+
+                {/* 500g / Meio Quilo */}
+                <button
+                  type="button"
+                  onClick={() => setWeightChoice('500g')}
+                  className={`p-3 rounded-2xl border-2 font-montserrat font-bold flex flex-col items-center justify-center gap-0.5 transition-all ${
+                    weightChoice === '500g'
+                      ? 'border-[#ff5e00] bg-[#ff5e00]/10 shadow-md scale-105'
+                      : 'border-[#ecd596] bg-white text-stone-700 hover:bg-[#fff9e6] hover:border-[#d8a832]'
+                  }`}
+                >
+                  <span className={`text-2xl font-black leading-none ${weightChoice === '500g' ? 'text-[#ff5e00]' : 'text-stone-900'}`}>500g</span>
+                  <span className="text-[10px] uppercase font-extrabold text-stone-400 tracking-wide">Meio Quilo</span>
+                  <span className={`font-black text-sm mt-1 ${weightChoice === '500g' ? 'text-[#ff5e00]' : 'text-stone-800'}`}>
+                    R$ {(unitPrice / 2).toFixed(2).replace('.', ',')}
+                  </span>
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Portion selection — apenas para acompanhamentos 250ml/500ml */}
           {hasPortions && (
             <div className="space-y-2">
               <label className="text-xs font-montserrat font-black uppercase text-stone-800 tracking-wide block">
