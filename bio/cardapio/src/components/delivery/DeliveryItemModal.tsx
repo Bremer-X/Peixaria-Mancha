@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { X, Plus, Minus, Check, Scale } from 'lucide-react';
+import { X, Plus, Minus, Check } from 'lucide-react';
 import { DeliveryMenuItem, DeliveryCartItem } from '../../data/deliveryMenuData';
 
 interface DeliveryItemModalProps {
@@ -9,8 +9,6 @@ interface DeliveryItemModalProps {
   onAddToCart: (cartItem: DeliveryCartItem) => void;
 }
 
-type WeightChoice = '1kg' | '500g';
-
 export default function DeliveryItemModal({
   item,
   defaultPortion,
@@ -19,17 +17,14 @@ export default function DeliveryItemModal({
 }: DeliveryItemModalProps) {
   const [quantity, setQuantity] = useState(1);
   const [selectedPortion, setSelectedPortion] = useState<'250ml' | '500ml'>('250ml');
-  const [weightChoice, setWeightChoice] = useState<WeightChoice>('1kg');
   const [notes, setNotes] = useState('');
 
   const hasPortions = Boolean(item?.price250ml && item?.price500ml);
-  const hasWeightChoice = Boolean(item?.allowWeightChoice && item?.unitType === 'KG');
 
   useEffect(() => {
     if (item) {
       setQuantity(1);
       setNotes('');
-      setWeightChoice('1kg');
       if (defaultPortion) {
         setSelectedPortion(defaultPortion);
       } else if (item.price250ml) {
@@ -50,20 +45,12 @@ export default function DeliveryItemModal({
     unitPrice = item.price500ml;
   }
 
-  // Apply weight discount for 500g
-  const effectivePrice = hasWeightChoice && weightChoice === '500g'
-    ? unitPrice / 2
-    : unitPrice;
-
-  const totalPrice = effectivePrice * quantity;
+  const totalPrice = unitPrice * quantity;
 
   const handleConfirm = () => {
-    let portionLabel: '250ml' | '500ml' | '1 KG' | '500g' | 'Unidade' | 'Banda' | undefined = undefined;
-
+    let portionLabel: '250ml' | '500ml' | '1 KG' | 'Unidade' | 'Banda' | undefined = undefined;
     if (hasPortions || item.price250ml || item.price500ml) {
       portionLabel = selectedPortion;
-    } else if (hasWeightChoice) {
-      portionLabel = weightChoice === '1kg' ? '1 KG' : '500g';
     } else if (item.unitType === 'KG') {
       portionLabel = '1 KG';
     } else if (item.unitType === 'UNIDADE') {
@@ -79,7 +66,7 @@ export default function DeliveryItemModal({
       menuItemId: item.id,
       name: item.name,
       portion: portionLabel,
-      price: effectivePrice,
+      price: unitPrice,
       quantity,
       notes: notes.trim() || undefined,
     });
@@ -114,61 +101,6 @@ export default function DeliveryItemModal({
             <p className="text-xs sm:text-sm text-stone-700 italic font-medium leading-relaxed bg-[#fff7d9] p-3 rounded-xl border border-[#ecd596]">
               {item.description}
             </p>
-          )}
-
-          {/* Weight choice for KG items */}
-          {hasWeightChoice && (
-            <div className="space-y-2">
-              <label className="text-xs font-montserrat font-black uppercase text-stone-800 tracking-wide flex items-center gap-1.5">
-                <Scale className="w-3.5 h-3.5 text-[#b21818]" />
-                Escolha a quantidade:
-              </label>
-              <div className="grid grid-cols-2 gap-3">
-                {/* 1 KG option */}
-                <button
-                  type="button"
-                  onClick={() => setWeightChoice('1kg')}
-                  className={`p-3 rounded-2xl border-2 font-montserrat font-bold text-xs flex flex-col items-center justify-center gap-1 transition-all ${
-                    weightChoice === '1kg'
-                      ? 'border-[#b21818] bg-[#b21818]/10 text-[#b21818] shadow-md scale-105'
-                      : 'border-[#ecd596] bg-white text-stone-700 hover:bg-[#fff9e6] hover:border-[#d8a832]'
-                  }`}
-                >
-                  <span className="text-2xl font-black leading-none">1 KG</span>
-                  <span className="text-[10px] uppercase font-extrabold text-stone-500 tracking-wide">
-                    Peso completo
-                  </span>
-                  <span className={`font-black text-base mt-0.5 ${weightChoice === '1kg' ? 'text-[#b21818]' : 'text-stone-900'}`}>
-                    R$ {unitPrice.toFixed(2).replace('.', ',')}
-                  </span>
-                </button>
-
-                {/* 500g / Meio Quilo option */}
-                <button
-                  type="button"
-                  onClick={() => setWeightChoice('500g')}
-                  className={`p-3 rounded-2xl border-2 font-montserrat font-bold text-xs flex flex-col items-center justify-center gap-1 transition-all ${
-                    weightChoice === '500g'
-                      ? 'border-[#ff5e00] bg-[#ff5e00]/10 text-[#ff5e00] shadow-md scale-105'
-                      : 'border-[#ecd596] bg-white text-stone-700 hover:bg-[#fff9e6] hover:border-[#d8a832]'
-                  }`}
-                >
-                  <span className="text-2xl font-black leading-none">500g</span>
-                  <span className="text-[10px] uppercase font-extrabold text-stone-500 tracking-wide">
-                    Meio Quilo
-                  </span>
-                  <span className={`font-black text-base mt-0.5 ${weightChoice === '500g' ? 'text-[#ff5e00]' : 'text-stone-900'}`}>
-                    R$ {(unitPrice / 2).toFixed(2).replace('.', ',')}
-                  </span>
-                </button>
-              </div>
-
-              {weightChoice === '500g' && (
-                <p className="text-[11px] text-stone-500 italic font-medium text-center bg-amber-50 rounded-xl px-3 py-1.5 border border-amber-200">
-                  ✓ Meio quilo — metade do valor do KG
-                </p>
-              )}
-            </div>
           )}
 
           {/* Portion selection if item has 250ml / 500ml options */}
