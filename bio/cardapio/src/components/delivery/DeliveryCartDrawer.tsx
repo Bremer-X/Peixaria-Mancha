@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   X,
   Trash2,
@@ -41,6 +41,17 @@ export default function DeliveryCartDrawer({
   const [cashChangeFor, setCashChangeFor] = useState('');
   const [generalNotes, setGeneralNotes] = useState('');
   const [validationError, setValidationError] = useState('');
+  const [showDeliveryNotice, setShowDeliveryNotice] = useState(false);
+
+  useEffect(() => {
+    if (!isOpen) {
+      setShowDeliveryNotice(false);
+      return;
+    }
+
+    const timer = window.setTimeout(() => setShowDeliveryNotice(true), 3000);
+    return () => window.clearTimeout(timer);
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
@@ -141,7 +152,7 @@ export default function DeliveryCartDrawer({
     <div className="fixed inset-0 z-50 flex justify-end bg-black/60 backdrop-blur-xs animate-in fade-in">
       <div
         id="delivery-cart-panel"
-        className="w-full max-w-lg bg-[#fffdec] h-full shadow-2xl flex flex-col border-l border-[#ecd596]"
+        className="relative w-full max-w-lg bg-[#fffdec] h-full shadow-2xl flex flex-col border-l border-[#ecd596]"
       >
         {/* Header */}
         <div className="bg-[#b21818] text-white p-4 flex items-center justify-between shadow-sm flex-shrink-0">
@@ -507,6 +518,41 @@ export default function DeliveryCartDrawer({
             <p className="text-[11px] text-center text-stone-500 font-medium">
               Você será redirecionado para o WhatsApp da Peixaria com o pedido pronto!
             </p>
+          </div>
+        )}
+
+        {/* Aviso exibido 3 segundos após a abertura do carrinho */}
+        {showDeliveryNotice && (
+          <div
+            className="absolute inset-0 z-20 flex items-center justify-center bg-black/55 p-4 backdrop-blur-xs"
+            role="alertdialog"
+            aria-modal="true"
+            aria-labelledby="delivery-notice-title"
+            aria-describedby="delivery-notice-description"
+          >
+            <div className="w-full max-w-sm rounded-3xl border-2 border-amber-300 bg-[#fffdec] p-5 text-center shadow-2xl">
+              <AlertCircle className="mx-auto mb-2 h-10 w-10 text-[#ff5e00]" />
+              <h3
+                id="delivery-notice-title"
+                className="font-bebas text-2xl tracking-wide text-[#b21818] uppercase"
+              >
+                Atenção sobre a entrega
+              </h3>
+              <p
+                id="delivery-notice-description"
+                className="mt-2 text-sm font-montserrat font-semibold leading-relaxed text-stone-800"
+              >
+                A atendente informará a taxa de entrega de acordo com a sua região
+                (bairro). Aguarde a confirmação do pedido pelo WhatsApp.
+              </p>
+              <button
+                type="button"
+                onClick={() => setShowDeliveryNotice(false)}
+                className="mt-5 w-full rounded-full bg-[#ff5e00] px-5 py-3 text-sm font-montserrat font-black text-white shadow-md transition-all hover:bg-[#e05200] active:scale-98"
+              >
+                Entendi
+              </button>
+            </div>
           </div>
         )}
       </div>
