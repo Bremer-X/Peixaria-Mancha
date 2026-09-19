@@ -27,7 +27,7 @@ export interface DeliveryCartItem {
   id: string;
   menuItemId: string;
   name: string;
-  portion?: '250ml' | '500ml' | '1 KG' | '500g' | 'Unidade' | 'Banda';
+  portion?: string;
   price: number;
   quantity: number;
   notes?: string;

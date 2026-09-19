@@ -17,14 +17,22 @@ export default function DeliveryItemModal({
 }: DeliveryItemModalProps) {
   const [quantity, setQuantity] = useState(1);
   const [selectedPortion, setSelectedPortion] = useState<'250ml' | '500ml'>('250ml');
-  const [weightChoice, setWeightChoice] = useState<'1kg' | '500g'>('1kg');
+  const [weightInGrams, setWeightInGrams] = useState<number>(1000);
   const [notes, setNotes] = useState('');
+
+  const formatWeightLabel = (grams: number) => {
+    if (grams >= 1000) {
+      const kg = grams / 1000;
+      return kg % 1 === 0 ? `${kg} KG` : `${kg.toFixed(1).replace('.', ',')} KG`;
+    }
+    return `${grams}g`;
+  };
 
   useEffect(() => {
     if (item) {
       setQuantity(1);
       setNotes('');
-      setWeightChoice('1kg');
+      setWeightInGrams(1000);
       if (defaultPortion) {
         setSelectedPortion(defaultPortion);
       } else if (item.price250ml) {
@@ -40,7 +48,7 @@ export default function DeliveryItemModal({
   const hasPortions = Boolean(item?.price250ml && item?.price500ml);
   const hasWeightChoice = Boolean(item?.allowWeightChoice && item?.unitType === 'KG');
 
-  // Calculate unit price
+  // Calculate unit price base (preço por KG ou preço da porção)
   let unitPrice = item.price || 0;
   if (hasPortions) {
     unitPrice = selectedPortion === '250ml' ? item.price250ml || 0 : item.price500ml || 0;
@@ -48,19 +56,19 @@ export default function DeliveryItemModal({
     unitPrice = item.price500ml;
   }
 
-  // Para itens com escolha de peso, metade do preço quando 500g
-  const effectivePrice = hasWeightChoice && weightChoice === '500g'
-    ? unitPrice / 2
+  // Preço proporcional ao peso baseado no valor do KG
+  const effectivePrice = hasWeightChoice
+    ? (unitPrice * weightInGrams) / 1000
     : unitPrice;
 
   const totalPrice = effectivePrice * quantity;
 
   const handleConfirm = () => {
-    let portionLabel: '250ml' | '500ml' | '1 KG' | '500g' | 'Unidade' | 'Banda' | undefined = undefined;
+    let portionLabel: string | undefined = undefined;
     if (hasPortions || item.price250ml || item.price500ml) {
       portionLabel = selectedPortion;
     } else if (hasWeightChoice) {
-      portionLabel = weightChoice === '1kg' ? '1 KG' : '500g';
+      portionLabel = formatWeightLabel(weightInGrams);
     } else if (item.unitType === 'KG') {
       portionLabel = '1 KG';
     } else if (item.unitType === 'UNIDADE') {
@@ -113,26 +121,33 @@ export default function DeliveryItemModal({
             </p>
           )}
 
-          {/* Seleção de peso: 1 KG ou 500g — apenas para itens KG com allowWeightChoice */}
+          {/* Seleção de peso: 1 KG ou 500g + Ajuste fino de 100g em 100g */}
           {hasWeightChoice && (
-            <div className="space-y-2">
-              <label className="text-xs font-montserrat font-black uppercase text-stone-800 tracking-wide block">
-                Escolha a quantidade:
-              </label>
-              <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-montserrat font-black uppercase text-stone-800 tracking-wide block">
+                  Escolha a quantidade:
+                </label>
+                <span className="text-[11px] font-montserrat font-bold text-amber-900 bg-[#fff5d6] px-2.5 py-0.5 rounded-full border border-[#ecd596]">
+                  R$ {unitPrice.toFixed(2).replace('.', ',')} / KG
+                </span>
+              </div>
+
+              {/* Atalhos Rápidos: 1 KG e 500g */}
+              <div className="grid grid-cols-2 gap-2.5">
                 {/* 1 KG */}
                 <button
                   type="button"
-                  onClick={() => setWeightChoice('1kg')}
-                  className={`p-3 rounded-2xl border-2 font-montserrat font-bold flex flex-col items-center justify-center gap-0.5 transition-all ${
-                    weightChoice === '1kg'
-                      ? 'border-[#b21818] bg-[#b21818]/10 shadow-md scale-105'
+                  onClick={() => setWeightInGrams(1000)}
+                  className={`p-3 rounded-2xl border-2 font-montserrat font-bold flex flex-col items-center justify-center gap-0.5 transition-all cursor-pointer ${
+                    weightInGrams === 1000
+                      ? 'border-[#b21818] bg-[#b21818]/10 shadow-sm scale-102'
                       : 'border-[#ecd596] bg-white text-stone-700 hover:bg-[#fff9e6] hover:border-[#d8a832]'
                   }`}
                 >
-                  <span className={`text-2xl font-black leading-none ${weightChoice === '1kg' ? 'text-[#b21818]' : 'text-stone-900'}`}>1 KG</span>
+                  <span className={`text-2xl font-black leading-none ${weightInGrams === 1000 ? 'text-[#b21818]' : 'text-stone-900'}`}>1 KG</span>
                   <span className="text-[10px] uppercase font-extrabold text-stone-400 tracking-wide">Peso completo</span>
-                  <span className={`font-black text-sm mt-1 ${weightChoice === '1kg' ? 'text-[#b21818]' : 'text-stone-800'}`}>
+                  <span className={`font-black text-sm mt-0.5 ${weightInGrams === 1000 ? 'text-[#b21818]' : 'text-stone-800'}`}>
                     R$ {unitPrice.toFixed(2).replace('.', ',')}
                   </span>
                 </button>
@@ -140,19 +155,79 @@ export default function DeliveryItemModal({
                 {/* 500g / Meio Quilo */}
                 <button
                   type="button"
-                  onClick={() => setWeightChoice('500g')}
-                  className={`p-3 rounded-2xl border-2 font-montserrat font-bold flex flex-col items-center justify-center gap-0.5 transition-all ${
-                    weightChoice === '500g'
-                      ? 'border-[#ff5e00] bg-[#ff5e00]/10 shadow-md scale-105'
+                  onClick={() => setWeightInGrams(500)}
+                  className={`p-3 rounded-2xl border-2 font-montserrat font-bold flex flex-col items-center justify-center gap-0.5 transition-all cursor-pointer ${
+                    weightInGrams === 500
+                      ? 'border-[#ff5e00] bg-[#ff5e00]/10 shadow-sm scale-102'
                       : 'border-[#ecd596] bg-white text-stone-700 hover:bg-[#fff9e6] hover:border-[#d8a832]'
                   }`}
                 >
-                  <span className={`text-2xl font-black leading-none ${weightChoice === '500g' ? 'text-[#ff5e00]' : 'text-stone-900'}`}>500g</span>
+                  <span className={`text-2xl font-black leading-none ${weightInGrams === 500 ? 'text-[#ff5e00]' : 'text-stone-900'}`}>500g</span>
                   <span className="text-[10px] uppercase font-extrabold text-stone-400 tracking-wide">Meio Quilo</span>
-                  <span className={`font-black text-sm mt-1 ${weightChoice === '500g' ? 'text-[#ff5e00]' : 'text-stone-800'}`}>
-                    R$ {(unitPrice / 2).toFixed(2).replace('.', ',')}
+                  <span className={`font-black text-sm mt-0.5 ${weightInGrams === 500 ? 'text-[#ff5e00]' : 'text-stone-800'}`}>
+                    R$ {(unitPrice * 0.5).toFixed(2).replace('.', ',')}
                   </span>
                 </button>
+              </div>
+
+              {/* Seletor Stepper de Gramatura (de 100g em 100g) */}
+              <div className="bg-[#fff9e6] p-3 rounded-2xl border border-[#ecd596] shadow-2xs">
+                <div className="flex items-center justify-between text-[11px] font-montserrat font-bold text-stone-600 mb-2 px-1">
+                  <span>Ajuste personalizado:</span>
+                  <span className="text-amber-800 font-extrabold bg-amber-100 px-2 py-0.5 rounded-md border border-amber-200/60">
+                    de 100g em 100g
+                  </span>
+                </div>
+
+                <div className="flex items-center justify-between bg-white rounded-xl border border-[#e5cf94] p-1.5 shadow-inner">
+                  <button
+                    type="button"
+                    disabled={weightInGrams <= 500}
+                    onClick={() => setWeightInGrams(prev => Math.max(500, prev - 100))}
+                    className={`w-10 h-10 rounded-lg flex items-center justify-center font-bold text-base transition-all ${
+                      weightInGrams <= 500
+                        ? 'text-stone-300 bg-stone-100 cursor-not-allowed opacity-50'
+                        : 'text-stone-800 bg-[#fff5d6] hover:bg-[#ffebad] active:scale-95 cursor-pointer shadow-xs'
+                    }`}
+                    aria-label="Diminuir 100g"
+                  >
+                    <Minus className="w-4 h-4" />
+                  </button>
+
+                  <div className="text-center flex flex-col items-center">
+                    <span className="font-montserrat font-black text-2xl text-stone-900 leading-tight">
+                      {formatWeightLabel(weightInGrams)}
+                    </span>
+                    <span className="text-xs font-montserrat font-black text-[#b21818]">
+                      R$ {effectivePrice.toFixed(2).replace('.', ',')}
+                    </span>
+                  </div>
+
+                  <button
+                    type="button"
+                    disabled={weightInGrams >= 2000}
+                    onClick={() => setWeightInGrams(prev => Math.min(2000, prev + 100))}
+                    className={`w-10 h-10 rounded-lg flex items-center justify-center font-bold text-base transition-all ${
+                      weightInGrams >= 2000
+                        ? 'text-stone-300 bg-stone-100 cursor-not-allowed opacity-50'
+                        : 'text-stone-800 bg-[#fff5d6] hover:bg-[#ffebad] active:scale-95 cursor-pointer shadow-xs'
+                    }`}
+                    aria-label="Aumentar 100g"
+                  >
+                    <Plus className="w-4 h-4" />
+                  </button>
+                </div>
+
+                {/* Rodapé sutil com limites */}
+                <div className="flex justify-between items-center px-1 mt-2 text-[10px] font-montserrat font-semibold text-stone-500">
+                  <span>Mínimo: 500g</span>
+                  {weightInGrams > 500 && weightInGrams < 1000 && (
+                    <span className="text-amber-800 font-extrabold">
+                      (Opção fracionada)
+                    </span>
+                  )}
+                  <span>Máximo: 2 KG</span>
+                </div>
               </div>
             </div>
           )}
