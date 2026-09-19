@@ -209,7 +209,7 @@ export const DELIVERY_MENU_CATEGORIES: DeliveryCategory[] = [
         id: 'acomp-farofa',
         name: 'FAROFA CROCANTE',
         category: 'acompanhamentos',
-        description: 'Farofa dourada artesanal com manteiga.',
+        description: 'Farofa especial de soja.',
         price250ml: 8.0,
         price250mlFormatted: 'R$ 8,00',
         price500ml: 16.0,
