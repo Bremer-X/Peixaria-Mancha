@@ -1,4 +1,5 @@
 .agente/
+.agents/
 .vscode/
 temp_info.txt
 test_git.py
