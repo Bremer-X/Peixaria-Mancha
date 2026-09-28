@@ -151,6 +151,16 @@ export default function DeliveryCartDrawer({
 
     const encoded = encodeURIComponent(msg);
     const url = `https://wa.me/${DELIVERY_RESTAURANT_INFO.whatsapp}?text=${encoded}`;
+
+    if (typeof window !== 'undefined' && typeof (window as any).gtag === 'function') {
+      (window as any).gtag('event', 'conversion', {
+        send_to: 'AW-16545779111/H7mqCNjC-u4aEKeb0tE9',
+        value: subtotal || 0,
+        currency: 'BRL',
+        transaction_id: 'PED-' + Date.now(),
+      });
+    }
+
     window.open(url, '_blank');
   };
 
