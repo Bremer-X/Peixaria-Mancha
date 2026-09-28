@@ -11,6 +11,13 @@ export default function Header({
   searchQuery,
   onSearchChange,
 }: HeaderProps) {
+  const deliveryAppUrl =
+    typeof window !== 'undefined' &&
+    window.location.port === '3000' &&
+    !window.location.pathname.includes('cardapio-restaurante')
+      ? './index2.html'
+      : '../cardapio-delivery/index.html';
+
   return (
     <header className="w-full pt-3 pb-2 text-center relative z-20">
       {/* Top Floating Utility Bar */}
@@ -43,7 +50,7 @@ export default function Header({
         {/* Link to Delivery for customers browsing from home */}
         <a
           id="link-to-delivery"
-          href="./index2.html"
+          href={deliveryAppUrl}
           className="inline-flex items-center gap-1.5 bg-amber-500 hover:bg-amber-600 text-white text-xs font-montserrat font-bold px-3.5 py-1.5 rounded-full transition-all active:scale-95 shadow-xs cursor-pointer group"
           title="Ir para o Cardápio Delivery"
         >
