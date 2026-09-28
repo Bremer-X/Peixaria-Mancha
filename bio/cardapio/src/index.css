@@ -24,7 +24,7 @@ body {
 /* Custom dotted leader lines */
 .dotted-leader {
   flex-grow: 1;
-  border-bottom: 2px dotted #d19a2e;
+  border-bottom: 2px dotted #d6d3d1;
   margin: 0 8px;
   position: relative;
   top: -4px;
