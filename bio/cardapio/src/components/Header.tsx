@@ -18,7 +18,7 @@ export default function Header({
         <div className="flex items-center gap-2">
           <a
             id="back-to-bio-link"
-            href="../bio/index.html"
+            href="https://engrenebio.com.br/peixaria-mancha"
             className="inline-flex items-center gap-1 bg-stone-900 hover:bg-stone-800 text-white text-xs sm:text-sm font-bold px-3.5 py-1.5 rounded-full shadow transition-transform active:scale-95"
             title="Voltar para os links da Bio"
           >

@@ -13,6 +13,9 @@ export interface DeliveryMenuItem {
   unitType?: 'KG' | 'UNIDADE' | 'BANDA' | 'PORÇÃO';
   /** Quando true, o modal exibe a escolha entre 1 KG e 500g */
   allowWeightChoice?: boolean;
+  image?: string;
+  isPopular?: boolean;
+  serves?: string;
 }
 
 export interface DeliveryCategory {
@@ -20,6 +23,7 @@ export interface DeliveryCategory {
   title: string;
   subtitle?: string;
   type: 'single' | 'portion-columns';
+  iconName?: 'Fish' | 'Flame' | 'Utensils';
   items: DeliveryMenuItem[];
 }
 
@@ -31,6 +35,51 @@ export interface DeliveryCartItem {
   price: number;
   quantity: number;
   notes?: string;
+  image?: string;
+}
+
+export const DELIVERY_HOURS = {
+  openHour: 7,
+  closeHour: 14,
+  label: 'Todos os dias das 07h às 14h',
+};
+
+export function getDeliveryAvailability() {
+  try {
+    const now = new Date();
+    // Timezone Belém (UTC-3)
+    const formatter = new Intl.DateTimeFormat('pt-BR', {
+      timeZone: 'America/Belem',
+      hour: 'numeric',
+      minute: 'numeric',
+      hour12: false,
+    });
+    const parts = formatter.formatToParts(now);
+    const hour = parseInt(parts.find((p) => p.type === 'hour')?.value || '0', 10);
+    const minute = parseInt(parts.find((p) => p.type === 'minute')?.value || '0', 10);
+    const currentMinutes = hour * 60 + minute;
+
+    const openMinutes = DELIVERY_HOURS.openHour * 60; // 07:00 (420 min)
+    const closeMinutes = DELIVERY_HOURS.closeHour * 60; // 14:00 (840 min)
+
+    const isOpen = currentMinutes >= openMinutes && currentMinutes < closeMinutes;
+
+    return {
+      isOpen,
+      statusText: isOpen ? 'Aberto para Pedidos' : 'Fechado no momento',
+      subText: isOpen ? '30-50 min' : 'Disponível das 07h às 14h',
+      scheduleText: 'Todos os dias das 07h às 14h',
+    };
+  } catch {
+    const hour = new Date().getHours();
+    const isOpen = hour >= 7 && hour < 14;
+    return {
+      isOpen,
+      statusText: isOpen ? 'Aberto para Pedidos' : 'Fechado no momento',
+      subText: isOpen ? '30-50 min' : 'Disponível das 07h às 14h',
+      scheduleText: 'Todos os dias das 07h às 14h',
+    };
+  }
 }
 
 export const DELIVERY_RESTAURANT_INFO = {
@@ -39,6 +88,9 @@ export const DELIVERY_RESTAURANT_INFO = {
   tagline: 'Qualidade que você sente, sabor que você ama!',
   freshFishBadge: 'PEIXE FRESCO TODOS OS DIAS!',
   qualityGuarantee: 'QUALIDADE GARANTIDA, SABOR QUE FAZ A DIFERENÇA!',
+  statusText: 'Aberto para Pedidos',
+  deliveryTime: '30-50 min',
+  location: 'Belém & Ananindeua',
   whatsapp: '5591989379978',
   phoneFormatted: '(91) 98937-9978',
   instagram: '@peixaria.mancha',
@@ -51,7 +103,59 @@ export const DELIVERY_MENU_CATEGORIES: DeliveryCategory[] = [
     title: 'PEIXES FRITOS',
     subtitle: 'PRODUTOS PESADOS IN NATURA',
     type: 'single',
+    iconName: 'Fish',
     items: [
+      {
+        id: 'frito-file-filhote',
+        name: 'FILÉ DE FILHOTE FRITO (KG)',
+        category: 'fritos',
+        badge: 'FRITO CROCANTE',
+        description: 'Filé nobre de Filhote amazônico frito crocante e sequinho por fora, macio e suculento por dentro (peso in natura).',
+        price: 88.0,
+        priceFormatted: 'R$ 88,00',
+        unitType: 'KG',
+        allowWeightChoice: true,
+        isPopular: true,
+        serves: 'Até 3 pessoas',
+      },
+      {
+        id: 'frito-file-dourada',
+        name: 'FILÉ DE DOURADA (KG)',
+        category: 'fritos',
+        badge: 'PESO IN NATURA',
+        description: 'Filé nobre de Dourada fresca empanada crocante.',
+        price: 76.0,
+        priceFormatted: 'R$ 76,00',
+        unitType: 'KG',
+        allowWeightChoice: true,
+        isPopular: true,
+        serves: 'Até 3 pessoas',
+      },
+      {
+        id: 'frito-isca-dourada',
+        name: 'ISCA DE DOURADA (KG)',
+        category: 'fritos',
+        badge: 'PETISCO CAMPEÃO',
+        description: 'Iscas selecionadas de Dourada fresca, crocantes e douradas.',
+        price: 74.0,
+        priceFormatted: 'R$ 74,00',
+        unitType: 'KG',
+        allowWeightChoice: true,
+        isPopular: true,
+        serves: 'Porção generosa',
+      },
+      {
+        id: 'frito-pescada-amarela',
+        name: 'PESCADA AMARELA (KG)',
+        category: 'fritos',
+        badge: 'ESPECIALIDADE',
+        description: 'Pescada amarela nobre de alta qualidade (pesado in natura).',
+        price: 82.0,
+        priceFormatted: 'R$ 82,00',
+        unitType: 'KG',
+        allowWeightChoice: true,
+        serves: 'Até 3 pessoas',
+      },
       {
         id: 'frito-file-go',
         name: 'FILÉ DE GÓ (KG)',
@@ -62,50 +166,7 @@ export const DELIVERY_MENU_CATEGORIES: DeliveryCategory[] = [
         priceFormatted: 'R$ 74,00',
         unitType: 'KG',
         allowWeightChoice: true,
-      },
-      {
-        id: 'frito-isca-dourada',
-        name: 'ISCA DE DOURADA (KG)',
-        category: 'fritos',
-        badge: 'PESO IN NATURA',
-        description: 'Iscas selecionadas de Dourada empanadas e fritas crocantes.',
-        price: 74.0,
-        priceFormatted: 'R$ 74,00',
-        unitType: 'KG',
-        allowWeightChoice: true,
-      },
-      {
-        id: 'frito-file-dourada',
-        name: 'FILÉ DE DOURADA (KG)',
-        category: 'fritos',
-        badge: 'PESO IN NATURA',
-        description: 'Filé nobre de Dourada fresca pesado in natura.',
-        price: 76.0,
-        priceFormatted: 'R$ 76,00',
-        unitType: 'KG',
-        allowWeightChoice: true,
-      },
-      {
-        id: 'frito-pescada-amarela',
-        name: 'PESCADA AMARELA (KG)',
-        category: 'fritos',
-        badge: 'PESO IN NATURA',
-        description: 'Pescada amarela nobre de alta qualidade (pesado in natura).',
-        price: 82.0,
-        priceFormatted: 'R$ 82,00',
-        unitType: 'KG',
-        allowWeightChoice: true,
-      },
-      {
-        id: 'frito-filhote',
-        name: 'FILHOTE (KG)',
-        category: 'fritos',
-        badge: 'PESO IN NATURA',
-        description: 'Filhote amazônico de primeira linha, super macio e saboroso.',
-        price: 88.0,
-        priceFormatted: 'R$ 88,00',
-        unitType: 'KG',
-        allowWeightChoice: true,
+        serves: 'Até 3 pessoas',
       },
       {
         id: 'frito-pirarucu',
@@ -117,6 +178,7 @@ export const DELIVERY_MENU_CATEGORIES: DeliveryCategory[] = [
         priceFormatted: 'R$ 85,00',
         unitType: 'KG',
         allowWeightChoice: true,
+        serves: 'Até 3 pessoas',
       },
       {
         id: 'frito-go-inteira',
@@ -127,6 +189,7 @@ export const DELIVERY_MENU_CATEGORIES: DeliveryCategory[] = [
         price: 10.0,
         priceFormatted: 'R$ 10,00',
         unitType: 'UNIDADE',
+        serves: 'Individual',
       },
     ],
   },
@@ -135,7 +198,33 @@ export const DELIVERY_MENU_CATEGORIES: DeliveryCategory[] = [
     title: 'PEIXES ASSADOS',
     subtitle: 'ASSADOS NA BRASA COM TEMPERO ESPECIAL',
     type: 'single',
+    iconName: 'Flame',
     items: [
+      {
+        id: 'assado-tambaqui',
+        name: 'TAMBAQUI A PARTIR (BANDA)',
+        category: 'assados',
+        badge: 'BRASA PARAENSE',
+        description: 'Banda nobre de Tambaqui assado na brasa, suculento e dourado.',
+        price: 100.0,
+        priceFormatted: 'R$ 100,00',
+        unitType: 'BANDA',
+        isPopular: true,
+        serves: 'Serve 3 a 4 pessoas',
+      },
+      {
+        id: 'assado-file-filhote',
+        name: 'FILÉ DE FILHOTE ASSADO (KG)',
+        category: 'assados',
+        badge: 'ASSADO NA BRASA',
+        description: 'Filé nobre de Filhote assado na brasa com tempero especial da casa, textura macia e sabor defumado incomparável (peso in natura).',
+        price: 90.0,
+        priceFormatted: 'R$ 90,00',
+        unitType: 'KG',
+        allowWeightChoice: true,
+        isPopular: true,
+        serves: 'Até 3 pessoas',
+      },
       {
         id: 'assado-mapara',
         name: 'MAPARÁ (UNIDADE)',
@@ -156,34 +245,14 @@ export const DELIVERY_MENU_CATEGORIES: DeliveryCategory[] = [
         priceFormatted: 'R$ 50,00',
         unitType: 'UNIDADE',
       },
-      {
-        id: 'assado-tambaqui',
-        name: 'TAMBAQUI A PARTIR (BANDA)',
-        category: 'assados',
-        badge: 'BANDA NA BRASA',
-        description: 'Banda de Tambaqui assado na brasa com tempero paraense.',
-        price: 100.0,
-        priceFormatted: 'R$ 100,00',
-        unitType: 'BANDA',
-      },
-      {
-        id: 'assado-file-filhote',
-        name: 'FILÉ DE FILHOTE (KG)',
-        category: 'assados',
-        badge: 'PESO IN NATURA',
-        description: 'Filé nobre de Filhote assado na perfeição (peso in natura).',
-        price: 90.0,
-        priceFormatted: 'R$ 90,00',
-        unitType: 'KG',
-        allowWeightChoice: true,
-      },
     ],
   },
   {
     id: 'porcoes-acompanhamento',
     title: 'PORÇÕES DE ACOMPANHAMENTO',
-    subtitle: 'ESCOLHA O TAMANHO: PORÇÃO 250ML OU 500ML',
+    subtitle: 'ESCOLHA O TAMANHO: PORÇÃO 250g OU 500g',
     type: 'portion-columns',
+    iconName: 'Utensils',
     items: [
       {
         id: 'acomp-arroz',
@@ -193,6 +262,7 @@ export const DELIVERY_MENU_CATEGORIES: DeliveryCategory[] = [
         price500ml: 8.0,
         price500mlFormatted: 'R$ 8,00',
         unitType: 'PORÇÃO',
+        image: '../Fotos/delivery/Arroz.png',
       },
       {
         id: 'acomp-vinagrete',
@@ -204,6 +274,7 @@ export const DELIVERY_MENU_CATEGORIES: DeliveryCategory[] = [
         price500ml: 16.0,
         price500mlFormatted: 'R$ 16,00',
         unitType: 'PORÇÃO',
+        image: '../Fotos/delivery/Vinagrete.png',
       },
       {
         id: 'acomp-farofa',
@@ -215,6 +286,7 @@ export const DELIVERY_MENU_CATEGORIES: DeliveryCategory[] = [
         price500ml: 16.0,
         price500mlFormatted: 'R$ 16,00',
         unitType: 'PORÇÃO',
+        image: '../Fotos/delivery/Farofa.png',
       },
       {
         id: 'acomp-baiao',
@@ -226,6 +298,7 @@ export const DELIVERY_MENU_CATEGORIES: DeliveryCategory[] = [
         price500ml: 16.0,
         price500mlFormatted: 'R$ 16,00',
         unitType: 'PORÇÃO',
+        image: '../Fotos/delivery/Baião.png',
       },
       {
         id: 'acomp-feijao',
@@ -237,6 +310,7 @@ export const DELIVERY_MENU_CATEGORIES: DeliveryCategory[] = [
         price500ml: 16.0,
         price500mlFormatted: 'R$ 16,00',
         unitType: 'PORÇÃO',
+        image: '../Fotos/delivery/Feijão.png',
       },
     ],
   },

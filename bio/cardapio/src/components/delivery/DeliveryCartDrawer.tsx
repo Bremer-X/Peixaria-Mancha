@@ -12,8 +12,9 @@ import {
   Banknote,
   QrCode,
   AlertCircle,
+  Clock,
 } from 'lucide-react';
-import { DeliveryCartItem, DELIVERY_RESTAURANT_INFO } from '../../data/deliveryMenuData';
+import { DeliveryCartItem, DELIVERY_RESTAURANT_INFO, getDeliveryAvailability } from '../../data/deliveryMenuData';
 
 interface DeliveryCartDrawerProps {
   isOpen: boolean;
@@ -140,6 +141,11 @@ export default function DeliveryCartDrawer({
       msg += `📝 *Observações Gerais:* ${generalNotes.trim()}\n`;
     }
 
+    const availability = getDeliveryAvailability();
+    if (!availability.isOpen) {
+      msg += `⏰ *Horário:* Enviado fora do horário de delivery (07h às 14h).\n`;
+    }
+
     msg += `─────────────────────────\n`;
     msg += `_Pedido gerado via Cardápio Digital Peixaria Mancha_`;
 
@@ -152,47 +158,55 @@ export default function DeliveryCartDrawer({
     <div className="fixed inset-0 z-50 flex justify-end bg-black/60 backdrop-blur-xs animate-in fade-in">
       <div
         id="delivery-cart-panel"
-        className="relative w-full max-w-lg bg-[#fffdec] h-full shadow-2xl flex flex-col border-l border-[#ecd596]"
+        className="relative w-full max-w-lg bg-[#FAF7F2] h-full shadow-2xl flex flex-col border-l border-stone-200/80"
       >
         {/* Header */}
-        <div className="bg-[#b21818] text-white p-4 flex items-center justify-between shadow-sm flex-shrink-0">
-          <div className="flex items-center gap-2">
-            <ShoppingBag className="w-5 h-5 text-amber-300" />
-            <h2 className="font-bebas text-2xl sm:text-3xl tracking-wide uppercase">
-              Meu Pedido ({totalCount})
-            </h2>
+        <div className="bg-[#b21818] text-white p-4 flex items-center justify-between shadow-xs flex-shrink-0">
+          <div className="flex items-center gap-2.5">
+            <div className="bg-white/15 p-1.5 rounded-xl">
+              <ShoppingBag className="w-5 h-5 text-amber-200" />
+            </div>
+            <div>
+              <h2 className="font-bebas text-2xl sm:text-3xl tracking-wide uppercase leading-tight">
+                Seu Pedido ({totalCount})
+              </h2>
+              <span className="text-[10px] font-montserrat font-bold text-amber-100 uppercase tracking-wider block -mt-1">
+                Peixaria Mancha Delivery
+              </span>
+            </div>
           </div>
           <button
             onClick={onClose}
-            className="p-1 rounded-full text-white/80 hover:text-white hover:bg-black/20 transition-colors"
+            className="p-1.5 rounded-full text-white/80 hover:text-white hover:bg-white/20 transition-all cursor-pointer"
+            title="Fechar"
           >
-            <X className="w-6 h-6" />
+            <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Scrollable Content */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-5">
+        <div className="flex-1 overflow-y-auto p-3.5 sm:p-5 space-y-4">
           {/* Cart Items List */}
           {cart.length === 0 ? (
-            <div className="text-center py-12 text-stone-500">
-              <ShoppingBag className="w-12 h-12 mx-auto mb-2 opacity-40 text-[#b21818]" />
-              <p className="font-montserrat font-bold text-sm text-stone-700">
-                Seu carrinho está vazio
+            <div className="text-center py-16 px-4 bg-white rounded-3xl border border-stone-200/80 shadow-2xs">
+              <ShoppingBag className="w-12 h-12 mx-auto mb-2 text-stone-300" />
+              <p className="font-montserrat font-black text-sm text-stone-800">
+                Seu pedido está vazio
               </p>
-              <p className="text-xs text-stone-500 mt-1">
-                Escolha seus peixes e porções no cardápio para fazer o pedido!
+              <p className="text-xs text-stone-500 mt-1 max-w-xs mx-auto">
+                Escolha seus peixes e porções no cardápio para pedir rapidinho no WhatsApp!
               </p>
             </div>
           ) : (
-            <div className="space-y-3">
-              <div className="flex items-center justify-between pb-1 border-b border-[#ebd8ab]">
-                <span className="font-montserrat font-black text-xs uppercase text-stone-700">
-                  Itens Selecionados
+            <div className="space-y-2.5">
+              <div className="flex items-center justify-between px-1">
+                <span className="font-montserrat font-bold text-xs uppercase text-stone-600">
+                  Pratos no Carrinho
                 </span>
                 <button
                   type="button"
                   onClick={onClearCart}
-                  className="text-[11px] font-montserrat font-bold text-[#b21818] hover:underline flex items-center gap-1"
+                  className="text-[11px] font-montserrat font-bold text-[#b21818] hover:underline flex items-center gap-1 cursor-pointer"
                 >
                   <Trash2 className="w-3 h-3" /> Limpar tudo
                 </button>
@@ -201,35 +215,44 @@ export default function DeliveryCartDrawer({
               {cart.map((item) => (
                 <div
                   key={item.id}
-                  className="bg-white p-3 rounded-xl border border-[#ecd596] shadow-2xs space-y-2"
+                  className="bg-white p-3.5 rounded-2xl border border-stone-200/90 shadow-2xs space-y-2"
                 >
-                  <div className="flex items-start justify-between gap-2">
-                    <div>
-                      <h4 className="font-montserrat font-black text-xs sm:text-sm text-stone-900 uppercase">
-                        {item.name}
-                      </h4>
-                      {item.portion && (
-                        <span className="inline-block bg-[#ff5e00]/10 text-[#ff5e00] text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full mt-0.5">
-                          {item.portion}
-                        </span>
+                  <div className="flex items-start justify-between gap-2.5">
+                    <div className="flex items-start gap-2.5 flex-1 min-w-0">
+                      {item.image && (
+                        <img
+                          src={item.image}
+                          alt={item.name}
+                          className="w-12 h-12 rounded-xl object-cover border border-stone-200 flex-shrink-0"
+                        />
                       )}
-                      {item.notes && (
-                        <p className="text-[11px] text-stone-600 italic mt-0.5">
-                          Obs: {item.notes}
-                        </p>
-                      )}
+                      <div className="flex-1 min-w-0">
+                        <h4 className="font-montserrat font-black text-xs sm:text-sm text-stone-900 uppercase leading-snug">
+                          {item.name}
+                        </h4>
+                        {item.portion && (
+                          <span className="inline-block bg-amber-50 text-[#d97706] border border-amber-200/80 text-[10px] font-bold uppercase px-2 py-0.5 rounded-full mt-0.5">
+                            {item.portion}
+                          </span>
+                        )}
+                        {item.notes && (
+                          <p className="text-[11px] text-stone-500 italic mt-0.5">
+                            Obs: {item.notes}
+                          </p>
+                        )}
+                      </div>
                     </div>
-                    <span className="font-montserrat font-black text-xs sm:text-sm text-[#b21818] whitespace-nowrap">
+                    <span className="font-bebas text-base sm:text-lg font-bold text-[#b21818] whitespace-nowrap">
                       R$ {(item.price * item.quantity).toFixed(2).replace('.', ',')}
                     </span>
                   </div>
 
-                  <div className="flex items-center justify-between pt-1 border-t border-stone-100">
-                    <div className="flex items-center gap-2 bg-stone-50 border border-stone-200 rounded-full p-0.5">
+                  <div className="flex items-center justify-between pt-1.5 border-t border-stone-100">
+                    <div className="flex items-center gap-2 bg-stone-100 border border-stone-200 rounded-full p-0.5">
                       <button
                         type="button"
                         onClick={() => onUpdateQuantity(item.id, item.quantity - 1)}
-                        className="w-6 h-6 flex items-center justify-center rounded-full bg-white hover:bg-stone-200 text-stone-800"
+                        className="w-6 h-6 flex items-center justify-center rounded-full bg-white hover:bg-stone-200 text-stone-800 shadow-2xs cursor-pointer"
                       >
                         <Minus className="w-3 h-3" />
                       </button>
@@ -239,7 +262,7 @@ export default function DeliveryCartDrawer({
                       <button
                         type="button"
                         onClick={() => onUpdateQuantity(item.id, item.quantity + 1)}
-                        className="w-6 h-6 flex items-center justify-center rounded-full bg-[#ff5e00] hover:bg-[#e05200] text-white"
+                        className="w-6 h-6 flex items-center justify-center rounded-full bg-[#b21818] hover:bg-[#8c1010] text-white shadow-2xs cursor-pointer"
                       >
                         <Plus className="w-3 h-3" />
                       </button>
@@ -248,7 +271,7 @@ export default function DeliveryCartDrawer({
                     <button
                       type="button"
                       onClick={() => onRemoveItem(item.id)}
-                      className="text-stone-400 hover:text-red-600 p-1 transition-colors"
+                      className="text-stone-400 hover:text-red-600 p-1.5 transition-colors cursor-pointer"
                       title="Remover item"
                     >
                       <Trash2 className="w-4 h-4" />
@@ -261,24 +284,41 @@ export default function DeliveryCartDrawer({
 
           {/* Customer & Checkout Form */}
           {cart.length > 0 && (
-            <div className="space-y-4 pt-2 border-t-2 border-[#ebd8ab]">
-              <h3 className="font-bebas text-xl sm:text-2xl tracking-wide uppercase text-stone-800">
-                Informações para Entrega
-              </h3>
+            <div className="space-y-4 pt-3 border-t border-stone-200/80">
+              {!getDeliveryAvailability().isOpen && (
+                <div className="bg-amber-50 border border-amber-300/80 rounded-2xl p-3 flex items-start gap-2.5 text-xs font-montserrat shadow-2xs">
+                  <Clock className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <span className="font-bold text-stone-900 block">Horário Delivery: Todos os dias das 07h às 14h</span>
+                    <span className="text-stone-600 font-medium leading-relaxed">
+                      Você pode adiantar seu pedido agora! A equipe receberá no WhatsApp e atenderá logo no início do expediente.
+                    </span>
+                  </div>
+                </div>
+              )}
+
+              <div className="flex items-center gap-1.5">
+                <span className="bg-[#b21818] text-white font-montserrat font-bold text-[10px] w-5 h-5 rounded-full flex items-center justify-center">
+                  2
+                </span>
+                <h3 className="font-bebas text-xl sm:text-2xl tracking-wide uppercase text-stone-900">
+                  Dados de Entrega & Pagamento
+                </h3>
+              </div>
 
               {/* Order Type Toggle */}
               <div>
-                <label className="text-xs font-montserrat font-black uppercase text-stone-700 block mb-1.5">
-                  Como deseja receber?
+                <label className="text-xs font-montserrat font-bold uppercase text-stone-700 block mb-1.5">
+                  Modalidade do Pedido:
                 </label>
                 <div className="grid grid-cols-2 gap-2">
                   <button
                     type="button"
                     onClick={() => setOrderType('delivery')}
-                    className={`py-2.5 px-3 rounded-xl font-montserrat font-bold text-xs flex items-center justify-center gap-2 border-2 transition-all ${
+                    className={`py-2.5 px-3 rounded-2xl font-montserrat font-bold text-xs flex items-center justify-center gap-2 border-2 transition-all cursor-pointer ${
                       orderType === 'delivery'
-                        ? 'border-[#ff5e00] bg-[#ff5e00]/10 text-[#ff5e00] shadow-sm'
-                        : 'border-[#ecd596] bg-white text-stone-700 hover:bg-[#fff9e6]'
+                        ? 'border-[#b21818] bg-red-50/70 text-[#b21818] shadow-xs'
+                        : 'border-stone-200 bg-white text-stone-700 hover:bg-stone-50'
                     }`}
                   >
                     <MapPin className="w-4 h-4" />
@@ -288,10 +328,10 @@ export default function DeliveryCartDrawer({
                   <button
                     type="button"
                     onClick={() => setOrderType('pickup')}
-                    className={`py-2.5 px-3 rounded-xl font-montserrat font-bold text-xs flex items-center justify-center gap-2 border-2 transition-all ${
+                    className={`py-2.5 px-3 rounded-2xl font-montserrat font-bold text-xs flex items-center justify-center gap-2 border-2 transition-all cursor-pointer ${
                       orderType === 'pickup'
-                        ? 'border-[#ff5e00] bg-[#ff5e00]/10 text-[#ff5e00] shadow-sm'
-                        : 'border-[#ecd596] bg-white text-stone-700 hover:bg-[#fff9e6]'
+                        ? 'border-[#d97706] bg-amber-50/70 text-[#d97706] shadow-xs'
+                        : 'border-stone-200 bg-white text-stone-700 hover:bg-stone-50'
                     }`}
                   >
                     <Store className="w-4 h-4" />
@@ -304,7 +344,7 @@ export default function DeliveryCartDrawer({
               <div className="space-y-1">
                 <label className="text-xs font-montserrat font-bold text-stone-800 flex items-center justify-between">
                   <span>Seu Nome</span>
-                  <span className="text-red-600 font-black text-[11px] uppercase tracking-wider">* Obrigatório</span>
+                  <span className="text-red-600 font-bold text-[10px] uppercase tracking-wider">* Obrigatório</span>
                 </label>
                 <input
                   type="text"
@@ -314,10 +354,10 @@ export default function DeliveryCartDrawer({
                     setCustomerName(e.target.value);
                     if (validationError) setValidationError('');
                   }}
-                  className={`w-full p-2.5 bg-white border rounded-xl text-xs sm:text-sm text-stone-900 focus:outline-none focus:ring-2 ${
+                  className={`w-full p-2.5 bg-white border rounded-xl text-xs sm:text-sm text-stone-900 focus:outline-none transition-all ${
                     !customerName.trim() && validationError
                       ? 'border-red-500 ring-1 ring-red-500 bg-red-50/50'
-                      : 'border-[#d8a832] focus:ring-[#ff5e00]'
+                      : 'border-stone-200 focus:border-[#b21818] focus:ring-2 focus:ring-[#b21818]/15'
                   }`}
                 />
               </div>
@@ -325,8 +365,8 @@ export default function DeliveryCartDrawer({
               {/* Phone */}
               <div className="space-y-1">
                 <label className="text-xs font-montserrat font-bold text-stone-800 flex items-center justify-between">
-                  <span>WhatsApp / Telefone</span>
-                  <span className="text-red-600 font-black text-[11px] uppercase tracking-wider">* Obrigatório</span>
+                  <span>WhatsApp de Contato</span>
+                  <span className="text-red-600 font-bold text-[10px] uppercase tracking-wider">* Obrigatório</span>
                 </label>
                 <input
                   type="tel"
@@ -336,10 +376,10 @@ export default function DeliveryCartDrawer({
                     setPhone(e.target.value);
                     if (validationError) setValidationError('');
                   }}
-                  className={`w-full p-2.5 bg-white border rounded-xl text-xs sm:text-sm text-stone-900 focus:outline-none focus:ring-2 ${
+                  className={`w-full p-2.5 bg-white border rounded-xl text-xs sm:text-sm text-stone-900 focus:outline-none transition-all ${
                     (!phone.trim() || phone.replace(/\D/g, '').length < 10) && validationError
                       ? 'border-red-500 ring-1 ring-red-500 bg-red-50/50'
-                      : 'border-[#d8a832] focus:ring-[#ff5e00]'
+                      : 'border-stone-200 focus:border-[#b21818] focus:ring-2 focus:ring-[#b21818]/15'
                   }`}
                 />
               </div>
@@ -349,8 +389,8 @@ export default function DeliveryCartDrawer({
                 <>
                   <div className="space-y-1">
                     <label className="text-xs font-montserrat font-bold text-stone-800 flex items-center justify-between">
-                      <span>Endereço Completo de Entrega</span>
-                      <span className="text-red-600 font-black text-[11px] uppercase tracking-wider">* Obrigatório</span>
+                      <span>Endereço de Entrega</span>
+                      <span className="text-red-600 font-bold text-[10px] uppercase tracking-wider">* Obrigatório</span>
                     </label>
                     <input
                       type="text"
@@ -360,10 +400,10 @@ export default function DeliveryCartDrawer({
                         setAddress(e.target.value);
                         if (validationError) setValidationError('');
                       }}
-                      className={`w-full p-2.5 bg-white border rounded-xl text-xs sm:text-sm text-stone-900 focus:outline-none focus:ring-2 ${
+                      className={`w-full p-2.5 bg-white border rounded-xl text-xs sm:text-sm text-stone-900 focus:outline-none transition-all ${
                         !address.trim() && validationError
                           ? 'border-red-500 ring-1 ring-red-500 bg-red-50/50'
-                          : 'border-[#d8a832] focus:ring-[#ff5e00]'
+                          : 'border-stone-200 focus:border-[#b21818] focus:ring-2 focus:ring-[#b21818]/15'
                       }`}
                     />
                   </div>
@@ -377,7 +417,7 @@ export default function DeliveryCartDrawer({
                       placeholder="Ex: próximo à praça, em frente à padaria"
                       value={referencePoint}
                       onChange={(e) => setReferencePoint(e.target.value)}
-                      className="w-full p-2.5 bg-white border border-[#d8a832] rounded-xl text-xs sm:text-sm text-stone-900 focus:outline-none focus:ring-2 focus:ring-[#ff5e00]"
+                      className="w-full p-2.5 bg-white border border-stone-200 rounded-xl text-xs sm:text-sm text-stone-900 focus:outline-none focus:border-[#b21818] focus:ring-2 focus:ring-[#b21818]/15 transition-all"
                     />
                   </div>
                 </>
@@ -386,8 +426,8 @@ export default function DeliveryCartDrawer({
               {/* Payment Method */}
               <div className="space-y-1.5">
                 <label className="text-xs font-montserrat font-bold text-stone-800 flex items-center justify-between">
-                  <span className="uppercase font-black">Forma de Pagamento</span>
-                  <span className="text-red-600 font-black text-[11px] uppercase tracking-wider">* Obrigatório</span>
+                  <span className="uppercase">Forma de Pagamento</span>
+                  <span className="text-red-600 font-bold text-[10px] uppercase tracking-wider">* Obrigatório</span>
                 </label>
                 <div className={`grid grid-cols-2 gap-2 p-1 rounded-2xl ${
                   !paymentMethod && validationError ? 'border-2 border-red-500 bg-red-50/30' : ''
@@ -400,12 +440,12 @@ export default function DeliveryCartDrawer({
                     }}
                     className={`p-2.5 rounded-xl border-2 text-xs font-montserrat font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
                       paymentMethod === 'pix'
-                        ? 'border-[#ff5e00] bg-[#ff5e00]/15 text-[#ff5e00] shadow-sm font-black'
-                        : 'border-[#ecd596] bg-white text-stone-700 hover:bg-[#fff9e6]'
+                        ? 'border-emerald-500 bg-emerald-50/80 text-emerald-800 shadow-2xs font-black'
+                        : 'border-stone-200 bg-white text-stone-700 hover:bg-stone-50'
                     }`}
                   >
-                    <QrCode className="w-4 h-4" />
-                    <span>PIX</span>
+                    <QrCode className="w-4 h-4 text-emerald-600" />
+                    <span>PIX (Instantâneo)</span>
                   </button>
 
                   <button
@@ -416,8 +456,8 @@ export default function DeliveryCartDrawer({
                     }}
                     className={`p-2.5 rounded-xl border-2 text-xs font-montserrat font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
                       paymentMethod === 'credit'
-                        ? 'border-[#ff5e00] bg-[#ff5e00]/15 text-[#ff5e00] shadow-sm font-black'
-                        : 'border-[#ecd596] bg-white text-stone-700 hover:bg-[#fff9e6]'
+                        ? 'border-[#b21818] bg-red-50/80 text-[#b21818] shadow-2xs font-black'
+                        : 'border-stone-200 bg-white text-stone-700 hover:bg-stone-50'
                     }`}
                   >
                     <CreditCard className="w-4 h-4" />
@@ -432,8 +472,8 @@ export default function DeliveryCartDrawer({
                     }}
                     className={`p-2.5 rounded-xl border-2 text-xs font-montserrat font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
                       paymentMethod === 'debit'
-                        ? 'border-[#ff5e00] bg-[#ff5e00]/15 text-[#ff5e00] shadow-sm font-black'
-                        : 'border-[#ecd596] bg-white text-stone-700 hover:bg-[#fff9e6]'
+                        ? 'border-[#b21818] bg-red-50/80 text-[#b21818] shadow-2xs font-black'
+                        : 'border-stone-200 bg-white text-stone-700 hover:bg-stone-50'
                     }`}
                   >
                     <CreditCard className="w-4 h-4" />
@@ -448,8 +488,8 @@ export default function DeliveryCartDrawer({
                     }}
                     className={`p-2.5 rounded-xl border-2 text-xs font-montserrat font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
                       paymentMethod === 'cash'
-                        ? 'border-[#ff5e00] bg-[#ff5e00]/15 text-[#ff5e00] shadow-sm font-black'
-                        : 'border-[#ecd596] bg-white text-stone-700 hover:bg-[#fff9e6]'
+                        ? 'border-[#d97706] bg-amber-50/80 text-[#d97706] shadow-2xs font-black'
+                        : 'border-stone-200 bg-white text-stone-700 hover:bg-stone-50'
                     }`}
                   >
                     <Banknote className="w-4 h-4" />
@@ -464,7 +504,7 @@ export default function DeliveryCartDrawer({
                       placeholder="Precisa de troco para quanto? (Ex: R$ 100,00)"
                       value={cashChangeFor}
                       onChange={(e) => setCashChangeFor(e.target.value)}
-                      className="w-full p-2 bg-white border border-[#d8a832] rounded-xl text-xs text-stone-900 focus:outline-none focus:ring-2 focus:ring-[#ff5e00]"
+                      className="w-full p-2 bg-white border border-stone-200 rounded-xl text-xs text-stone-900 focus:outline-none focus:border-[#b21818] focus:ring-2 focus:ring-[#b21818]/15"
                     />
                   </div>
                 )}
@@ -473,21 +513,21 @@ export default function DeliveryCartDrawer({
               {/* General Notes */}
               <div className="space-y-1">
                 <label className="text-xs font-montserrat font-bold text-stone-700 block">
-                  Observações Gerais (opcional)
+                  Instruções para o Entregador ou Cozinha (opcional)
                 </label>
                 <textarea
                   rows={2}
-                  placeholder="Alguma instrução para o entregador ou para a cozinha?"
+                  placeholder="Ex: interfone 204, entregar na portaria..."
                   value={generalNotes}
                   onChange={(e) => setGeneralNotes(e.target.value)}
-                  className="w-full p-2.5 bg-white border border-[#d8a832] rounded-xl text-xs sm:text-sm text-stone-900 focus:outline-none focus:ring-2 focus:ring-[#ff5e00]"
+                  className="w-full p-2.5 bg-white border border-stone-200 rounded-xl text-xs sm:text-sm text-stone-900 focus:outline-none focus:border-[#b21818] focus:ring-2 focus:ring-[#b21818]/15 transition-all"
                 />
               </div>
 
               {/* Error warning */}
               {validationError && (
-                <div className="p-3 bg-red-100 border border-red-300 text-red-700 rounded-xl text-xs font-montserrat font-bold flex items-center gap-2">
-                  <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                <div className="p-3 bg-red-50 border border-red-200 text-red-700 rounded-2xl text-xs font-montserrat font-bold flex items-center gap-2">
+                  <AlertCircle className="w-4 h-4 flex-shrink-0 text-red-500" />
                   <span>{validationError}</span>
                 </div>
               )}
@@ -497,12 +537,17 @@ export default function DeliveryCartDrawer({
 
         {/* Footer with Subtotal & WhatsApp CTA */}
         {cart.length > 0 && (
-          <div className="p-4 bg-white border-t-2 border-[#ecd596] space-y-3 flex-shrink-0">
+          <div className="p-4 bg-white border-t border-stone-200/90 space-y-2.5 flex-shrink-0 shadow-lg">
             <div className="flex items-center justify-between">
-              <span className="font-montserrat font-bold text-xs uppercase text-stone-600">
-                Total do Pedido:
-              </span>
-              <span className="font-montserrat font-black text-2xl text-[#b21818]">
+              <div>
+                <span className="font-montserrat font-bold text-[10px] uppercase text-stone-500 block">
+                  Total Estimado:
+                </span>
+                <span className="text-[11px] text-stone-400 font-medium">
+                  {orderType === 'delivery' ? '+ taxa a combinar' : 'Retirada no balcão'}
+                </span>
+              </div>
+              <span className="font-bebas text-3xl font-bold text-[#b21818]">
                 R$ {subtotal.toFixed(2).replace('.', ',')}
               </span>
             </div>
@@ -510,13 +555,13 @@ export default function DeliveryCartDrawer({
             <button
               type="button"
               onClick={handleSendWhatsApp}
-              className="w-full inline-flex items-center justify-center gap-2.5 bg-[#25D366] hover:bg-[#20ba59] active:scale-98 text-white py-3.5 px-6 rounded-full font-montserrat font-black text-sm sm:text-base tracking-wide shadow-md transition-all cursor-pointer group"
+              className="w-full inline-flex items-center justify-center gap-2 bg-[#25D366] hover:bg-[#20ba59] active:scale-98 text-white py-3.5 px-6 rounded-2xl font-montserrat font-black text-sm sm:text-base tracking-wide shadow-md transition-all cursor-pointer min-h-[48px] group"
             >
               <Send className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-              <span>Enviar Pedido no WhatsApp</span>
+              <span>Enviar Pedido via WhatsApp</span>
             </button>
-            <p className="text-[11px] text-center text-stone-500 font-medium">
-              Você será redirecionado para o WhatsApp da Peixaria com o pedido pronto!
+            <p className="text-[10px] text-center text-stone-500 font-medium">
+              Ao clicar, você enviará o pedido formatado direto no WhatsApp da Peixaria!
             </p>
           </div>
         )}
@@ -524,33 +569,32 @@ export default function DeliveryCartDrawer({
         {/* Aviso exibido 3 segundos após a abertura do carrinho */}
         {showDeliveryNotice && (
           <div
-            className="absolute inset-0 z-20 flex items-center justify-center bg-black/55 p-4 backdrop-blur-xs"
+            className="absolute inset-0 z-20 flex items-center justify-center bg-black/60 p-4 backdrop-blur-xs"
             role="alertdialog"
             aria-modal="true"
             aria-labelledby="delivery-notice-title"
             aria-describedby="delivery-notice-description"
           >
-            <div className="w-full max-w-sm rounded-3xl border-2 border-amber-300 bg-[#fffdec] p-5 text-center shadow-2xl">
-              <AlertCircle className="mx-auto mb-2 h-10 w-10 text-[#ff5e00]" />
+            <div className="w-full max-w-sm rounded-3xl border border-stone-200 bg-white p-5 text-center shadow-2xl animate-in zoom-in-95">
+              <AlertCircle className="mx-auto mb-2 h-10 w-10 text-[#d97706]" />
               <h3
                 id="delivery-notice-title"
                 className="font-bebas text-2xl tracking-wide text-[#b21818] uppercase"
               >
-                Atenção sobre a entrega
+                Taxa de Entrega
               </h3>
               <p
                 id="delivery-notice-description"
-                className="mt-2 text-sm font-montserrat font-semibold leading-relaxed text-stone-800"
+                className="mt-2 text-xs font-montserrat font-medium leading-relaxed text-stone-700"
               >
-                A atendente informará a taxa de entrega de acordo com a sua região
-                (bairro). Aguarde a confirmação do pedido pelo WhatsApp.
+                A atendente informará a taxa de entrega exata de acordo com a sua região (bairro de Belém ou Ananindeua). Aguarde a confirmação rápida no WhatsApp.
               </p>
               <button
                 type="button"
                 onClick={() => setShowDeliveryNotice(false)}
-                className="mt-5 w-full rounded-full bg-[#ff5e00] px-5 py-3 text-sm font-montserrat font-black text-white shadow-md transition-all hover:bg-[#e05200] active:scale-98"
+                className="mt-4 w-full rounded-2xl bg-[#b21818] hover:bg-[#8c1010] active:scale-98 px-5 py-2.5 text-xs font-montserrat font-bold text-white shadow-xs transition-all cursor-pointer"
               >
-                Entendi
+                Entendi, continuar
               </button>
             </div>
           </div>
@@ -559,3 +603,4 @@ export default function DeliveryCartDrawer({
     </div>
   );
 }
+

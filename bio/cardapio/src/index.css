@@ -1,5 +1,13 @@
 @import "tailwindcss";
 
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  -webkit-tap-highlight-color: transparent;
+}
+
 .font-bebas {
   font-family: 'Bebas Neue', Impact, 'Arial Black', sans-serif;
   letter-spacing: 0.04em;
@@ -29,4 +37,13 @@
 .hide-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
