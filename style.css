@@ -43,6 +43,42 @@
 }
 
 /* ==========================================================================
+   CLASSES UTILITÁRIAS DO DESIGN SYSTEM (AMAZÔNICO CONTEMPORÂNEO)
+   ========================================================================== */
+
+.bg-forest { background-color: #173D35 !important; }
+.bg-forest-dark { background-color: #102B25 !important; }
+.bg-forest-light { background-color: #215449 !important; }
+.bg-tucuma { background-color: #F15A24 !important; }
+.bg-sand { background-color: #E8D8B8 !important; }
+.bg-river { background-color: #172B35 !important; }
+.bg-natural { background-color: #F8F6F0 !important; }
+.bg-acai-gold { background-color: #D7A642 !important; }
+
+.text-forest { color: #173D35 !important; }
+.text-tucuma { color: #F15A24 !important; }
+.text-sand { color: #E8D8B8 !important; }
+.text-river { color: #172B35 !important; }
+.text-river-muted { color: #415865 !important; }
+.text-natural { color: #F8F6F0 !important; }
+.text-acai-gold { color: #D7A642 !important; }
+
+.border-forest { border-color: #173D35 !important; }
+.border-tucuma { border-color: #F15A24 !important; }
+.border-sand { border-color: #E8D8B8 !important; }
+.border-river { border-color: #172B35 !important; }
+.border-acai-gold { border-color: #D7A642 !important; }
+
+#hero {
+  background-color: #173D35 !important;
+  color: #F8F6F0 !important;
+}
+
+#hero h1 {
+  color: #F8F6F0 !important;
+}
+
+/* ==========================================================================
    BASE & TIPOGRAFIA
    ========================================================================== */
 

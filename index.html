@@ -16,9 +16,8 @@
   <meta charset="utf-8" />
   <meta content="width=device-width, initial-scale=1.0" name="viewport" />
   <meta http-equiv="Content-Security-Policy"
-    content="default-src 'self'; script-src 'self' https://cdn.tailwindcss.com https://fonts.googleapis.com https://connect.facebook.net https://www.googletagmanager.com 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com https://fonts.googleapis.com; img-src 'self' data: blob: https://peixariamancha.com https://www.facebook.com https://www.googletagmanager.com https://*.google-analytics.com https://*.google.com https://*.google.com.br https://*.doubleclick.net; connect-src 'self' https://kgyhrapfhfkwgejquyjx.supabase.co https://n8n.vps7767.panel.icontainer.cloud https://www.facebook.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://*.g.doubleclick.net https://*.google.com; frame-src https://maps.google.com https://www.google.com https://www.facebook.com; media-src 'self';" />
+    content="default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://cdn.tailwindcss.com https://fonts.googleapis.com https://connect.facebook.net https://www.googletagmanager.com https://googleads.g.doubleclick.net https://www.googleadservices.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com https://fonts.googleapis.com; img-src 'self' data: blob: https://peixariamancha.com https://www.facebook.com https://www.googletagmanager.com https://*.google-analytics.com https://*.google.com https://*.google.com.br https://*.doubleclick.net https://*.googleadservices.com; connect-src 'self' https://kgyhrapfhfkwgejquyjx.supabase.co https://n8n.vps7767.panel.icontainer.cloud https://www.facebook.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://*.g.doubleclick.net https://*.doubleclick.net https://*.google.com https://*.googleadservices.com; frame-src https://maps.google.com https://www.google.com https://www.facebook.com; media-src 'self';" />
   <meta http-equiv="X-Content-Type-Options" content="nosniff" />
-  <meta http-equiv="X-Frame-Options" content="SAMEORIGIN" />
   <meta name="referrer" content="strict-origin-when-cross-origin" />
   <title>Peixaria Mancha | O Verdadeiro Sabor da Amazônia em Belém</title>
   <meta name="description"
@@ -109,6 +108,102 @@
     href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap"
     rel="stylesheet" />
 
+  <!-- Injeção Crítica dos Tokens e Estilos Base do Amazônico Contemporâneo -->
+  <style>
+    :root {
+      --color-forest: #173D35;
+      --color-forest-dark: #102B25;
+      --color-forest-light: #215449;
+      --color-tucuma: #F15A24;
+      --color-tucuma-hover: #D94B18;
+      --color-tucuma-soft: rgba(241, 90, 36, 0.12);
+      --color-sand: #E8D8B8;
+      --color-sand-light: #F2E8D4;
+      --color-sand-border: #D8C49E;
+      --color-river: #172B35;
+      --color-river-muted: #415865;
+      --color-natural: #F8F6F0;
+      --color-acai-gold: #D7A642;
+      --color-acai-gold-soft: rgba(215, 166, 66, 0.16);
+      --font-heading: 'Manrope', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      --shadow-card: 0 10px 30px -10px rgba(23, 43, 53, 0.08);
+      --shadow-cta: 0 10px 24px -6px rgba(241, 90, 36, 0.38);
+      --radius-sm: 0.5rem;
+      --radius-md: 0.875rem;
+      --radius-lg: 1.25rem;
+      --radius-xl: 1.75rem;
+    }
+
+    body {
+      background-color: #F8F6F0;
+      color: #172B35;
+      font-family: var(--font-body);
+    }
+
+    #hero {
+      background-color: #173D35 !important;
+      color: #F8F6F0 !important;
+    }
+
+    #hero h1 {
+      color: #F8F6F0 !important;
+    }
+
+    .btn-primary-tucuma {
+      background-color: #F15A24 !important;
+      color: #FFFFFF !important;
+      min-height: 48px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.85rem 1.75rem;
+      border-radius: 0.875rem;
+      font-weight: 700;
+      text-decoration: none;
+      box-shadow: 0 10px 24px -6px rgba(241, 90, 36, 0.38);
+      transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+      border: none;
+    }
+    .btn-primary-tucuma:hover {
+      background-color: #D94B18 !important;
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary-forest {
+      background-color: #173D35 !important;
+      color: #F8F6F0 !important;
+      min-height: 48px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.85rem 1.75rem;
+      border-radius: 0.875rem;
+      font-weight: 700;
+      text-decoration: none;
+      border: 1px solid rgba(232, 216, 184, 0.3);
+      transition: background-color 0.2s ease, transform 0.2s ease;
+    }
+
+    .btn-outline-light {
+      background-color: rgba(248, 246, 240, 0.08) !important;
+      color: #F8F6F0 !important;
+      min-height: 48px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.85rem 1.75rem;
+      border-radius: 0.875rem;
+      font-weight: 600;
+      text-decoration: none;
+      border: 1px solid rgba(232, 216, 184, 0.35);
+      transition: background-color 0.2s ease, transform 0.2s ease;
+    }
+  </style>
+
   <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
   <script id="tailwind-config">
     tailwind.config = {
@@ -116,22 +211,22 @@
       theme: {
         extend: {
           colors: {
-            "forest": "var(--color-forest)",
-            "forest-dark": "var(--color-forest-dark)",
-            "forest-light": "var(--color-forest-light)",
-            "tucuma": "var(--color-tucuma)",
-            "tucuma-hover": "var(--color-tucuma-hover)",
-            "sand": "var(--color-sand)",
-            "sand-light": "var(--color-sand-light)",
-            "river": "var(--color-river)",
-            "river-muted": "var(--color-river-muted)",
-            "natural": "var(--color-natural)",
-            "acai-gold": "var(--color-acai-gold)",
+            "forest": "#173D35",
+            "forest-dark": "#102B25",
+            "forest-light": "#215449",
+            "tucuma": "#F15A24",
+            "tucuma-hover": "#D94B18",
+            "sand": "#E8D8B8",
+            "sand-light": "#F2E8D4",
+            "river": "#172B35",
+            "river-muted": "#415865",
+            "natural": "#F8F6F0",
+            "acai-gold": "#D7A642",
             /* Aliases de compatibilidade */
-            "background": "var(--color-natural)",
-            "on-surface": "var(--color-river)",
-            "primary": "var(--color-forest)",
-            "tertiary": "var(--color-tucuma)"
+            "background": "#F8F6F0",
+            "on-surface": "#172B35",
+            "primary": "#173D35",
+            "tertiary": "#F15A24"
           },
           fontFamily: {
             "headline": ["Manrope", "sans-serif"],
@@ -142,7 +237,7 @@
       }
     }
   </script>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css?v=20261110_2" />
 
   <!-- Meta Pixel Code -->
   <script>
@@ -2135,7 +2230,7 @@
     </div>
   </div>
 
-  <script src="script.js?v=2026-11-09"></script>
+  <script src="script.js?v=20261110_2"></script>
 </body>
 
 </html>
