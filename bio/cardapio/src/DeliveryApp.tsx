@@ -141,8 +141,8 @@ export default function DeliveryApp() {
   const totalCartValue = cart.reduce((acc, item) => acc + item.price * item.quantity, 0);
 
   return (
-    <div className="min-h-screen bg-[#FAF7F2] text-stone-900 flex flex-col items-center selection:bg-[#b21818] selection:text-white">
-      <div className="w-full max-w-2xl flex flex-col min-h-screen relative bg-[#FAF7F2]">
+    <div className="min-h-screen bg-[var(--color-natural)] text-[var(--color-river)] flex flex-col items-center selection:bg-[var(--color-forest)] selection:text-white">
+      <div className="w-full max-w-2xl flex flex-col min-h-screen relative bg-[var(--color-natural)]">
         {/* Header with Search and Cart info */}
         <DeliveryHeader
           searchQuery={searchQuery}
@@ -153,7 +153,7 @@ export default function DeliveryApp() {
         />
 
         {/* Sticky Horizontal Categories Pill Navigation */}
-        <div className="sticky top-0 z-30 bg-[#FAF7F2]/95 backdrop-blur-md py-2 px-3 sm:px-4 border-y border-stone-200/80 shadow-2xs">
+        <div className="sticky top-0 z-30 bg-[var(--color-natural)]/95 backdrop-blur-md py-2 px-3 sm:px-4 border-y border-stone-200/80 shadow-2xs">
           <div className="flex items-center gap-2 overflow-x-auto hide-scrollbar py-0.5">
             {DELIVERY_MENU_CATEGORIES.map((category) => {
               const isActive = activeCategoryId === category.id;
@@ -161,10 +161,10 @@ export default function DeliveryApp() {
                 <button
                   key={category.id}
                   onClick={() => handleSelectCategory(category.id)}
-                  className={`inline-flex items-center gap-1.5 whitespace-nowrap px-3.5 py-1.5 rounded-full font-montserrat font-bold text-xs tracking-wide transition-all uppercase cursor-pointer ${
+                  className={`inline-flex items-center gap-1.5 whitespace-nowrap px-4 py-2 min-h-[42px] rounded-full font-montserrat font-bold text-xs tracking-wide transition-all uppercase cursor-pointer ${
                     isActive
-                      ? 'bg-[#b21818] text-white shadow-xs scale-102 ring-2 ring-[#b21818]/20'
-                      : 'bg-white text-stone-700 hover:bg-stone-50 border border-stone-200 shadow-2xs'
+                      ? 'bg-[var(--color-forest)] text-white shadow-xs ring-2 ring-[var(--color-forest)]/20'
+                      : 'bg-white text-[var(--color-river)] hover:border-[var(--color-forest)] border border-stone-200 shadow-2xs'
                   }`}
                 >
                   <span>{category.title}</span>
@@ -184,7 +184,7 @@ export default function DeliveryApp() {
           {filteredCategories.length === 0 ? (
             <div className="text-center py-16 px-4 bg-white rounded-3xl border border-stone-200 shadow-xs">
               <UtensilsCrossed className="w-12 h-12 text-stone-300 mx-auto mb-3" />
-              <h3 className="font-bebas text-2xl uppercase text-stone-800">
+              <h3 className="font-bebas text-2xl uppercase text-[var(--color-river)]">
                 Nenhum prato encontrado
               </h3>
               <p className="text-xs text-stone-500 mt-1 max-w-xs mx-auto">
@@ -193,7 +193,7 @@ export default function DeliveryApp() {
               <button
                 type="button"
                 onClick={() => setSearchQuery('')}
-                className="mt-4 bg-[#b21818] hover:bg-[#8c1010] active:scale-95 text-white text-xs font-montserrat font-bold px-5 py-2.5 rounded-full shadow-xs cursor-pointer transition-all"
+                className="mt-4 bg-[var(--color-tucuma)] hover:opacity-95 active:scale-95 text-white text-xs font-montserrat font-bold px-5 py-2.5 min-h-[44px] rounded-full shadow-xs cursor-pointer transition-all"
               >
                 Ver Cardápio Completo
               </button>
@@ -212,10 +212,10 @@ export default function DeliveryApp() {
         {/* Footer */}
         <footer className="w-full max-w-2xl mx-auto px-3 sm:px-4 pb-24 pt-3 space-y-3 text-center">
           {/* Fresh fish guarantee */}
-          <div className="bg-gradient-to-r from-[#b21818] to-[#d97706] text-white py-3.5 px-4 rounded-3xl shadow-xs">
+          <div className="bg-[var(--color-forest)] text-white py-4 px-5 rounded-3xl shadow-xs border border-[var(--color-acai-gold)]/30">
             <div className="flex items-center justify-center gap-1.5 mb-0.5">
-              <CheckCircle2 className="w-4 h-4 text-amber-300" />
-              <h3 className="font-bebas text-xl sm:text-2xl tracking-wider uppercase font-bold text-amber-200">
+              <CheckCircle2 className="w-4 h-4 text-[var(--color-acai-gold)]" />
+              <h3 className="font-bebas text-lg sm:text-xl tracking-tight uppercase font-extrabold text-[var(--color-sand)]">
                 {DELIVERY_RESTAURANT_INFO.freshFishBadge}
               </h3>
             </div>
@@ -226,19 +226,19 @@ export default function DeliveryApp() {
 
           {/* WhatsApp & Social Media Contacts */}
           <div className="bg-white rounded-3xl p-5 sm:p-6 shadow-xs border border-stone-200/90 space-y-3">
-            <span className="font-montserrat font-black text-xs uppercase tracking-widest text-[#d97706] block">
+            <span className="font-montserrat font-black text-xs uppercase tracking-widest text-[var(--color-tucuma)] block">
               ATENDIMENTO & PEDIDOS
             </span>
-            <h3 className="font-bebas text-3xl sm:text-4xl text-stone-900 tracking-wide uppercase leading-tight">
+            <h3 className="font-bebas text-2xl sm:text-3xl font-extrabold text-[var(--color-river)] tracking-tight uppercase leading-tight">
               DELIVERY RÁPIDO E SEGURO
             </h3>
 
             <div className="pt-1 flex flex-col sm:flex-row items-center justify-center gap-2 max-w-md mx-auto">
               <a
-                href={`https://wa.me/${DELIVERY_RESTAURANT_INFO.whatsapp}?text=Olá,%20gostaria%20de%20fazer%20um%20pedido%20no%20Delivery!`}
+                href={`https://wa.me/${DELIVERY_RESTAURANT_INFO.whatsapp}?text=Olá!%20Gostaria%20de%20fazer%20um%20pedido.`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-full inline-flex items-center justify-center gap-2 bg-[#25D366] hover:bg-[#20ba59] active:scale-98 text-white py-3 px-5 rounded-2xl font-montserrat font-black text-sm tracking-wide shadow-xs transition-all group"
+                className="w-full inline-flex items-center justify-center gap-2 bg-[var(--color-tucuma)] hover:opacity-95 active:scale-98 text-white py-3 px-5 min-h-[48px] rounded-2xl font-montserrat font-bold text-sm tracking-wide shadow-xs transition-all group"
               >
                 <PhoneCall className="w-4 h-4 fill-white group-hover:rotate-12 transition-transform" />
                 <span>{DELIVERY_RESTAURANT_INFO.phoneFormatted}</span>
@@ -248,7 +248,7 @@ export default function DeliveryApp() {
                 href={DELIVERY_RESTAURANT_INFO.instagramUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-full inline-flex items-center justify-center gap-2 bg-gradient-to-r from-[#833ab4] via-[#fd1d1d] to-[#fcb045] hover:opacity-90 active:scale-98 text-white py-3 px-5 rounded-2xl font-montserrat font-black text-sm tracking-wide shadow-xs transition-all"
+                className="w-full inline-flex items-center justify-center gap-2 bg-[var(--color-forest)] hover:opacity-95 active:scale-98 text-white py-3 px-5 min-h-[48px] rounded-2xl font-montserrat font-bold text-sm tracking-wide shadow-xs transition-all"
               >
                 <Instagram className="w-4 h-4" />
                 <span>{DELIVERY_RESTAURANT_INFO.instagram}</span>

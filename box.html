@@ -73,7 +73,7 @@
 
   <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
   <link
-    href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Manrope:wght@400;500;600;700&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@600;700;800&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
     rel="stylesheet" />
 
   <script id="tailwind-config">
@@ -82,23 +82,23 @@
       theme: {
         extend: {
           colors: {
-            "background": "#FFFFFF",
-            "on-surface": "#1A1A1A",
+            "background": "#F8F6F0",
+            "on-surface": "#172B35",
             "surface": "#FFFFFF",
-            "surface-container-low": "#F5F5F5",
-            "surface-container-high": "#ebebeb",
-            "primary": "#0077b6",
-            "primary-dim": "#03045e",
+            "surface-container-low": "#F8F6F0",
+            "surface-container-high": "#E8D8B8",
+            "primary": "#173D35",
+            "primary-dim": "#0F2923",
             "on-primary": "#ffffff",
-            "tertiary": "#FF5722",
-            "on-surface-variant": "#444748",
-            "outline-variant": "#c4c7c7",
-            "surface-tint": "#0077b6"
+            "tertiary": "#F15A24",
+            "on-surface-variant": "#3E5460",
+            "outline-variant": "#D9D2C2",
+            "surface-tint": "#173D35"
           },
           fontFamily: {
-            "headline": ["Plus Jakarta Sans"],
-            "body": ["Manrope"],
-            "label": ["Manrope"]
+            "headline": ["Manrope", "sans-serif"],
+            "body": ["Inter", "sans-serif"],
+            "label": ["Inter", "sans-serif"]
           },
         },
       },
@@ -346,7 +346,7 @@
           <div class="map-glow rounded-3xl overflow-hidden h-[420px] relative">
             <div
               class="float-badge absolute top-4 left-4 z-10 bg-white rounded-xl px-3 py-2 shadow-lg flex items-center gap-2">
-              <img src="Fotos/logo.png" alt="Logo" class="w-8 h-8 rounded-full object-cover border-2 border-tertiary">
+              <img src="Fotos/logo.png" alt="Logo" class="h-10 w-auto object-contain drop-shadow-sm shrink-0">
               <div>
                 <p class="font-headline font-bold text-xs text-on-surface">Peixaria Mancha</p>
                 <p class="text-[10px] text-on-surface-variant">Box Oficial</p>
@@ -654,9 +654,7 @@
     </div>
 
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10 fade-up">
-      <div class="w-20 h-20 rounded-full overflow-hidden border-4 border-white/30 mx-auto mb-6 shadow-xl">
-        <img src="Fotos/logo.png" alt="Peixaria Mancha" class="w-full h-full object-cover">
-      </div>
+      <img src="Fotos/logo.png" alt="Peixaria Mancha" class="h-24 sm:h-28 w-auto object-contain mx-auto mb-6 drop-shadow-2xl">
       <h2 class="font-headline font-extrabold text-3xl md:text-4xl text-white mb-4">
         Te esperamos no Box!
       </h2>
@@ -684,9 +682,7 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex flex-col md:flex-row items-center justify-between gap-6">
         <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-full overflow-hidden border-2 border-tertiary">
-            <img src="Fotos/logo.png" alt="Peixaria Mancha" class="w-full h-full object-cover">
-          </div>
+          <img src="Fotos/logo.png" alt="Peixaria Mancha" class="h-12 w-auto object-contain drop-shadow-sm">
           <div>
             <p class="font-headline font-bold text-white">Peixaria Mancha</p>
             <p class="text-white/50 text-xs">Box Oficial · Belém, PA</p>
@@ -721,12 +717,14 @@
     // MOBILE MENU
     const mobileMenuBtn = document.getElementById('mobile-menu-btn');
     const mobileMenu = document.getElementById('mobile-menu');
-    mobileMenuBtn.addEventListener('click', () => {
-      mobileMenu.classList.toggle('hidden');
-    });
-    mobileMenu.querySelectorAll('a').forEach(link => {
-      link.addEventListener('click', () => mobileMenu.classList.add('hidden'));
-    });
+    if (mobileMenuBtn && mobileMenu) {
+      mobileMenuBtn.addEventListener('click', () => {
+        mobileMenu.classList.toggle('hidden');
+      });
+      mobileMenu.querySelectorAll('a').forEach(link => {
+        link.addEventListener('click', () => mobileMenu.classList.add('hidden'));
+      });
+    }
 
     // SCROLL ANIMATIONS
     const observer = new IntersectionObserver((entries) => {
@@ -748,36 +746,42 @@
     document.querySelectorAll('.gallery-thumb').forEach(thumb => {
       thumb.addEventListener('click', () => {
         const img = thumb.querySelector('img');
+        if (!img || !lightboxOverlay) return;
         lightboxImg.src = img.src;
         lightboxImg.alt = img.alt;
-        lightboxCaption.textContent = img.alt;
+        if (lightboxCaption) lightboxCaption.textContent = img.alt;
         lightboxOverlay.classList.add('active');
         document.body.style.overflow = 'hidden';
       });
     });
 
     function closeLightbox() {
+      if (!lightboxOverlay) return;
       lightboxOverlay.classList.remove('active');
       document.body.style.overflow = '';
     }
 
-    lightboxClose.addEventListener('click', closeLightbox);
-    lightboxOverlay.addEventListener('click', (e) => {
-      if (e.target === lightboxOverlay) closeLightbox();
-    });
+    if (lightboxClose) lightboxClose.addEventListener('click', closeLightbox);
+    if (lightboxOverlay) {
+      lightboxOverlay.addEventListener('click', (e) => {
+        if (e.target === lightboxOverlay) closeLightbox();
+      });
+    }
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') closeLightbox();
     });
 
     // NAVBAR SCROLL EFFECT
     const navbar = document.getElementById('navbar');
-    window.addEventListener('scroll', () => {
-      if (window.scrollY > 20) {
-        navbar.classList.add('shadow-md');
-      } else {
-        navbar.classList.remove('shadow-md');
-      }
-    });
+    if (navbar) {
+      window.addEventListener('scroll', () => {
+        if (window.scrollY > 20) {
+          navbar.classList.add('shadow-md');
+        } else {
+          navbar.classList.remove('shadow-md');
+        }
+      });
+    }
   </script>
 
 </body>

@@ -59,9 +59,9 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FAF7F2] text-stone-900 flex flex-col items-center selection:bg-[#b21818] selection:text-white">
+    <div className="min-h-screen bg-[var(--color-natural)] text-[var(--color-river)] flex flex-col items-center selection:bg-[var(--color-forest)] selection:text-white">
       {/* Container simulating authentic salon menu layout */}
-      <div className="w-full max-w-3xl flex flex-col min-h-screen relative bg-[#FAF7F2]">
+      <div className="w-full max-w-3xl flex flex-col min-h-screen relative bg-[var(--color-natural)]">
         {/* Header with Logo, Title, Search and Delivery Escape Link */}
         <Header
           searchQuery={searchQuery}
@@ -80,15 +80,15 @@ export default function App() {
           {/* Informative Table Sides Banner (Acompanhamentos inclusos na mesa) */}
           {!searchQuery && (
             <div className="bg-white border border-stone-200/90 rounded-2xl p-3.5 sm:p-4 shadow-2xs flex items-center gap-3">
-              <div className="bg-amber-100/80 p-2.5 rounded-2xl flex-shrink-0 text-amber-800">
+              <div className="bg-[var(--color-sand)]/50 p-2.5 rounded-2xl flex-shrink-0 text-[var(--color-forest)]">
                 <UtensilsCrossed className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="font-montserrat font-black text-stone-900 text-xs sm:text-sm uppercase tracking-tight">
+                <h3 className="font-bebas font-extrabold text-[var(--color-river)] text-xs sm:text-sm uppercase tracking-tight">
                   Acompanhamentos das Refeições
                 </h3>
-                <p className="text-[11px] sm:text-xs text-stone-600 font-medium leading-relaxed mt-0.5">
-                  Todos os pratos para 2 e 4 pessoas acompanham: <strong className="text-stone-900 font-bold">Arroz Soltinho, Farofa, Vinagrete e Pirão de Peixe</strong> (ou Feijão).
+                <p className="text-[11px] sm:text-xs text-[var(--color-river)]/80 font-medium leading-relaxed mt-0.5">
+                  Todos os pratos para 2 e 4 pessoas acompanham: <strong className="text-[var(--color-forest)] font-bold">Arroz Soltinho, Farofa, Vinagrete e Pirão de Peixe</strong> (ou Feijão).
                 </p>
               </div>
             </div>
@@ -97,7 +97,7 @@ export default function App() {
           {filteredCategories.length === 0 ? (
             <div className="text-center py-16 px-4 bg-white rounded-2xl border border-stone-200 shadow-2xs">
               <UtensilsCrossed className="w-12 h-12 text-stone-300 mx-auto mb-3" />
-              <h3 className="font-bebas text-2xl uppercase text-stone-800">
+              <h3 className="font-bebas text-2xl uppercase text-[var(--color-river)]">
                 Nenhum prato encontrado
               </h3>
               <p className="text-xs text-stone-500 mt-1 max-w-xs mx-auto">
@@ -106,7 +106,7 @@ export default function App() {
               <button
                 type="button"
                 onClick={() => setSearchQuery('')}
-                className="mt-4 bg-[#b21818] hover:bg-[#8c1010] active:scale-95 text-white text-xs font-montserrat font-bold px-4 py-2.5 rounded-xl shadow-xs cursor-pointer transition-all"
+                className="mt-4 bg-[var(--color-tucuma)] hover:opacity-95 active:scale-95 text-white text-xs font-montserrat font-bold px-4 py-2.5 min-h-[44px] rounded-xl shadow-xs cursor-pointer transition-all"
               >
                 Ver Cardápio Completo
               </button>
@@ -127,4 +127,3 @@ export default function App() {
     </div>
   );
 }
-
