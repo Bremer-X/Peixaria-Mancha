@@ -1,9 +1,11 @@
 document.addEventListener("DOMContentLoaded", () => {
-  // Detecta automaticamente a URL da API Node.js/Express
-  const API_BASE = window.location.port === "3001"
-    ? "/api"
-    : "http://localhost:3001/api";
+  // Detecta automaticamente o ambiente (Local com Node.js ou Web/Hospedagem Estática)
+  const isLocalHost = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+  const API_BASE = (window.location.port === "3001" || isLocalHost)
+    ? (window.location.origin.includes(":3001") ? window.location.origin + "/api" : "http://localhost:3001/api")
+    : "/api";
 
+  let isWebMode = (!isLocalHost && window.location.port !== "3001") || localStorage.getItem("mancha_is_web_mode") === "true";
   let authToken = localStorage.getItem("mancha_admin_token") || null;
   let currentPeriod = "all";
   let catalogData = { config: {}, categories: [], allProducts: [] };
@@ -48,20 +50,250 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   async function apiFetch(endpoint, options = {}) {
+    if (isWebMode) {
+      return handleWebModeApi(endpoint, options);
+    }
     const headers = {
       "Content-Type": "application/json",
       ...(authToken ? { Authorization: `Bearer ${authToken}` } : {}),
       ...(options.headers || {})
     };
-    const res = await fetch(`${API_BASE}${endpoint}`, {
-      ...options,
-      headers
-    });
-    const data = await res.json().catch(() => ({}));
-    if (!res.ok) {
-      throw new Error(data.error || "Erro na comunicação com o servidor.");
+    try {
+      const res = await fetch(`${API_BASE}${endpoint}`, {
+        ...options,
+        headers
+      });
+      if (res.status === 401) {
+        throw new Error("Sessão expirada. Faça login novamente.");
+      }
+      if (!res.ok) {
+        // Se deu 404 em ambiente web, aciona modo web cliente
+        if (!isLocalHost) {
+          isWebMode = true;
+          return handleWebModeApi(endpoint, options);
+        }
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || "Erro na comunicação com o servidor.");
+      }
+      return await res.json();
+    } catch (fetchErr) {
+      if (!isLocalHost) {
+        isWebMode = true;
+        return handleWebModeApi(endpoint, options);
+      }
+      throw fetchErr;
     }
-    return data;
+  }
+
+  // ==========================================================================
+  // MOTOR WEB CLIENT-SIDE (FALLBACK PARA QUANDO ACESSADO NA WEB / HOSPEDAGEM ESTÁTICA)
+  // ==========================================================================
+
+  function getWebModeOrders() {
+    try {
+      const stored = localStorage.getItem("peixaria_mancha_orders_cache");
+      return stored ? JSON.parse(stored) : [];
+    } catch {
+      return [];
+    }
+  }
+
+  function saveWebCatalog() {
+    try {
+      localStorage.setItem("peixaria_mancha_catalog_cache", JSON.stringify(catalogData));
+    } catch {}
+    broadcastSync();
+  }
+
+  async function handleWebModeApi(endpoint, options = {}) {
+    const method = (options.method || "GET").toUpperCase();
+
+    // 1. Catálogo
+    if (endpoint.startsWith("/delivery/catalog")) {
+      let cached = null;
+      try {
+        const stored = localStorage.getItem("peixaria_mancha_catalog_cache");
+        if (stored) cached = JSON.parse(stored);
+      } catch {}
+
+      if (cached && cached.categories && cached.categories.length > 0) {
+        return cached;
+      }
+
+      // Buscar do arquivo estático catalog-data.json
+      try {
+        const res = await fetch(`../cardapio-delivery/catalog-data.json?_t=${Date.now()}`);
+        if (res.ok) {
+          const data = await res.json();
+          try {
+            localStorage.setItem("peixaria_mancha_catalog_cache", JSON.stringify(data));
+          } catch {}
+          return data;
+        }
+      } catch {}
+
+      return cached || { config: {}, categories: [], allProducts: [] };
+    }
+
+    // 2. Dashboard
+    if (endpoint.startsWith("/admin/dashboard")) {
+      const orders = getWebModeOrders();
+      const validOrders = orders.filter(o => o.status !== "cancelado");
+      const totalRevenue = validOrders.reduce((sum, o) => sum + Number(o.totalAmount || 0), 0);
+      const totalOrders = validOrders.length;
+      const avgTicket = totalOrders > 0 ? totalRevenue / totalOrders : 0;
+
+      const productStatsMap = {};
+      validOrders.forEach(o => {
+        (o.items || []).forEach(it => {
+          const pid = it.productId || it.name;
+          if (!productStatsMap[pid]) {
+            productStatsMap[pid] = {
+              productId: pid,
+              name: it.name,
+              categoryId: it.categoryId || "outros",
+              quantitySold: 0,
+              revenue: 0,
+              portionsBreakdown: {}
+            };
+          }
+          productStatsMap[pid].quantitySold += Number(it.quantity || 1);
+          productStatsMap[pid].revenue += Number(it.subtotal || 0);
+          const pKey = it.portion || "Padrão";
+          productStatsMap[pid].portionsBreakdown[pKey] = (productStatsMap[pid].portionsBreakdown[pKey] || 0) + Number(it.quantity || 1);
+        });
+      });
+
+      const topProductsByQty = Object.values(productStatsMap).sort((a, b) => b.quantitySold - a.quantitySold);
+      const activeProductsCount = (catalogData.allProducts || []).filter(p => p.isAvailable !== false).length;
+
+      return {
+        kpis: {
+          totalRevenue,
+          totalOrders,
+          avgTicket,
+          canceledCount: orders.filter(o => o.status === "cancelado").length,
+          activeProductsCount,
+          totalProductsCount: (catalogData.allProducts || []).length
+        },
+        byModality: { delivery: validOrders.filter(o => o.customer?.modality === "delivery").length, pickup: validOrders.filter(o => o.customer?.modality === "pickup").length },
+        byPayment: { pix: validOrders.filter(o => o.payment?.method === "pix").length, credit: validOrders.filter(o => o.payment?.method === "credit").length, debit: validOrders.filter(o => o.payment?.method === "debit").length, cash: validOrders.filter(o => o.payment?.method === "cash").length },
+        topProductsByQty,
+        categoryPerformance: (catalogData.categories || []).map(c => ({ id: c.id, title: c.title, quantity: 0, revenue: 0 })),
+        dailySales: [],
+        recentOrders: orders.slice(0, 10)
+      };
+    }
+
+    // 3. Atualizar Configurações
+    if (endpoint === "/admin/config" && method === "PUT") {
+      const payload = JSON.parse(options.body || "{}");
+      catalogData.config = { ...catalogData.config, ...payload };
+      saveWebCatalog();
+      return { config: catalogData.config };
+    }
+
+    // 4. Alternar Status
+    if (endpoint === "/admin/toggle-status" && method === "POST") {
+      const payload = JSON.parse(options.body || "{}");
+      const current = catalogData.config?.manualStatus || "auto";
+      const next = payload.status || (current === "force_open" ? "force_closed" : "force_open");
+      catalogData.config = { ...catalogData.config, manualStatus: next };
+      saveWebCatalog();
+      return { manualStatus: next, config: catalogData.config };
+    }
+
+    // 5. Produtos
+    if (endpoint === "/admin/products" && method === "POST") {
+      const payload = JSON.parse(options.body || "{}");
+      payload.id = payload.id || "prod_" + Date.now();
+      payload.isAvailable = payload.isAvailable !== false;
+      payload.price = Number(payload.price || 0);
+      payload.order = Number(payload.order || 99);
+      payload.salesCount = 0;
+      payload.revenueGenerated = 0;
+      if (!catalogData.allProducts) catalogData.allProducts = [];
+      catalogData.allProducts.push(payload);
+      saveWebCatalog();
+      return { product: payload };
+    }
+
+    if (endpoint.startsWith("/admin/products/") && method === "PUT") {
+      const id = endpoint.replace("/admin/products/", "");
+      const payload = JSON.parse(options.body || "{}");
+      const idx = (catalogData.allProducts || []).findIndex(p => p.id === id);
+      if (idx !== -1) {
+        catalogData.allProducts[idx] = { ...catalogData.allProducts[idx], ...payload };
+        saveWebCatalog();
+        return { product: catalogData.allProducts[idx] };
+      }
+      throw new Error("Produto não encontrado.");
+    }
+
+    if (endpoint.startsWith("/admin/products/") && method === "DELETE") {
+      const id = endpoint.replace("/admin/products/", "");
+      catalogData.allProducts = (catalogData.allProducts || []).filter(p => p.id !== id);
+      saveWebCatalog();
+      return { success: true };
+    }
+
+    // 6. Categorias
+    if (endpoint === "/admin/categories" && method === "POST") {
+      const payload = JSON.parse(options.body || "{}");
+      payload.id = payload.id || "cat_" + Date.now();
+      if (!catalogData.categories) catalogData.categories = [];
+      catalogData.categories.push(payload);
+      saveWebCatalog();
+      return { category: payload };
+    }
+
+    if (endpoint.startsWith("/admin/categories/") && method === "PUT") {
+      const id = endpoint.replace("/admin/categories/", "");
+      const payload = JSON.parse(options.body || "{}");
+      const idx = (catalogData.categories || []).findIndex(c => c.id === id);
+      if (idx !== -1) {
+        catalogData.categories[idx] = { ...catalogData.categories[idx], ...payload };
+        saveWebCatalog();
+        return { category: catalogData.categories[idx] };
+      }
+      throw new Error("Categoria não encontrada.");
+    }
+
+    if (endpoint.startsWith("/admin/categories/") && method === "DELETE") {
+      const id = endpoint.replace("/admin/categories/", "");
+      catalogData.categories = (catalogData.categories || []).filter(c => c.id !== id);
+      saveWebCatalog();
+      return { success: true };
+    }
+
+    // 7. Backup e Restauração
+    if (endpoint === "/admin/backup") {
+      return {
+        config: catalogData.config,
+        categories: catalogData.categories,
+        products: catalogData.allProducts,
+        orders: getWebModeOrders()
+      };
+    }
+
+    if (endpoint === "/admin/restore" && method === "POST") {
+      const payload = JSON.parse(options.body || "{}");
+      if (payload.backupData) {
+        catalogData = payload.backupData;
+        saveWebCatalog();
+        return { message: "Backup restaurado com sucesso!" };
+      }
+      return { message: "Cardápio restaurado!" };
+    }
+
+    // 8. Credenciais
+    if (endpoint === "/auth/credentials" && method === "PUT") {
+      const payload = JSON.parse(options.body || "{}");
+      localStorage.setItem("mancha_saved_creds", JSON.stringify(payload));
+      return { message: "Credenciais de acesso salvas no navegador!" };
+    }
+
+    return {};
   }
 
   // ==========================================================================
@@ -70,14 +302,26 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function updateDbBadge() {
     if (dbStatusBadge) {
-      dbStatusBadge.textContent = "Banco 100% Local (JSON)";
-      dbStatusBadge.className = "text-[9px] font-bold uppercase tracking-wider text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-0.5 rounded-full";
+      if (isWebMode) {
+        dbStatusBadge.textContent = "Modo Web (Nuvem / JSON)";
+        dbStatusBadge.className = "text-[9px] font-bold uppercase tracking-wider text-amber-300 bg-amber-500/10 border border-amber-500/20 px-2.5 py-0.5 rounded-full";
+      } else {
+        dbStatusBadge.textContent = "Banco 100% Local (JSON)";
+        dbStatusBadge.className = "text-[9px] font-bold uppercase tracking-wider text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-0.5 rounded-full";
+      }
     }
   }
 
   async function checkSession() {
     if (!authToken) {
       showLoginScreen();
+      return;
+    }
+    if (authToken.startsWith("web_session_") || isWebMode) {
+      isWebMode = true;
+      updateDbBadge();
+      showAdminApp();
+      await loadAllData();
       return;
     }
     try {
@@ -90,9 +334,16 @@ document.addEventListener("DOMContentLoaded", () => {
       showAdminApp();
       await loadAllData();
     } catch {
-      authToken = null;
-      localStorage.removeItem("mancha_admin_token");
-      showLoginScreen();
+      if (!isLocalHost) {
+        isWebMode = true;
+        updateDbBadge();
+        showAdminApp();
+        await loadAllData();
+      } else {
+        authToken = null;
+        localStorage.removeItem("mancha_admin_token");
+        showLoginScreen();
+      }
     }
   }
 
@@ -234,8 +485,34 @@ document.addEventListener("DOMContentLoaded", () => {
       await loadAllData();
       showToast("Bem-vindo ao Painel da Peixaria Mancha!");
     } catch (err) {
-      loginError.textContent = err.message;
-      loginError.classList.remove("hidden");
+      // Fallback inteligente para ambiente Web / Hospedagem sem Node.js na porta 3001
+      const isDualMatch = (
+        (email === "culinariamancha@gmail.com" && password === "M@ncha123") ||
+        (email === "admin@peixariamancha.com.br" && password === "mancha2026")
+      );
+      let isSavedMatch = false;
+      try {
+        const savedCreds = JSON.parse(localStorage.getItem("mancha_saved_creds") || "{}");
+        if (savedCreds.email && savedCreds.email === email && savedCreds.password === password) {
+          isSavedMatch = true;
+        }
+      } catch {}
+
+      if (isDualMatch || isSavedMatch) {
+        isWebMode = true;
+        authToken = "web_session_" + Date.now();
+        localStorage.setItem("mancha_admin_token", authToken);
+        localStorage.setItem("mancha_is_web_mode", "true");
+        updateDbBadge();
+        const credEmail = document.getElementById("cred-email");
+        if (credEmail) credEmail.value = email;
+        showAdminApp();
+        await loadAllData();
+        showToast("Conectado ao Painel (Modo Web)!");
+      } else {
+        loginError.textContent = err.message || "E-mail ou senha incorretos.";
+        loginError.classList.remove("hidden");
+      }
     } finally {
       btn.disabled = false;
       btn.textContent = "Entrar no Painel";
@@ -249,6 +526,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (livePollInterval) clearInterval(livePollInterval);
       authToken = null;
       localStorage.removeItem("mancha_admin_token");
+      localStorage.removeItem("mancha_is_web_mode");
       showLoginScreen();
     });
   }
