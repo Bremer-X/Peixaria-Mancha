@@ -1,4 +1,8 @@
 document.addEventListener("DOMContentLoaded", () => {
+  // Supabase Nuvem - Configurações de Acesso
+  const SUPABASE_URL = "https://qnandyuygrilgptnpaeb.supabase.co";
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFuYW5keXV5Z3JpbGdwdG5wYWViIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQzMTM1MDgsImV4cCI6MjEwOTg4OTUwOH0.kOaTY_X6uq5bjo94bjm1RioTEJ-KBHJX7f948YLbJAs";
+
   // Detecta automaticamente o ambiente (Local com Node.js ou Web/Hospedagem Estática)
   const isLocalHost = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
   const API_BASE = (window.location.port === "3001" || isLocalHost)
@@ -302,7 +306,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function updateDbBadge() {
     if (dbStatusBadge) {
-      if (isWebMode) {
+      const authProvider = localStorage.getItem("mancha_auth_provider");
+      if (authProvider === "supabase") {
+        dbStatusBadge.textContent = "Supabase Nuvem (Online)";
+        dbStatusBadge.className = "text-[9px] font-bold uppercase tracking-wider text-emerald-300 bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-0.5 rounded-full";
+      } else if (isWebMode) {
         dbStatusBadge.textContent = "Modo Web (Nuvem / JSON)";
         dbStatusBadge.className = "text-[9px] font-bold uppercase tracking-wider text-amber-300 bg-amber-500/10 border border-amber-500/20 px-2.5 py-0.5 rounded-full";
       } else {
@@ -317,6 +325,39 @@ document.addEventListener("DOMContentLoaded", () => {
       showLoginScreen();
       return;
     }
+
+    const authProvider = localStorage.getItem("mancha_auth_provider");
+
+    // Validação com Supabase se a autenticação foi feita pela nuvem
+    if (authProvider === "supabase") {
+      try {
+        const verifyRes = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
+          headers: {
+            "apikey": SUPABASE_ANON_KEY,
+            "Authorization": `Bearer ${authToken}`
+          }
+        });
+        if (verifyRes.ok) {
+          const supaUser = await verifyRes.json();
+          if (supaUser && supaUser.email) {
+            updateDbBadge();
+            const credEmail = document.getElementById("cred-email");
+            if (credEmail) credEmail.value = supaUser.email;
+            showAdminApp();
+            await loadAllData();
+            return;
+          }
+        }
+      } catch (e) {
+        if (!isLocalHost) {
+          updateDbBadge();
+          showAdminApp();
+          await loadAllData();
+          return;
+        }
+      }
+    }
+
     if (authToken.startsWith("web_session_") || isWebMode) {
       isWebMode = true;
       updateDbBadge();
@@ -324,6 +365,7 @@ document.addEventListener("DOMContentLoaded", () => {
       await loadAllData();
       return;
     }
+
     try {
       const verify = await apiFetch("/auth/verify");
       updateDbBadge();
@@ -342,6 +384,7 @@ document.addEventListener("DOMContentLoaded", () => {
       } else {
         authToken = null;
         localStorage.removeItem("mancha_admin_token");
+        localStorage.removeItem("mancha_auth_provider");
         showLoginScreen();
       }
     }
@@ -472,47 +515,93 @@ document.addEventListener("DOMContentLoaded", () => {
     btn.textContent = "Autenticando...";
 
     try {
-      const data = await apiFetch("/auth/login", {
-        method: "POST",
-        body: JSON.stringify({ email, password })
-      });
-      authToken = data.token;
-      localStorage.setItem("mancha_admin_token", authToken);
-      updateDbBadge();
-      const credEmail = document.getElementById("cred-email");
-      if (credEmail) credEmail.value = data.email || email;
-      showAdminApp();
-      await loadAllData();
-      showToast("Bem-vindo ao Painel da Peixaria Mancha!");
-    } catch (err) {
-      // Fallback inteligente para ambiente Web / Hospedagem sem Node.js na porta 3001
-      const isDualMatch = (
-        (email === "culinariamancha@gmail.com" && password === "M@ncha123") ||
-        (email === "admin@peixariamancha.com.br" && password === "mancha2026")
-      );
-      let isSavedMatch = false;
-      try {
-        const savedCreds = JSON.parse(localStorage.getItem("mancha_saved_creds") || "{}");
-        if (savedCreds.email && savedCreds.email === email && savedCreds.password === password) {
-          isSavedMatch = true;
-        }
-      } catch {}
+      let loggedIn = false;
+      let userEmail = email;
 
-      if (isDualMatch || isSavedMatch) {
-        isWebMode = true;
-        authToken = "web_session_" + Date.now();
-        localStorage.setItem("mancha_admin_token", authToken);
-        localStorage.setItem("mancha_is_web_mode", "true");
+      // 1. Tentar primeiro autenticação oficial via Supabase Nuvem
+      try {
+        const supaRes = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "apikey": SUPABASE_ANON_KEY
+          },
+          body: JSON.stringify({ email, password })
+        });
+        if (supaRes.ok) {
+          const supaData = await supaRes.json();
+          authToken = supaData.access_token;
+          localStorage.setItem("mancha_admin_token", authToken);
+          localStorage.setItem("mancha_auth_provider", "supabase");
+          localStorage.setItem("mancha_admin_email", email);
+          if (!isLocalHost) {
+            isWebMode = true;
+            localStorage.setItem("mancha_is_web_mode", "true");
+          }
+          loggedIn = true;
+          userEmail = supaData.user?.email || email;
+        }
+      } catch (supaErr) {
+        console.warn("Supabase auth offline/erro:", supaErr);
+      }
+
+      // 2. Se não conectou pelo Supabase e está no localhost com Node.js, tentar servidor local
+      if (!loggedIn && isLocalHost) {
+        try {
+          const data = await apiFetch("/auth/login", {
+            method: "POST",
+            body: JSON.stringify({ email, password })
+          });
+          authToken = data.token;
+          localStorage.setItem("mancha_admin_token", authToken);
+          localStorage.setItem("mancha_auth_provider", "local");
+          localStorage.setItem("mancha_admin_email", email);
+          loggedIn = true;
+          userEmail = data.email || email;
+        } catch (localErr) {
+          // ignora para testar fallback
+        }
+      }
+
+      // 3. Fallback inteligente de contingência (offline / credenciais salvas)
+      if (!loggedIn) {
+        const isDualMatch = (
+          (email === "culinariamancha@gmail.com" && password === "M@ncha123") ||
+          (email === "admin@peixariamancha.com.br" && password === "mancha2026")
+        );
+        let isSavedMatch = false;
+        try {
+          const savedCreds = JSON.parse(localStorage.getItem("mancha_saved_creds") || "{}");
+          if (savedCreds.email && savedCreds.email === email && savedCreds.password === password) {
+            isSavedMatch = true;
+          }
+        } catch {}
+
+        if (isDualMatch || isSavedMatch) {
+          isWebMode = true;
+          authToken = "web_session_" + Date.now();
+          localStorage.setItem("mancha_admin_token", authToken);
+          localStorage.setItem("mancha_auth_provider", "offline");
+          localStorage.setItem("mancha_is_web_mode", "true");
+          localStorage.setItem("mancha_admin_email", email);
+          loggedIn = true;
+        }
+      }
+
+      if (loggedIn) {
         updateDbBadge();
         const credEmail = document.getElementById("cred-email");
-        if (credEmail) credEmail.value = email;
+        if (credEmail) credEmail.value = userEmail;
         showAdminApp();
         await loadAllData();
-        showToast("Conectado ao Painel (Modo Web)!");
+        showToast("Bem-vindo ao Painel da Peixaria Mancha!");
       } else {
-        loginError.textContent = err.message || "E-mail ou senha incorretos.";
+        loginError.textContent = "E-mail ou senha incorretos.";
         loginError.classList.remove("hidden");
       }
+    } catch (err) {
+      loginError.textContent = err.message || "Erro na autenticação.";
+      loginError.classList.remove("hidden");
     } finally {
       btn.disabled = false;
       btn.textContent = "Entrar no Painel";
@@ -526,6 +615,8 @@ document.addEventListener("DOMContentLoaded", () => {
       if (livePollInterval) clearInterval(livePollInterval);
       authToken = null;
       localStorage.removeItem("mancha_admin_token");
+      localStorage.removeItem("mancha_auth_provider");
+      localStorage.removeItem("mancha_admin_email");
       localStorage.removeItem("mancha_is_web_mode");
       showLoginScreen();
     });
