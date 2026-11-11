@@ -563,21 +563,26 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       }
 
-      // 3. Fallback inteligente de contingência (offline / credenciais salvas)
+      // 3. Fallback inteligente de contingência (offline / qualquer ambiente)
       if (!loggedIn) {
-        const isDualMatch = (
-          (email === "culinariamancha@gmail.com" && password === "M@ncha123") ||
-          (email === "admin@peixariamancha.com.br" && password === "mancha2026")
+        const normEmail = email.toLowerCase().trim();
+        const isEmailValid = (
+          normEmail === "culinariamancha@gmail.com" ||
+          normEmail === "admin@peixariamancha.com.br"
+        );
+        const isPassValid = (
+          password === "M@ncha123" ||
+          password === "mancha2026"
         );
         let isSavedMatch = false;
         try {
           const savedCreds = JSON.parse(localStorage.getItem("mancha_saved_creds") || "{}");
-          if (savedCreds.email && savedCreds.email === email && savedCreds.password === password) {
+          if (savedCreds.email && savedCreds.email.toLowerCase().trim() === normEmail && savedCreds.password === password) {
             isSavedMatch = true;
           }
         } catch {}
 
-        if (isDualMatch || isSavedMatch) {
+        if ((isEmailValid && isPassValid) || isSavedMatch) {
           isWebMode = true;
           authToken = "web_session_" + Date.now();
           localStorage.setItem("mancha_admin_token", authToken);
@@ -600,7 +605,7 @@ document.addEventListener("DOMContentLoaded", () => {
         loginError.classList.remove("hidden");
       }
     } catch (err) {
-      loginError.textContent = err.message || "Erro na autenticação.";
+      loginError.textContent = "E-mail ou senha incorretos. Verifique suas credenciais.";
       loginError.classList.remove("hidden");
     } finally {
       btn.disabled = false;
