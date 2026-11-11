@@ -1,436 +1,731 @@
 <!DOCTYPE html>
-<html lang="pt-BR" class="scroll-smooth">
+<html lang="pt-BR" class="h-full">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Painel Administrativo & Dashboard — Peixaria Mancha</title>
+  <title>Peixaria Mancha — Painel Administrativo & Dashboard</title>
   <meta name="robots" content="noindex,nofollow,noarchive,nosnippet" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Bebas+Neue&family=Montserrat:wght@500;600;700;800;900&display=swap" rel="stylesheet" />
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
   <style>
-    body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #0b0f17; color: #f8fafc; }
+    html, body {
+      height: 100%;
+      width: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: #f1f5f4;
+      color: #0f172a;
+    }
     .font-bebas { font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.04em; }
     .font-montserrat { font-family: 'Montserrat', sans-serif; }
-    .glass-card { background: rgba(255, 255, 255, 0.035); border: 1px solid rgba(255, 255, 255, 0.08); backdrop-filter: blur(12px); }
-    .glass-header { background: rgba(11, 15, 23, 0.88); border-bottom: 1px solid rgba(255, 255, 255, 0.08); backdrop-filter: blur(16px); }
-    .tab-btn.active { background: linear-gradient(135deg, #b21818, #d97706); color: #fff; border-color: transparent; box-shadow: 0 4px 15px rgba(178, 24, 24, 0.35); }
+
+    /* Custom scrollbars */
     .custom-scroll::-webkit-scrollbar { width: 6px; height: 6px; }
-    .custom-scroll::-webkit-scrollbar-track { background: rgba(255,255,255,0.02); }
-    .custom-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 9999px; }
+    .custom-scroll::-webkit-scrollbar-track { background: transparent; }
+    .custom-scroll::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.12); border-radius: 9999px; }
+    .custom-scroll-dark::-webkit-scrollbar { width: 5px; }
+    .custom-scroll-dark::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 9999px; }
+
+    /* Sidebar Navigation Active State */
+    .nav-pill {
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      color: #8da6a3;
+    }
+    .nav-pill:hover {
+      color: #ffffff;
+      background-color: rgba(255, 255, 255, 0.06);
+    }
+    .nav-pill.active {
+      background-color: #113a38;
+      color: #ffffff;
+      font-weight: 700;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
+    }
+    .nav-pill.active .nav-icon-box {
+      background-color: rgba(255, 255, 255, 0.12);
+      color: #00d084;
+    }
+
+    /* Soft aesthetic cards */
+    .dash-card {
+      background: #ffffff;
+      border: 1px solid #e7eee9;
+      border-radius: 24px;
+      box-shadow: 0 4px 20px -2px rgba(10, 40, 35, 0.04);
+      transition: all 0.2s ease;
+    }
+    .dash-card:hover {
+      box-shadow: 0 8px 24px -2px rgba(10, 40, 35, 0.07);
+    }
+
+    /* Sparkline Bars */
+    .sparkline-bar {
+      width: 4px;
+      border-radius: 9999px;
+      transition: height 0.3s ease;
+    }
   </style>
 </head>
-<body class="min-h-screen flex flex-col selection:bg-[#b21818] selection:text-white">
-
-  <!-- Background Glow -->
-  <div class="fixed inset-0 pointer-events-none opacity-20 z-0" style="background: radial-gradient(circle at 15% 0%, #b21818 0%, transparent 45%), radial-gradient(circle at 85% 10%, #d97706 0%, transparent 40%);"></div>
+<body class="h-screen w-screen overflow-hidden m-0 p-0 bg-[#f1f5f4]">
 
   <!-- ================= TELA DE LOGIN ================= -->
-  <div id="login-screen" class="min-h-screen flex items-center justify-center p-4 relative z-10">
-    <div class="w-full max-w-md glass-card rounded-3xl p-7 sm:p-9 shadow-2xl">
-      <div class="flex flex-col items-center text-center mb-7">
-        <img src="../Fotos/logo.png" alt="Peixaria Mancha" class="h-20 w-auto object-contain drop-shadow-lg mb-3" onerror="this.style.display='none'">
-        <span class="text-[11px] font-montserrat font-extrabold uppercase tracking-widest text-amber-400 bg-amber-500/10 border border-amber-500/20 px-3 py-1 rounded-full mb-2">Gestão Delivery & Métricas</span>
-        <h1 class="font-bebas text-4xl tracking-wide uppercase text-white">Painel Peixaria Mancha</h1>
-        <p class="text-xs text-slate-400 mt-1">Acesse para editar o cardápio, preços, horários e ver os produtos mais vendidos.</p>
+  <div id="login-screen" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#555d68]">
+    <div class="w-full max-w-md bg-[#072a29] text-white rounded-[32px] p-8 sm:p-10 shadow-2xl border border-white/10 relative overflow-hidden">
+      <!-- Glow ambient -->
+      <div class="absolute -top-24 -right-24 w-60 h-60 bg-emerald-500/15 rounded-full blur-3xl pointer-events-none"></div>
+
+      <div class="flex flex-col items-center text-center mb-8 relative z-10">
+        <div class="w-14 h-14 rounded-2xl bg-[#113a38] flex items-center justify-center text-emerald-400 mb-4 shadow-lg border border-white/10">
+          <i data-lucide="fish" class="w-7 h-7"></i>
+        </div>
+        <span class="text-[11px] font-bold uppercase tracking-widest text-emerald-400 mb-1">Painel Administrativo</span>
+        <h1 class="text-2xl font-bold tracking-tight text-white">Peixaria Mancha</h1>
+        <p class="text-xs text-[#8da6a3] mt-1.5 max-w-xs">Gerencie cardápio, produtos, preços e pedidos em tempo real.</p>
       </div>
 
-      <form id="login-form" class="space-y-4">
+      <form id="login-form" class="space-y-4 relative z-10">
         <div>
-          <label class="block text-xs font-montserrat font-bold uppercase tracking-wider text-slate-300 mb-1.5">E-mail de Acesso</label>
+          <label class="block text-xs font-semibold uppercase tracking-wider text-[#8da6a3] mb-1.5">E-mail de Acesso</label>
           <input type="email" id="login-email" required value="admin@peixariamancha.com.br"
-            class="w-full bg-black/40 border border-white/15 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-amber-500 transition-colors"
+            class="w-full bg-[#0a3533] border border-white/15 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-emerald-400 transition-colors placeholder-[#618581]"
             placeholder="admin@peixariamancha.com.br">
         </div>
         <div>
-          <label class="block text-xs font-montserrat font-bold uppercase tracking-wider text-slate-300 mb-1.5">Senha</label>
+          <label class="block text-xs font-semibold uppercase tracking-wider text-[#8da6a3] mb-1.5">Senha</label>
           <input type="password" id="login-password" required value="mancha2026"
-            class="w-full bg-black/40 border border-white/15 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-amber-500 transition-colors"
+            class="w-full bg-[#0a3533] border border-white/15 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-emerald-400 transition-colors placeholder-[#618581]"
             placeholder="••••••••">
         </div>
 
-        <div id="login-error" class="hidden p-3 rounded-xl bg-red-500/15 border border-red-500/30 text-red-300 text-xs font-semibold"></div>
+        <div id="login-error" class="hidden p-3 rounded-xl bg-red-500/20 border border-red-500/30 text-red-200 text-xs font-semibold"></div>
 
         <button type="submit" id="login-submit-btn"
-          class="w-full bg-gradient-to-r from-[#b21818] to-[#d97706] hover:brightness-110 active:scale-[0.99] text-white font-montserrat font-extrabold uppercase tracking-wider text-xs py-3.5 px-6 rounded-xl shadow-lg transition-all cursor-pointer">
+          class="w-full bg-emerald-500 hover:bg-emerald-400 active:scale-[0.99] text-[#072a29] font-bold text-sm py-3.5 px-6 rounded-xl shadow-lg transition-all cursor-pointer">
           Entrar no Painel
         </button>
       </form>
 
-      <div class="mt-6 pt-4 border-t border-white/10 flex items-center justify-between text-[11px] text-slate-400">
-        <span>Padrão inicial: <code class="text-amber-300">mancha2026</code></span>
-        <a href="../cardapio-delivery/index.html" target="_blank" class="text-amber-400 hover:underline font-semibold flex items-center gap-1">
+      <div class="mt-8 pt-4 border-t border-white/10 flex items-center justify-between text-[11px] text-[#8da6a3] relative z-10">
+        <span>Senha padrão: <code class="text-emerald-300 font-mono">mancha2026</code></span>
+        <a href="../cardapio-delivery/index.html" target="_blank" class="text-emerald-300 hover:underline font-semibold flex items-center gap-1">
           Ver Cardápio <i data-lucide="external-link" class="w-3 h-3"></i>
         </a>
       </div>
     </div>
   </div>
 
-  <!-- ================= SISTEMA ADMIN PRINCIPAL ================= -->
-  <div id="admin-app" class="hidden min-h-screen flex flex-col relative z-10">
+  <!-- ================= SISTEMA ADMIN PRINCIPAL (PREENCHE A TELA INTEIRA) ================= -->
+  <div id="admin-app" class="hidden w-full h-screen bg-[#f1f5f4] overflow-hidden flex flex-col lg:flex-row relative">
 
-    <!-- Topbar -->
-    <header class="sticky top-0 z-30 glass-header px-4 sm:px-8 py-3.5">
-      <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-4">
-        <div class="flex items-center gap-3">
-          <img src="../Fotos/logo.png" alt="Logo" class="h-11 w-auto object-contain" onerror="this.style.display='none'">
-          <div>
-            <div class="flex items-center gap-2">
-              <h1 class="font-bebas text-2xl sm:text-3xl tracking-wide text-white leading-none">PEIXARIA MANCHA</h1>
-              <span id="db-status-badge" class="text-[10px] font-montserrat font-bold uppercase px-2.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
-                Conectado
-              </span>
+    <!-- Backdrop de Fundo Escuro para Mobile -->
+    <div id="sidebar-backdrop" class="fixed inset-0 bg-black/60 backdrop-blur-xs z-40 hidden lg:hidden transition-opacity"></div>
+
+    <!-- ================= 1. BARRA LATERAL (SIDEBAR DEEP TEAL ALINHADA / DRAWER MOBILE) ================= -->
+    <aside id="admin-sidebar" class="fixed inset-y-0 left-0 z-50 w-[280px] bg-[#072a29] text-white flex-shrink-0 flex flex-col justify-between p-5 lg:p-6 select-none border-r border-[#0d3d3a]/60 transform -translate-x-full lg:translate-x-0 lg:static transition-transform duration-300 ease-in-out shadow-2xl lg:shadow-none">
+      
+      <!-- Topo: Logo + Seção Navigation -->
+      <div class="space-y-6">
+        <!-- Logo Brand + Botões (Atualizar + Fechar Mobile) -->
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-400 to-teal-600 flex items-center justify-center text-[#072a29] shadow-md font-black">
+              <i data-lucide="fish" class="w-5 h-5"></i>
             </div>
-            <p class="text-xs text-slate-400">Painel de Controle do Delivery & Inteligência de Vendas</p>
+            <div>
+              <span class="font-bold text-base tracking-tight block text-white leading-tight">ManchaAdmin</span>
+              <span class="text-[10px] text-[#8da6a3] font-medium tracking-wide block">Peixaria Delivery</span>
+            </div>
+          </div>
+          <div class="flex items-center gap-1">
+            <button id="refresh-all-btn" title="Atualizar dados" class="text-[#8da6a3] hover:text-white transition-colors p-2 rounded-xl hover:bg-white/5 cursor-pointer">
+              <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+            </button>
+            <!-- Botão Fechar no Mobile (X) -->
+            <button id="mobile-sidebar-close" title="Fechar Menu" class="lg:hidden text-[#8da6a3] hover:text-white transition-colors p-2 rounded-xl hover:bg-white/5 cursor-pointer">
+              <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
           </div>
         </div>
 
-        <div class="flex items-center gap-2.5">
-          <a href="../cardapio-delivery/index.html" target="_blank"
-            class="inline-flex items-center gap-1.5 bg-white/5 hover:bg-white/10 border border-white/10 text-slate-200 text-xs font-montserrat font-bold px-3.5 py-2 rounded-xl transition-all">
-            <i data-lucide="eye" class="w-4 h-4 text-amber-400"></i>
-            <span>Abrir Delivery</span>
-          </a>
-          <button id="refresh-all-btn" title="Atualizar dados"
-            class="inline-flex items-center gap-1.5 bg-white/5 hover:bg-white/10 border border-white/10 text-slate-200 text-xs font-montserrat font-bold p-2 rounded-xl transition-all cursor-pointer">
-            <i data-lucide="refresh-cw" class="w-4 h-4 text-slate-300"></i>
+        <!-- Seção Menu Navigation -->
+        <div class="space-y-2">
+          <span class="text-[10px] font-bold uppercase tracking-widest text-[#567a75] px-3 block mb-2">Navigation</span>
+
+          <!-- Botões de Aba Perfeitamente Alinhados com Ícones Fixos -->
+          <button data-tab="dashboard" class="tab-btn nav-pill active w-full flex items-center gap-3.5 px-3.5 py-3 rounded-2xl text-xs sm:text-[13px] font-semibold text-left transition-all cursor-pointer">
+            <span class="nav-icon-box w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 bg-white/5 transition-colors">
+              <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+            </span>
+            <span class="truncate whitespace-nowrap">Dashboard</span>
           </button>
-          <button id="logout-btn"
-            class="inline-flex items-center gap-1.5 bg-red-500/15 hover:bg-red-500/25 border border-red-500/30 text-red-300 text-xs font-montserrat font-bold px-3.5 py-2 rounded-xl transition-all cursor-pointer">
+
+          <button data-tab="products" class="tab-btn nav-pill w-full flex items-center gap-3.5 px-3.5 py-3 rounded-2xl text-xs sm:text-[13px] font-semibold text-left transition-all cursor-pointer">
+            <span class="nav-icon-box w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 bg-white/5 transition-colors">
+              <i data-lucide="fish" class="w-4 h-4"></i>
+            </span>
+            <span class="truncate whitespace-nowrap">Produtos & Preços</span>
+          </button>
+
+          <button data-tab="orders" class="tab-btn nav-pill w-full flex items-center gap-3.5 px-3.5 py-3 rounded-2xl text-xs sm:text-[13px] font-semibold text-left transition-all cursor-pointer">
+            <span class="nav-icon-box w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 bg-white/5 transition-colors">
+              <i data-lucide="shopping-bag" class="w-4 h-4"></i>
+            </span>
+            <span class="truncate whitespace-nowrap">Pedidos Delivery</span>
+            <span id="nav-orders-badge" class="ml-auto bg-emerald-500 text-[#072a29] text-[10px] font-black px-2 py-0.5 rounded-full flex-shrink-0">0</span>
+          </button>
+
+          <button data-tab="categories" class="tab-btn nav-pill w-full flex items-center gap-3.5 px-3.5 py-3 rounded-2xl text-xs sm:text-[13px] font-semibold text-left transition-all cursor-pointer">
+            <span class="nav-icon-box w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 bg-white/5 transition-colors">
+              <i data-lucide="layers" class="w-4 h-4"></i>
+            </span>
+            <span class="truncate whitespace-nowrap">Categorias</span>
+          </button>
+
+          <button data-tab="settings" class="tab-btn nav-pill w-full flex items-center gap-3.5 px-3.5 py-3 rounded-2xl text-xs sm:text-[13px] font-semibold text-left transition-all cursor-pointer">
+            <span class="nav-icon-box w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 bg-white/5 transition-colors">
+              <i data-lucide="settings" class="w-4 h-4"></i>
+            </span>
+            <span class="truncate whitespace-nowrap">Configurações & Loja</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Rodapé da Barra Lateral: User Account -->
+      <div class="pt-4 border-t border-white/10 space-y-3">
+        <span class="text-[10px] font-bold uppercase tracking-widest text-[#567a75] px-1 block">User Account</span>
+        
+        <div class="flex items-center justify-between bg-white/5 rounded-2xl p-3 border border-white/5">
+          <div class="flex items-center gap-2.5 min-w-0">
+            <div class="w-9 h-9 rounded-full bg-emerald-500/20 border border-emerald-400/30 flex items-center justify-center text-emerald-300 font-black text-xs flex-shrink-0">
+              PM
+            </div>
+            <div class="min-w-0">
+              <span class="text-xs font-bold text-white block truncate leading-tight">Administrador</span>
+              <span class="text-[10px] text-[#8da6a3] block font-mono truncate">#mancha-admin</span>
+            </div>
+          </div>
+          <button id="logout-btn" title="Encerrar Sessão" class="text-[#8da6a3] hover:text-red-400 p-1.5 transition-colors cursor-pointer">
             <i data-lucide="log-out" class="w-4 h-4"></i>
-            <span class="hidden sm:inline">Sair</span>
           </button>
         </div>
+
+        <div class="flex items-center justify-between px-1">
+          <span id="db-status-badge" class="text-[9px] font-bold uppercase tracking-wider text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-full">
+            Banco 100% Local
+          </span>
+          <a href="../cardapio-delivery/index.html" target="_blank" class="text-[10px] font-semibold text-emerald-400 hover:text-emerald-300 flex items-center gap-1">
+            Cardápio <i data-lucide="arrow-up-right" class="w-3 h-3"></i>
+          </a>
+        </div>
       </div>
+    </aside>
 
-      <!-- Navegação de Abas -->
-      <div class="max-w-7xl mx-auto mt-3 pt-2 border-t border-white/5 flex items-center gap-2 overflow-x-auto custom-scroll pb-1">
-        <button data-tab="dashboard" class="tab-btn active inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-montserrat font-bold uppercase tracking-wider border border-white/10 text-slate-300 hover:text-white whitespace-nowrap transition-all cursor-pointer">
-          <i data-lucide="bar-chart-3" class="w-4 h-4"></i>
-          <span>Dashboard & Mais Vendidos</span>
-        </button>
-        <button data-tab="products" class="tab-btn inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-montserrat font-bold uppercase tracking-wider border border-white/10 text-slate-300 hover:text-white whitespace-nowrap transition-all cursor-pointer">
-          <i data-lucide="fish" class="w-4 h-4"></i>
-          <span>Produtos & Preços</span>
-        </button>
-        <button data-tab="orders" class="tab-btn inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-montserrat font-bold uppercase tracking-wider border border-white/10 text-slate-300 hover:text-white whitespace-nowrap transition-all cursor-pointer">
-          <i data-lucide="shopping-bag" class="w-4 h-4"></i>
-          <span>Pedidos Recebidos</span>
-          <span id="nav-orders-badge" class="bg-white/20 text-white text-[10px] px-1.5 py-0.2 rounded-full">0</span>
-        </button>
-        <button data-tab="categories" class="tab-btn inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-montserrat font-bold uppercase tracking-wider border border-white/10 text-slate-300 hover:text-white whitespace-nowrap transition-all cursor-pointer">
-          <i data-lucide="layers" class="w-4 h-4"></i>
-          <span>Categorias</span>
-        </button>
-        <button data-tab="settings" class="tab-btn inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-montserrat font-bold uppercase tracking-wider border border-white/10 text-slate-300 hover:text-white whitespace-nowrap transition-all cursor-pointer">
-          <i data-lucide="settings" class="w-4 h-4"></i>
-          <span>Horários, Loja & MongoDB</span>
-        </button>
-      </div>
-    </header>
-
-    <!-- Conteúdo Principal -->
-    <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-8 space-y-6">
-
-      <!-- ================= ABA 1: DASHBOARD & MAIS VENDIDOS ================= -->
-      <section id="tab-dashboard" class="tab-panel space-y-6">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <!-- ================= 2. ÁREA PRINCIPAL DE CONTEÚDO (OFF-WHITE / MINT CLARO) ================= -->
+    <main class="flex-1 flex flex-col h-full overflow-hidden bg-[#f1f5f4]">
+      
+      <!-- Topbar Interna da Área Principal -->
+      <header class="h-16 lg:h-20 px-4 sm:px-6 lg:px-8 border-b border-[#e4ebe7] bg-[#f1f5f4]/80 backdrop-blur-md flex items-center justify-between flex-shrink-0 z-10 gap-3">
+        <div class="flex items-center gap-3">
+          <!-- Botão dos Três Riscos (Menu Hambúrguer para Mobile) -->
+          <button id="mobile-menu-btn" title="Abrir Menu de Navegação" class="lg:hidden p-2.5 rounded-xl bg-white border border-[#e4ebe7] text-[#072a29] hover:bg-slate-100 active:scale-95 transition-all shadow-xs cursor-pointer flex items-center justify-center">
+            <i data-lucide="menu" class="w-5 h-5"></i>
+          </button>
           <div>
-            <h2 class="font-bebas text-3xl tracking-wide text-white uppercase">Visão Geral & Ranking de Produtos</h2>
-            <p class="text-xs text-slate-400">Acompanhe o desempenho do seu Delivery e descubra quais peixes e porções mais vendem.</p>
-          </div>
-          <div class="flex items-center gap-2 bg-white/5 p-1 rounded-xl border border-white/10 self-start">
-            <button data-period="today" class="period-btn px-3 py-1.5 rounded-lg text-xs font-montserrat font-bold text-slate-300 hover:text-white transition-all cursor-pointer">Hoje</button>
-            <button data-period="7d" class="period-btn px-3 py-1.5 rounded-lg text-xs font-montserrat font-bold text-slate-300 hover:text-white transition-all cursor-pointer">7 Dias</button>
-            <button data-period="30d" class="period-btn px-3 py-1.5 rounded-lg text-xs font-montserrat font-bold text-slate-300 hover:text-white transition-all cursor-pointer">30 Dias</button>
-            <button data-period="all" class="period-btn bg-[#b21818] text-white px-3 py-1.5 rounded-lg text-xs font-montserrat font-bold transition-all cursor-pointer">Tudo</button>
+            <h2 id="view-title" class="text-xl sm:text-2xl font-extrabold text-[#0a2725] tracking-tight">Dashboard</h2>
+            <p id="view-subtitle" class="text-xs text-slate-500 hidden sm:block">Acompanhe métricas, ranking de peixes e volume de pedidos.</p>
           </div>
         </div>
 
-        <!-- KPIs Cards -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div class="glass-card rounded-2xl p-5 border-l-4 border-l-emerald-500">
-            <div class="flex items-center justify-between text-slate-400 text-xs font-montserrat font-bold uppercase">
-              <span>Faturamento Estimado</span>
-              <i data-lucide="dollar-sign" class="w-4 h-4 text-emerald-400"></i>
-            </div>
-            <p id="kpi-revenue" class="font-bebas text-4xl text-white mt-2">R$ 0,00</p>
-            <span class="text-[11px] text-slate-400">Pedidos válidos no período</span>
+        <!-- Ações do Topo -->
+        <div class="flex items-center gap-1.5 sm:gap-3 flex-shrink-0">
+          <!-- Filtro de Período (para o Dashboard) -->
+          <div id="period-selector-wrapper" class="hidden xs:flex items-center bg-white p-1 rounded-full border border-[#e4ebe7] shadow-xs">
+            <button data-period="today" class="period-btn px-2 sm:px-3 py-1 rounded-full text-[11px] sm:text-xs font-semibold text-slate-500 hover:text-slate-800 transition-all cursor-pointer">Hoje</button>
+            <button data-period="7d" class="period-btn px-2 sm:px-3 py-1 rounded-full text-[11px] sm:text-xs font-semibold text-slate-500 hover:text-slate-800 transition-all cursor-pointer">7D</button>
+            <button data-period="30d" class="period-btn hidden sm:block px-3 py-1 rounded-full text-xs font-semibold text-slate-500 hover:text-slate-800 transition-all cursor-pointer">30 Dias</button>
+            <button data-period="all" class="period-btn bg-[#072a29] text-white px-2.5 sm:px-3 py-1 rounded-full text-[11px] sm:text-xs font-bold transition-all cursor-pointer">Tudo</button>
           </div>
 
-          <div class="glass-card rounded-2xl p-5 border-l-4 border-l-amber-500">
-            <div class="flex items-center justify-between text-slate-400 text-xs font-montserrat font-bold uppercase">
-              <span>Total de Pedidos</span>
-              <i data-lucide="shopping-cart" class="w-4 h-4 text-amber-400"></i>
-            </div>
-            <p id="kpi-orders" class="font-bebas text-4xl text-white mt-2">0</p>
-            <span id="kpi-modality-split" class="text-[11px] text-slate-400">0 Entrega • 0 Retirada</span>
-          </div>
+          <!-- Status Rápido do Delivery (Ao Vivo) -->
+          <button id="quick-store-status-btn" title="Alternar status do Delivery (Aberto / Fechado)"
+            class="inline-flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-full text-[11px] sm:text-xs font-bold transition-all border shadow-xs cursor-pointer bg-emerald-50 text-emerald-800 border-emerald-200 hover:bg-emerald-100 flex-shrink-0">
+            <span class="relative flex h-2 w-2">
+              <span id="quick-status-ping" class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span id="quick-status-dot" class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+            </span>
+            <span id="quick-status-text">Loja Aberta</span>
+          </button>
 
-          <div class="glass-card rounded-2xl p-5 border-l-4 border-l-[#b21818]">
-            <div class="flex items-center justify-between text-slate-400 text-xs font-montserrat font-bold uppercase">
-              <span>Ticket Médio</span>
-              <i data-lucide="trending-up" class="w-4 h-4 text-red-400"></i>
-            </div>
-            <p id="kpi-ticket" class="font-bebas text-4xl text-white mt-2">R$ 0,00</p>
-            <span class="text-[11px] text-slate-400">Valor médio por cliente</span>
-          </div>
-
-          <div class="glass-card rounded-2xl p-5 border-l-4 border-l-sky-500">
-            <div class="flex items-center justify-between text-slate-400 text-xs font-montserrat font-bold uppercase">
-              <span>Itens Ativos no Cardápio</span>
-              <i data-lucide="check-circle-2" class="w-4 h-4 text-sky-400"></i>
-            </div>
-            <p id="kpi-active-products" class="font-bebas text-4xl text-white mt-2">0 / 0</p>
-            <span class="text-[11px] text-slate-400">Produtos disponíveis hoje</span>
-          </div>
-        </div>
-
-        <!-- Ranking de Mais Vendidos + Desempenho por Categoria -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <!-- Coluna Principal: Top Produtos Mais Vendidos -->
-          <div class="lg:col-span-2 glass-card rounded-3xl p-5 sm:p-6 flex flex-col">
-            <div class="flex flex-wrap items-center justify-between gap-2 pb-4 border-b border-white/10">
-              <div class="flex items-center gap-2">
-                <span class="bg-amber-500/20 text-amber-300 p-2 rounded-xl"><i data-lucide="trophy" class="w-5 h-5"></i></span>
-                <div>
-                  <h3 class="font-montserrat font-black text-base uppercase text-white">Ranking: Produtos Mais Vendidos</h3>
-                  <p class="text-xs text-slate-400">Ordenado por volume de saídas e receita gerada</p>
-                </div>
-              </div>
-              <button id="simulate-order-btn" class="text-[11px] font-montserrat font-bold bg-white/5 hover:bg-white/10 text-amber-300 border border-amber-500/30 px-3 py-1.5 rounded-xl transition-all cursor-pointer">
-                + Gerar Pedido Exemplo
-              </button>
-            </div>
-
-            <div id="top-products-list" class="mt-4 space-y-3 flex-1">
-              <!-- Renderizado via JS -->
-            </div>
-          </div>
-
-          <!-- Coluna Lateral: Categorias, Pagamentos e Últimos 7 dias -->
-          <div class="space-y-6">
-            <!-- Vendas por Categoria -->
-            <div class="glass-card rounded-3xl p-5">
-              <h3 class="font-montserrat font-extrabold text-sm uppercase text-white mb-3 flex items-center gap-2">
-                <i data-lucide="pie-chart" class="w-4 h-4 text-amber-400"></i>
-                Vendas por Categoria
-              </h3>
-              <div id="category-stats-list" class="space-y-3"></div>
-            </div>
-
-            <!-- Meios de Pagamento -->
-            <div class="glass-card rounded-3xl p-5">
-              <h3 class="font-montserrat font-extrabold text-sm uppercase text-white mb-3 flex items-center gap-2">
-                <i data-lucide="credit-card" class="w-4 h-4 text-emerald-400"></i>
-                Formas de Pagamento Preferidas
-              </h3>
-              <div id="payment-stats-list" class="grid grid-cols-2 gap-2.5 text-xs"></div>
-            </div>
-
-            <!-- Movimento últimos 7 dias -->
-            <div class="glass-card rounded-3xl p-5">
-              <h3 class="font-montserrat font-extrabold text-sm uppercase text-white mb-3 flex items-center gap-2">
-                <i data-lucide="calendar" class="w-4 h-4 text-sky-400"></i>
-                Movimento (Últimos 7 Dias)
-              </h3>
-              <div id="daily-sales-list" class="space-y-2 text-xs"></div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- ================= ABA 2: PRODUTOS & PREÇOS ================= -->
-      <section id="tab-products" class="tab-panel hidden space-y-6">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div>
-            <h2 class="font-bebas text-3xl tracking-wide text-white uppercase">Gerenciar Produtos & Preços</h2>
-            <p class="text-xs text-slate-400">Adicione novos pratos, altere preços rapidamente, troque fotos ou pause itens esgotados no dia.</p>
-          </div>
-          <button id="new-product-btn"
-            class="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-[#b21818] to-[#d97706] hover:brightness-110 text-white font-montserrat font-extrabold text-xs uppercase tracking-wider px-5 py-3 rounded-2xl shadow-lg transition-all cursor-pointer">
-            <i data-lucide="plus-circle" class="w-4 h-4"></i>
+          <!-- Botão Preto de Ação Principal (exatamente como "Add Custom Widget" do modelo) -->
+          <button id="new-product-quick-btn" class="hidden md:flex bg-[#072a29] hover:bg-[#0c3f3d] text-white text-xs font-bold px-4 py-2.5 rounded-full shadow-sm items-center gap-1.5 transition-all cursor-pointer flex-shrink-0">
+            <i data-lucide="plus" class="w-3.5 h-3.5"></i>
             <span>Novo Produto</span>
           </button>
         </div>
+      </header>
 
-        <!-- Filtros de Produto -->
-        <div class="glass-card rounded-2xl p-4 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
-          <div class="relative flex-1">
-            <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
-            <input type="text" id="admin-product-search" placeholder="Buscar produto por nome, descrição ou selo..."
-              class="w-full bg-black/40 border border-white/10 rounded-xl pl-10 pr-4 py-2.5 text-xs sm:text-sm text-white focus:outline-none focus:border-amber-500">
+      <!-- Área com Scroll Interno dos Painéis -->
+      <div class="flex-1 overflow-y-auto custom-scroll p-4 sm:p-6 lg:p-8 space-y-6">
+
+        <!-- ================= ABA 1: DASHBOARD (ORGANIZADO FIELMENTE AO MODELO) ================= -->
+        <section id="tab-dashboard" class="tab-panel space-y-6">
+
+          <!-- LINHA 1: 3 CARDS DE KPI SUPERIORES (com sparklines de barras como no exemplo) -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+
+            <!-- Card 1: Faturamento Estimado (como "Air Pollution Level" com sparkline verde) -->
+            <div class="dash-card p-5 sm:p-6 flex items-center justify-between">
+              <div>
+                <span class="text-xs font-bold text-slate-500 block mb-1">Faturamento Estimado</span>
+                <div class="flex items-baseline gap-1.5">
+                  <h3 id="kpi-revenue" class="text-2xl sm:text-3xl font-extrabold text-[#072a29] tracking-tight">R$ 0,00</h3>
+                </div>
+                <div class="flex items-center gap-1 text-[11px] font-bold text-emerald-600 mt-2">
+                  <i data-lucide="trending-up" class="w-3.5 h-3.5"></i>
+                  <span>Vendas confirmadas</span>
+                </div>
+              </div>
+              <!-- Mini Bar Sparklines Visual -->
+              <div class="flex items-end gap-1.5 h-12 pl-2">
+                <div class="sparkline-bar bg-emerald-200 h-4"></div>
+                <div class="sparkline-bar bg-emerald-300 h-7"></div>
+                <div class="sparkline-bar bg-emerald-400 h-5"></div>
+                <div class="sparkline-bar bg-emerald-500 h-10"></div>
+                <div class="sparkline-bar bg-emerald-600 h-8"></div>
+              </div>
+            </div>
+
+            <!-- Card 2: Total de Pedidos (como "Environmental Quality Index" com sparkline coral) -->
+            <div class="dash-card p-5 sm:p-6 flex items-center justify-between">
+              <div>
+                <span class="text-xs font-bold text-slate-500 block mb-1">Total de Pedidos</span>
+                <div class="flex items-baseline gap-1.5">
+                  <h3 id="kpi-orders" class="text-2xl sm:text-3xl font-extrabold text-[#072a29] tracking-tight">0</h3>
+                </div>
+                <div id="kpi-modality-split" class="text-[11px] font-bold text-slate-500 mt-2">
+                  0 Entrega • 0 Retirada
+                </div>
+              </div>
+              <!-- Mini Bar Sparklines Visual Coral/Rose -->
+              <div class="flex items-end gap-1.5 h-12 pl-2">
+                <div class="sparkline-bar bg-rose-200 h-6"></div>
+                <div class="sparkline-bar bg-rose-300 h-4"></div>
+                <div class="sparkline-bar bg-rose-400 h-9"></div>
+                <div class="sparkline-bar bg-rose-500 h-7"></div>
+                <div class="sparkline-bar bg-rose-600 h-11"></div>
+              </div>
+            </div>
+
+            <!-- Card 3: Ticket Médio (como "Investments in Clean Tech" com sparkline verde) -->
+            <div class="dash-card p-5 sm:p-6 flex items-center justify-between">
+              <div>
+                <span class="text-xs font-bold text-slate-500 block mb-1">Ticket Médio por Cliente</span>
+                <div class="flex items-baseline gap-1.5">
+                  <h3 id="kpi-ticket" class="text-2xl sm:text-3xl font-extrabold text-[#072a29] tracking-tight">R$ 0,00</h3>
+                </div>
+                <div class="flex items-center gap-1 text-[11px] font-bold text-emerald-600 mt-2">
+                  <i data-lucide="check-circle-2" class="w-3.5 h-3.5"></i>
+                  <span>Valor médio por pedido</span>
+                </div>
+              </div>
+              <!-- Mini Bar Sparklines Visual Verde -->
+              <div class="flex items-end gap-1.5 h-12 pl-2">
+                <div class="sparkline-bar bg-teal-200 h-5"></div>
+                <div class="sparkline-bar bg-teal-300 h-8"></div>
+                <div class="sparkline-bar bg-teal-400 h-6"></div>
+                <div class="sparkline-bar bg-teal-500 h-11"></div>
+                <div class="sparkline-bar bg-teal-600 h-9"></div>
+              </div>
+            </div>
+
           </div>
-          <select id="admin-product-cat-filter"
-            class="bg-black/60 border border-white/15 rounded-xl px-4 py-2.5 text-xs sm:text-sm text-white font-semibold focus:outline-none focus:border-amber-500">
-            <option value="all">Todas as Categorias</option>
-          </select>
-        </div>
 
-        <!-- Lista de Produtos -->
-        <div id="admin-products-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <!-- Renderizado via JS -->
-        </div>
-      </section>
+          <!-- LINHA 2: 3 CARDS DO MEIO (Semi-Gauge, Breakdown com bolinhas e Mapa/Regiões) -->
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
 
-      <!-- ================= ABA 3: PEDIDOS RECEBIDOS ================= -->
-      <section id="tab-orders" class="tab-panel hidden space-y-6">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div>
-            <h2 class="font-bebas text-3xl tracking-wide text-white uppercase">Histórico & Gestão de Pedidos</h2>
-            <p class="text-xs text-slate-400">Todos os pedidos finalizados pelos clientes no Delivery aparecem aqui automaticamente.</p>
+            <!-- Card 1: Gauge Semicircular (Fiel ao "Waste Processing Level 72%") -->
+            <div class="lg:col-span-4 dash-card p-6 flex flex-col justify-between items-center text-center">
+              <div class="w-full text-left">
+                <span class="text-xs font-bold text-slate-500">Cardápio & Pratos Ativos</span>
+              </div>
+
+              <div class="my-3 flex flex-col items-center">
+                <span id="kpi-active-products" class="text-4xl font-extrabold text-[#072a29] tracking-tight">0 / 0</span>
+                <span class="text-[11px] text-slate-400 font-medium mt-0.5">Disponíveis hoje</span>
+
+                <!-- Gauge Semicircular SVG -->
+                <div class="relative w-44 h-24 mt-3">
+                  <svg viewBox="0 0 100 55" class="w-full h-full">
+                    <!-- Arco de Fundo Cinza -->
+                    <path d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="#e6eee9" stroke-width="8" stroke-linecap="round" />
+                    <!-- Arco de Progresso Verde Esmeralda -->
+                    <path id="gauge-arc" d="M 10 50 A 40 40 0 0 1 76 22" fill="none" stroke="#00d084" stroke-width="8" stroke-linecap="round" />
+                    <!-- Ponto de Destaque no Fim -->
+                    <circle cx="76" cy="22" r="5" fill="#072a29" stroke="#ffffff" stroke-width="2" />
+                  </svg>
+                </div>
+              </div>
+
+              <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+                Índice de Disponibilidade
+              </div>
+            </div>
+
+            <!-- Card 2: Mix de Vendas / Categorias (Fiel ao "Renewable Energy 86%" com lista e botão) -->
+            <div class="lg:col-span-4 dash-card p-6 flex flex-col justify-between">
+              <div>
+                <span class="text-xs font-bold text-slate-500 block mb-1">Mix de Vendas (Categorias)</span>
+                <span id="mix-highlight-pct" class="text-4xl font-extrabold text-[#072a29] tracking-tight block">100%</span>
+                <span class="text-[11px] text-slate-400 font-medium">Distribuição das saídas</span>
+
+                <!-- Lista com marcadores coloridos como no exemplo -->
+                <div id="category-stats-list" class="mt-4 space-y-2.5 text-xs">
+                  <!-- Preenchido via JS -->
+                </div>
+              </div>
+
+              <div class="pt-4 mt-2">
+                <button type="button" data-tab-switch="products" class="w-full py-2 px-4 rounded-xl border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-50 transition-colors text-center cursor-pointer">
+                  Ver Todos os Produtos
+                </button>
+              </div>
+            </div>
+
+            <!-- Card 3: Vendas por Região e Bairros (Fiel ao "Sources Usage in Manufacturing") -->
+            <div class="lg:col-span-4 dash-card p-6 flex flex-col justify-between">
+              <div>
+                <span class="text-xs font-bold text-slate-500 block">Distribuição do Atendimento</span>
+                <p class="text-[11px] text-slate-400 mt-0.5 leading-tight">Percentual estimado de pedidos por localidade e retirada</p>
+
+                <div class="mt-4 space-y-2 text-xs">
+                  <div class="flex items-center justify-between py-1 border-b border-slate-100">
+                    <span class="flex items-center gap-2 text-slate-600 font-medium">
+                      <span class="w-2 h-2 rounded-full bg-emerald-500"></span> Marambaia (Próximo)
+                    </span>
+                    <span class="font-bold text-[#072a29]">42%</span>
+                  </div>
+                  <div class="flex items-center justify-between py-1 border-b border-slate-100">
+                    <span class="flex items-center gap-2 text-slate-600 font-medium">
+                      <span class="w-2 h-2 rounded-full bg-teal-500"></span> Ananindeua / BR
+                    </span>
+                    <span class="font-bold text-[#072a29]">28%</span>
+                  </div>
+                  <div class="flex items-center justify-between py-1 border-b border-slate-100">
+                    <span class="flex items-center gap-2 text-slate-600 font-medium">
+                      <span class="w-2 h-2 rounded-full bg-amber-500"></span> São Brás & Marco
+                    </span>
+                    <span class="font-bold text-[#072a29]">16%</span>
+                  </div>
+                  <div class="flex items-center justify-between py-1 border-b border-slate-100">
+                    <span class="flex items-center gap-2 text-slate-600 font-medium">
+                      <span class="w-2 h-2 rounded-full bg-rose-500"></span> Retirada no Balcão
+                    </span>
+                    <span class="font-bold text-[#072a29]">14%</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Badge com bandeira/status do restaurante -->
+              <div class="mt-4 p-3 rounded-2xl bg-[#f5f9f7] border border-[#e4eee8] flex items-center justify-between">
+                <div>
+                  <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Região Atendida</span>
+                  <span class="text-xs font-bold text-[#072a29]">Belém & Ananindeua</span>
+                </div>
+                <span class="text-xs font-bold px-2.5 py-1 rounded-full bg-emerald-500/15 text-emerald-800">
+                  Raio Ativo
+                </span>
+              </div>
+            </div>
+
           </div>
-        </div>
 
-        <div id="admin-orders-list" class="space-y-4">
-          <!-- Renderizado via JS -->
-        </div>
-      </section>
+          <!-- LINHA 3: 3 CARDS INFERIORES (Pill Escuro, Indicador Circular e Banner Comunidade) -->
+          <div class="grid grid-cols-1 md:grid-cols-12 gap-5">
 
-      <!-- ================= ABA 4: CATEGORIAS ================= -->
-      <section id="tab-categories" class="tab-panel hidden space-y-6">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div>
-            <h2 class="font-bebas text-3xl tracking-wide text-white uppercase">Categorias do Cardápio</h2>
-            <p class="text-xs text-slate-400">Organize as seções do Delivery (ex: Peixes Fritos, Assados, Porções, Bebidas).</p>
+            <!-- Card 1: Card Escuro Sleek (Fiel ao "Climate Change Index 76.2") -->
+            <div class="md:col-span-4 bg-[#072424] text-white rounded-3xl p-5 sm:p-6 flex items-center gap-4 shadow-sm">
+              <div class="w-14 h-14 rounded-full border-4 border-amber-400 flex items-center justify-center font-black text-sm flex-shrink-0 text-white shadow-inner">
+                4.9★
+              </div>
+              <div>
+                <h4 class="font-bold text-sm text-white leading-tight">Satisfação dos Clientes</h4>
+                <p class="text-xs text-[#8da6a3] mt-0.5 leading-snug">Qualidade comprovada no sabor do peixe fresco e rapidez no WhatsApp.</p>
+              </div>
+            </div>
+
+            <!-- Card 2: Tempo de Atendimento (Fiel ao "Water level in Dnipro 57m") -->
+            <div class="md:col-span-4 dash-card p-5 sm:p-6 flex items-center gap-4">
+              <div class="w-14 h-14 rounded-full border-4 border-emerald-400 flex items-center justify-center font-extrabold text-xs text-emerald-700 flex-shrink-0 bg-emerald-50">
+                30-50m
+              </div>
+              <div>
+                <h4 class="font-bold text-sm text-[#072a29] leading-tight">Tempo Médio de Entrega</h4>
+                <p class="text-xs text-slate-500 mt-0.5 leading-snug">Preparo na hora com peixes assados na brasa e fritos in natura.</p>
+              </div>
+            </div>
+
+            <!-- Card 3: Featured Banner (Fiel ao "Let's join our community" com botão de seta) -->
+            <div class="md:col-span-4 bg-gradient-to-br from-[#0c3f38] to-[#062420] text-white rounded-3xl p-5 sm:p-6 flex flex-col justify-between shadow-sm relative overflow-hidden group">
+              <!-- Glow decorativo -->
+              <div class="absolute -right-8 -bottom-8 w-32 h-32 bg-emerald-400/20 rounded-full blur-2xl pointer-events-none"></div>
+
+              <div class="flex items-center justify-between">
+                <span class="text-[10px] font-bold uppercase tracking-wider text-emerald-400">Peixaria Mancha</span>
+                <a href="../cardapio-delivery/index.html" target="_blank" title="Abrir Cardápio Delivery" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-all cursor-pointer">
+                  <i data-lucide="arrow-up-right" class="w-4 h-4"></i>
+                </a>
+              </div>
+
+              <div class="my-2">
+                <h4 class="font-extrabold text-lg text-white leading-tight">Cardápio Digital</h4>
+                <p class="text-xs text-emerald-200/80 mt-0.5">Receba pedidos automaticamente direto no WhatsApp.</p>
+              </div>
+
+              <div class="flex items-center justify-between pt-1">
+                <div class="flex -space-x-1.5 overflow-hidden">
+                  <div class="inline-block h-6 w-6 rounded-full ring-2 ring-[#072a29] bg-emerald-400 text-[#072a29] text-[9px] font-black flex items-center justify-center">🐟</div>
+                  <div class="inline-block h-6 w-6 rounded-full ring-2 ring-[#072a29] bg-amber-400 text-[#072a29] text-[9px] font-black flex items-center justify-center">🔥</div>
+                  <div class="inline-block h-6 w-6 rounded-full ring-2 ring-[#072a29] bg-teal-300 text-[#072a29] text-[9px] font-black flex items-center justify-center">📦</div>
+                </div>
+                <span class="text-[11px] font-bold text-emerald-300">Pedidos Online</span>
+              </div>
+            </div>
+
           </div>
-          <button id="new-category-btn"
-            class="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-[#b21818] to-[#d97706] hover:brightness-110 text-white font-montserrat font-extrabold text-xs uppercase tracking-wider px-5 py-3 rounded-2xl shadow-lg transition-all cursor-pointer">
-            <i data-lucide="folder-plus" class="w-4 h-4"></i>
-            <span>Nova Categoria</span>
-          </button>
-        </div>
 
-        <div id="admin-categories-list" class="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <!-- Renderizado via JS -->
-        </div>
-      </section>
+          <!-- LINHA 4: RANKING DE MAIS VENDIDOS & HISTÓRICO DE DIAS -->
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 pt-2">
+            
+            <!-- Coluna 1: Top Produtos Mais Vendidos -->
+            <div class="lg:col-span-8 dash-card p-6">
+              <div class="flex items-center justify-between pb-4 border-b border-slate-100">
+                <div>
+                  <h3 class="font-extrabold text-base text-[#072a29]">Ranking: Produtos Mais Vendidos</h3>
+                  <p class="text-xs text-slate-500">Ordenado por unidades vendidas e faturamento gerado</p>
+                </div>
+                <button id="simulate-order-btn" class="text-xs font-bold bg-[#f1f6f4] hover:bg-[#e4ede8] text-[#072a29] border border-[#d6e4dc] px-3.5 py-1.5 rounded-full transition-all cursor-pointer">
+                  + Gerar Pedido Exemplo
+                </button>
+              </div>
 
-      <!-- ================= ABA 5: CONFIGURAÇÕES & MONGODB ================= -->
-      <section id="tab-settings" class="tab-panel hidden space-y-6">
-        <div>
-          <h2 class="font-bebas text-3xl tracking-wide text-white uppercase">Configurações da Loja, Horários & Banco MongoDB</h2>
-          <p class="text-xs text-slate-400">Controle o funcionamento do Delivery, WhatsApp de pedidos e a conexão com o MongoDB.</p>
-        </div>
+              <div id="top-products-list" class="mt-4 space-y-3">
+                <!-- Preenchido via JS com design clean -->
+              </div>
+            </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <!-- Card 1: Horários e Informações da Loja -->
-          <form id="store-config-form" class="glass-card rounded-3xl p-6 space-y-4">
-            <h3 class="font-montserrat font-black text-base uppercase text-amber-400 flex items-center gap-2 border-b border-white/10 pb-3">
-              <i data-lucide="clock" class="w-5 h-5"></i>
-              Operação & Horário do Delivery
-            </h3>
+            <!-- Coluna 2: Formas de Pagamento e Histórico 7 Dias -->
+            <div class="lg:col-span-4 space-y-5">
+              
+              <!-- Formas de Pagamento -->
+              <div class="dash-card p-5">
+                <span class="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-3">Formas de Pagamento</span>
+                <div id="payment-stats-list" class="grid grid-cols-2 gap-2 text-xs">
+                  <!-- Preenchido via JS -->
+                </div>
+              </div>
 
-            <div>
-              <label class="block text-xs font-montserrat font-bold uppercase text-slate-300 mb-1.5">Status de Operação da Loja</label>
-              <select id="cfg-manualStatus" class="w-full bg-black/50 border border-white/15 rounded-xl px-4 py-2.5 text-sm text-white font-semibold focus:border-amber-500 outline-none">
-                <option value="auto">Automático pelo Horário (Recomendado)</option>
-                <option value="force_open">Forçar ABERTO Agora (Ignorar horário)</option>
-                <option value="force_closed">Forçar FECHADO Agora (Pausar loja temporariamente)</option>
+              <!-- Movimento Últimos 7 Dias -->
+              <div class="dash-card p-5">
+                <span class="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-3">Movimento (Últimos 7 Dias)</span>
+                <div id="daily-sales-list" class="space-y-2 text-xs">
+                  <!-- Preenchido via JS -->
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+
+        </section>
+
+        <!-- ================= ABA 2: PRODUTOS & PREÇOS ================= -->
+        <section id="tab-products" class="tab-panel hidden space-y-6">
+          <div class="dash-card p-6">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-100">
+              <div>
+                <h3 class="font-extrabold text-xl text-[#072a29]">Gerenciar Produtos & Preços</h3>
+                <p class="text-xs text-slate-500">Adicione pratos, altere valores, pause itens do dia ou troque imagens.</p>
+              </div>
+              <button id="new-product-btn" class="bg-[#072a29] hover:bg-[#0c3f3d] text-white font-bold text-xs uppercase tracking-wider px-5 py-2.5 rounded-full shadow-sm flex items-center justify-center gap-2 cursor-pointer transition-all">
+                <i data-lucide="plus" class="w-4 h-4"></i>
+                <span>Novo Produto</span>
+              </button>
+            </div>
+
+            <!-- Filtros de Busca -->
+            <div class="mt-4 flex flex-col sm:flex-row items-center gap-3">
+              <div class="relative flex-1 w-full">
+                <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+                <input type="text" id="admin-product-search" placeholder="Buscar por nome, descrição ou selo..."
+                  class="w-full bg-[#f8faf9] border border-slate-200 rounded-xl pl-10 pr-4 py-2.5 text-xs sm:text-sm text-slate-800 focus:outline-none focus:border-emerald-500">
+              </div>
+              <select id="admin-product-cat-filter"
+                class="w-full sm:w-auto bg-[#f8faf9] border border-slate-200 rounded-xl px-4 py-2.5 text-xs sm:text-sm text-slate-800 font-semibold focus:outline-none focus:border-emerald-500">
+                <option value="all">Todas as Categorias</option>
               </select>
             </div>
 
-            <div class="grid grid-cols-2 gap-3">
-              <div>
-                <label class="block text-xs font-montserrat font-bold uppercase text-slate-300 mb-1">Hora de Abertura (0-23h)</label>
-                <input type="number" id="cfg-openHour" min="0" max="23" class="w-full bg-black/40 border border-white/15 rounded-xl px-3.5 py-2.5 text-sm text-white">
-              </div>
-              <div>
-                <label class="block text-xs font-montserrat font-bold uppercase text-slate-300 mb-1">Hora de Fechamento (0-23h)</label>
-                <input type="number" id="cfg-closeHour" min="0" max="23" class="w-full bg-black/40 border border-white/15 rounded-xl px-3.5 py-2.5 text-sm text-white">
-              </div>
+            <!-- Grid de Produtos -->
+            <div id="admin-products-grid" class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+              <!-- Renderizado via JS -->
             </div>
-
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div>
-                <label class="block text-xs font-montserrat font-bold uppercase text-slate-300 mb-1">Texto do Horário</label>
-                <input type="text" id="cfg-scheduleLabel" class="w-full bg-black/40 border border-white/15 rounded-xl px-3.5 py-2.5 text-sm text-white" placeholder="Todos os dias das 07h às 14h">
-              </div>
-              <div>
-                <label class="block text-xs font-montserrat font-bold uppercase text-slate-300 mb-1">Tempo Estimado</label>
-                <input type="text" id="cfg-estimatedTime" class="w-full bg-black/40 border border-white/15 rounded-xl px-3.5 py-2.5 text-sm text-white" placeholder="30-50 min">
-              </div>
-            </div>
-
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div>
-                <label class="block text-xs font-montserrat font-bold uppercase text-slate-300 mb-1">WhatsApp Recebedor (com 55 + DDD)</label>
-                <input type="text" id="cfg-whatsapp" class="w-full bg-black/40 border border-white/15 rounded-xl px-3.5 py-2.5 text-sm text-white" placeholder="5591989379978">
-              </div>
-              <div>
-                <label class="block text-xs font-montserrat font-bold uppercase text-slate-300 mb-1">Telefone Exibido</label>
-                <input type="text" id="cfg-phoneFormatted" class="w-full bg-black/40 border border-white/15 rounded-xl px-3.5 py-2.5 text-sm text-white" placeholder="(91) 98937-9978">
-              </div>
-            </div>
-
-            <div>
-              <label class="block text-xs font-montserrat font-bold uppercase text-slate-300 mb-1">Frase Slogan (Topo do Cardápio)</label>
-              <input type="text" id="cfg-tagline" class="w-full bg-black/40 border border-white/15 rounded-xl px-3.5 py-2.5 text-sm text-white">
-            </div>
-
-            <div>
-              <label class="block text-xs font-montserrat font-bold uppercase text-slate-300 mb-1">Aviso de Taxa de Entrega (No Carrinho)</label>
-              <textarea id="cfg-deliveryFeeNotice" rows="3" class="w-full bg-black/40 border border-white/15 rounded-xl px-3.5 py-2.5 text-sm text-white"></textarea>
-            </div>
-
-            <button type="submit" class="w-full bg-gradient-to-r from-[#b21818] to-[#d97706] hover:brightness-110 text-white font-montserrat font-extrabold uppercase text-xs py-3.5 rounded-xl shadow-lg transition-all cursor-pointer">
-              Salvar Configurações do Delivery
-            </button>
-          </form>
-
-          <!-- Card 2: Conexão MongoDB & Senha Admin -->
-          <div class="space-y-6">
-            <form id="mongo-config-form" class="glass-card rounded-3xl p-6 space-y-4 border border-emerald-500/20">
-              <h3 class="font-montserrat font-black text-base uppercase text-emerald-400 flex items-center gap-2 border-b border-white/10 pb-3">
-                <i data-lucide="database" class="w-5 h-5"></i>
-                Conexão com Banco de Dados MongoDB
-              </h3>
-              <p class="text-xs text-slate-300 leading-relaxed">
-                Cole abaixo a sua string de conexão (URI) do <strong>MongoDB Atlas</strong> ou servidor MongoDB. Ao salvar, o sistema conecta imediatamente e cria todas as coleções com os produtos atuais.
-              </p>
-              <div>
-                <label class="block text-xs font-montserrat font-bold uppercase text-slate-300 mb-1">MongoDB Connection URI</label>
-                <input type="password" id="mongo-uri-input" placeholder="mongodb+srv://usuario:senha@cluster.mongodb.net/peixaria-mancha"
-                  class="w-full bg-black/50 border border-white/15 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-white focus:border-emerald-500 outline-none">
-              </div>
-              <button type="submit" id="save-mongo-btn"
-                class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-montserrat font-extrabold uppercase text-xs py-3 rounded-xl shadow-lg transition-all cursor-pointer">
-                Conectar e Sincronizar MongoDB
-              </button>
-            </form>
-
-            <!-- Alterar E-mail e Senha do Painel -->
-            <form id="admin-credentials-form" class="glass-card rounded-3xl p-6 space-y-4">
-              <h3 class="font-montserrat font-black text-base uppercase text-white flex items-center gap-2 border-b border-white/10 pb-3">
-                <i data-lucide="shield-check" class="w-5 h-5 text-amber-400"></i>
-                Alterar Login e Senha do Painel
-              </h3>
-              <div>
-                <label class="block text-xs font-montserrat font-bold uppercase text-slate-300 mb-1">Novo E-mail Admin</label>
-                <input type="email" id="cred-email" required class="w-full bg-black/40 border border-white/15 rounded-xl px-3.5 py-2.5 text-sm text-white">
-              </div>
-              <div>
-                <label class="block text-xs font-montserrat font-bold uppercase text-slate-300 mb-1">Nova Senha</label>
-                <input type="password" id="cred-password" required placeholder="Digite a nova senha" class="w-full bg-black/40 border border-white/15 rounded-xl px-3.5 py-2.5 text-sm text-white">
-              </div>
-              <button type="submit" class="w-full bg-white/10 hover:bg-white/20 border border-white/15 text-white font-montserrat font-bold uppercase text-xs py-3 rounded-xl transition-all cursor-pointer">
-                Atualizar Senha de Acesso
-              </button>
-            </form>
           </div>
-        </div>
-      </section>
+        </section>
 
+        <!-- ================= ABA 3: PEDIDOS RECEBIDOS ================= -->
+        <section id="tab-orders" class="tab-panel hidden space-y-6">
+          <div class="dash-card p-6">
+            <div class="pb-5 border-b border-slate-100">
+              <h3 class="font-extrabold text-xl text-[#072a29]">Histórico & Gestão de Pedidos</h3>
+              <p class="text-xs text-slate-500">Todos os pedidos gerados pelos clientes aparecem aqui automaticamente.</p>
+            </div>
+
+            <div id="admin-orders-list" class="mt-6 space-y-4">
+              <!-- Renderizado via JS -->
+            </div>
+          </div>
+        </section>
+
+        <!-- ================= ABA 4: CATEGORIAS ================= -->
+        <section id="tab-categories" class="tab-panel hidden space-y-6">
+          <div class="dash-card p-6">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-100">
+              <div>
+                <h3 class="font-extrabold text-xl text-[#072a29]">Categorias do Cardápio</h3>
+                <p class="text-xs text-slate-500">Organize as seções do cardápio digital (Peixes Fritos, Assados, Porções, etc.).</p>
+              </div>
+              <button id="new-category-btn" class="bg-[#072a29] hover:bg-[#0c3f3d] text-white font-bold text-xs uppercase tracking-wider px-5 py-2.5 rounded-full shadow-sm flex items-center justify-center gap-2 cursor-pointer transition-all">
+                <i data-lucide="folder-plus" class="w-4 h-4"></i>
+                <span>Nova Categoria</span>
+              </button>
+            </div>
+
+            <div id="admin-categories-list" class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+              <!-- Renderizado via JS -->
+            </div>
+          </div>
+        </section>
+
+        <!-- ================= ABA 5: CONFIGURAÇÕES & DADOS LOCAIS ================= -->
+        <section id="tab-settings" class="tab-panel hidden space-y-6">
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            
+            <!-- Formulário Horários e Operação -->
+            <form id="store-config-form" class="lg:col-span-7 dash-card p-6 sm:p-8 space-y-4">
+              <div class="border-b border-slate-100 pb-3">
+                <h4 class="font-extrabold text-base uppercase text-[#072a29] flex items-center gap-2">
+                  <i data-lucide="clock" class="w-5 h-5 text-emerald-600"></i>
+                  Horário & Operação do Delivery
+                </h4>
+                <p class="text-xs text-slate-400 mt-0.5">Gerencie os horários em que os clientes podem realizar pedidos.</p>
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold uppercase text-slate-600 mb-1.5">Status de Operação</label>
+                <select id="cfg-manualStatus" class="w-full bg-[#f8faf9] border border-slate-200 rounded-xl px-4 py-2.5 text-xs sm:text-sm text-slate-800 font-semibold focus:border-emerald-500 outline-none">
+                  <option value="auto">Automático pelo Horário (Recomendado)</option>
+                  <option value="force_open">Forçar ABERTO Agora (Ignorar horário)</option>
+                  <option value="force_closed">Forçar FECHADO Agora (Pausar loja temporariamente)</option>
+                </select>
+              </div>
+
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Abertura (0-23h)</label>
+                  <input type="number" id="cfg-openHour" min="0" max="23" class="w-full bg-[#f8faf9] border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-slate-800">
+                </div>
+                <div>
+                  <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Fechamento (0-23h)</label>
+                  <input type="number" id="cfg-closeHour" min="0" max="23" class="w-full bg-[#f8faf9] border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-slate-800">
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Texto do Horário</label>
+                  <input type="text" id="cfg-scheduleLabel" class="w-full bg-[#f8faf9] border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-slate-800" placeholder="Todos os dias das 07h às 14h">
+                </div>
+                <div>
+                  <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Tempo Estimado</label>
+                  <input type="text" id="cfg-estimatedTime" class="w-full bg-[#f8faf9] border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-slate-800" placeholder="30-50 min">
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label class="block text-xs font-bold uppercase text-slate-600 mb-1">WhatsApp (com 55 + DDD)</label>
+                  <input type="text" id="cfg-whatsapp" class="w-full bg-[#f8faf9] border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-slate-800" placeholder="5591989379978">
+                </div>
+                <div>
+                  <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Telefone Exibido</label>
+                  <input type="text" id="cfg-phoneFormatted" class="w-full bg-[#f8faf9] border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-slate-800" placeholder="(91) 98937-9978">
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Slogan (Topo do Cardápio)</label>
+                <input type="text" id="cfg-tagline" class="w-full bg-[#f8faf9] border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-slate-800">
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Aviso de Taxa de Entrega (Carrinho)</label>
+                <textarea id="cfg-deliveryFeeNotice" rows="3" class="w-full bg-[#f8faf9] border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-slate-800"></textarea>
+              </div>
+
+              <button type="submit" class="w-full bg-[#072a29] hover:bg-[#0c3f3d] text-white font-bold uppercase text-xs py-3.5 rounded-xl shadow-sm transition-all cursor-pointer">
+                Salvar Configurações
+              </button>
+            </form>
+
+            <!-- Painel de Credenciais Admin -->
+            <div class="lg:col-span-5 space-y-6">
+              <form id="admin-credentials-form" class="dash-card p-6 sm:p-8 space-y-4">
+                <div class="border-b border-slate-100 pb-3">
+                  <h4 class="font-extrabold text-base uppercase text-[#072a29] flex items-center gap-2">
+                    <i data-lucide="shield-check" class="w-5 h-5 text-emerald-600"></i>
+                    Alterar Acesso Admin
+                  </h4>
+                  <p class="text-xs text-slate-400 mt-0.5">Defina o e-mail e a senha que você usará para entrar no painel.</p>
+                </div>
+
+                <div>
+                  <label class="block text-xs font-bold uppercase text-slate-600 mb-1.5">E-mail de Login</label>
+                  <input type="email" id="cred-email" required class="w-full bg-[#f8faf9] border border-slate-200 rounded-xl px-4 py-2.5 text-xs sm:text-sm text-slate-800 focus:border-emerald-500 outline-none">
+                </div>
+                <div>
+                  <label class="block text-xs font-bold uppercase text-slate-600 mb-1.5">Nova Senha de Acesso</label>
+                  <input type="password" id="cred-password" required placeholder="Digite a nova senha" class="w-full bg-[#f8faf9] border border-slate-200 rounded-xl px-4 py-2.5 text-xs sm:text-sm text-slate-800 focus:border-emerald-500 outline-none">
+                </div>
+                <button type="submit" class="w-full bg-[#072a29] hover:bg-[#0c3f3d] text-white font-bold uppercase text-xs py-3.5 rounded-xl transition-all cursor-pointer">
+                  Atualizar Senha de Acesso
+                </button>
+              </form>
+
+              <!-- Backup Local (Oculto) -->
+              <div id="local-db-card" class="hidden">
+                <button type="button" id="export-backup-btn"></button>
+                <input type="file" id="import-backup-input">
+                <button type="button" id="reset-factory-btn"></button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </div>
     </main>
+
   </div>
 
   <!-- ================= MODAL CRIAR / EDITAR PRODUTO ================= -->
-  <div id="product-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/75 backdrop-blur-sm">
-    <div class="glass-card bg-[#111726] w-full max-w-xl rounded-3xl border border-white/15 shadow-2xl overflow-hidden flex flex-col max-h-[92vh]">
-      <div class="bg-gradient-to-r from-[#b21818] to-[#d97706] px-6 py-4 flex items-center justify-between">
-        <h3 id="product-modal-title" class="font-bebas text-2xl tracking-wide text-white uppercase">Editar Produto</h3>
+  <div id="product-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
+    <div class="bg-white w-full max-w-xl rounded-3xl border border-slate-200 shadow-2xl overflow-hidden flex flex-col max-h-[92vh]">
+      <div class="bg-[#072a29] text-white px-6 py-4 flex items-center justify-between">
+        <h3 id="product-modal-title" class="font-bold text-lg text-white">Editar Produto</h3>
         <button type="button" id="close-product-modal" class="text-white/80 hover:text-white p-1 cursor-pointer">
           <i data-lucide="x" class="w-5 h-5"></i>
         </button>
@@ -442,101 +737,107 @@
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
-            <label class="block text-xs font-montserrat font-bold uppercase text-slate-300 mb-1">Nome do Produto *</label>
+            <label class="block text-xs font-bold uppercase text-slate-700 mb-1">Nome do Prato *</label>
             <input type="text" id="prod-name" required placeholder="Ex: FILÉ DE FILHOTE FRITO (KG)"
-              class="w-full bg-black/50 border border-white/15 rounded-xl px-3.5 py-2.5 text-sm text-white">
+              class="w-full bg-[#f8faf9] border border-slate-200 rounded-xl px-3.5 py-2 text-sm text-slate-800">
           </div>
           <div>
-            <label class="block text-xs font-montserrat font-bold uppercase text-slate-300 mb-1">Categoria *</label>
-            <select id="prod-categoryId" required class="w-full bg-black/50 border border-white/15 rounded-xl px-3.5 py-2.5 text-sm text-white"></select>
+            <label class="block text-xs font-bold uppercase text-slate-700 mb-1">Categoria *</label>
+            <select id="prod-categoryId" required
+              class="w-full bg-[#f8faf9] border border-slate-200 rounded-xl px-3.5 py-2 text-sm text-slate-800 font-semibold"></select>
           </div>
         </div>
 
         <div>
-          <label class="block text-xs font-montserrat font-bold uppercase text-slate-300 mb-1">Descrição do Prato</label>
-          <textarea id="prod-description" rows="2" placeholder="Descreva o preparo, acompanhamentos ou peso..."
-            class="w-full bg-black/50 border border-white/15 rounded-xl px-3.5 py-2.5 text-sm text-white"></textarea>
+          <label class="block text-xs font-bold uppercase text-slate-700 mb-1">Descrição Comercial</label>
+          <textarea id="prod-description" rows="2" placeholder="Descreva os acompanhamentos ou detalhes..."
+            class="w-full bg-[#f8faf9] border border-slate-200 rounded-xl px-3.5 py-2 text-sm text-slate-800"></textarea>
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <div>
-            <label class="block text-xs font-montserrat font-bold uppercase text-slate-300 mb-1">Unidade de Venda</label>
-            <select id="prod-unitType" class="w-full bg-black/50 border border-white/15 rounded-xl px-3.5 py-2.5 text-sm text-white">
-              <option value="KG">Por KG</option>
-              <option value="UNIDADE">Por UNIDADE</option>
-              <option value="BANDA">Por BANDA</option>
-              <option value="PORÇÃO">PORÇÃO (250g / 500g)</option>
+            <label class="block text-xs font-bold uppercase text-slate-700 mb-1">Tipo de Unidade</label>
+            <select id="prod-unitType"
+              class="w-full bg-[#f8faf9] border border-slate-200 rounded-xl px-3.5 py-2 text-sm text-slate-800 font-semibold">
+              <option value="KG">Por Quilo (KG)</option>
+              <option value="BANDA">Banda de Peixe</option>
+              <option value="UNIDADE">Unidade</option>
+              <option value="PORÇÃO">Porção (250g / 500g)</option>
             </select>
           </div>
           <div>
-            <label class="block text-xs font-montserrat font-bold uppercase text-slate-300 mb-1">Selo / Etiqueta</label>
-            <input type="text" id="prod-badge" placeholder="Ex: MAIS PEDIDO, SAZONAL"
-              class="w-full bg-black/50 border border-white/15 rounded-xl px-3.5 py-2.5 text-sm text-white">
+            <label class="block text-xs font-bold uppercase text-slate-700 mb-1">Selo / Badge</label>
+            <input type="text" id="prod-badge" placeholder="Ex: MAIS PEDIDO"
+              class="w-full bg-[#f8faf9] border border-slate-200 rounded-xl px-3.5 py-2 text-sm text-slate-800">
           </div>
           <div>
-            <label class="block text-xs font-montserrat font-bold uppercase text-slate-300 mb-1">Serve quantas pessoas?</label>
-            <input type="text" id="prod-serves" placeholder="Ex: Até 3 pessoas"
-              class="w-full bg-black/50 border border-white/15 rounded-xl px-3.5 py-2.5 text-sm text-white">
+            <label class="block text-xs font-bold uppercase text-slate-700 mb-1">Serve quantas pessoas?</label>
+            <input type="text" id="prod-serves" placeholder="Ex: 2 a 3 pessoas"
+              class="w-full bg-[#f8faf9] border border-slate-200 rounded-xl px-3.5 py-2 text-sm text-slate-800">
           </div>
         </div>
 
-        <!-- Preços -->
-        <div class="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-3">
-          <span class="text-xs font-montserrat font-extrabold uppercase text-amber-400 block">Configuração de Preços (R$)</span>
+        <!-- Campos de Preço -->
+        <div class="p-4 rounded-2xl bg-[#f8faf9] border border-slate-200 space-y-3">
+          <span class="text-xs font-bold uppercase tracking-wider text-slate-700 block">Configuração de Preço</span>
+          
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div>
-              <label class="block text-[11px] font-montserrat font-bold text-slate-300 mb-1">Preço Principal (KG/Unid/Banda)</label>
-              <input type="number" step="0.01" id="prod-price" placeholder="Ex: 88.00"
-                class="w-full bg-black/50 border border-white/15 rounded-xl px-3 py-2 text-sm text-white">
+              <label class="block text-[11px] font-bold text-slate-600 mb-1">Preço Padrão (R$)</label>
+              <input type="number" step="0.01" min="0" id="prod-price" placeholder="88.00"
+                class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-sm text-slate-800 font-bold">
             </div>
             <div>
-              <label class="block text-[11px] font-montserrat font-bold text-slate-300 mb-1">Preço Porção 250g (Opcional)</label>
-              <input type="number" step="0.01" id="prod-price250ml" placeholder="Ex: 8.00"
-                class="w-full bg-black/50 border border-white/15 rounded-xl px-3 py-2 text-sm text-white">
+              <label class="block text-[11px] font-bold text-slate-600 mb-1">Preço 250g (Opcional)</label>
+              <input type="number" step="0.01" min="0" id="prod-price250ml" placeholder="10.00"
+                class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-sm text-slate-800">
             </div>
             <div>
-              <label class="block text-[11px] font-montserrat font-bold text-slate-300 mb-1">Preço Porção 500g (Opcional)</label>
-              <input type="number" step="0.01" id="prod-price500ml" placeholder="Ex: 16.00"
-                class="w-full bg-black/50 border border-white/15 rounded-xl px-3 py-2 text-sm text-white">
+              <label class="block text-[11px] font-bold text-slate-600 mb-1">Preço 500g (Opcional)</label>
+              <input type="number" step="0.01" min="0" id="prod-price500ml" placeholder="16.00"
+                class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-sm text-slate-800">
             </div>
           </div>
         </div>
 
-        <!-- Opções de Comportamento -->
+        <!-- Switches / Checkboxes -->
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
-          <label class="flex items-center gap-2.5 p-3 rounded-xl bg-white/5 border border-white/10 cursor-pointer">
-            <input type="checkbox" id="prod-allowWeightChoice" class="w-4 h-4 accent-[#b21818]">
-            <span class="text-xs font-semibold text-slate-200">Permitir escolher peso (500g a 2KG)</span>
+          <label class="flex items-center gap-2 p-3 rounded-xl bg-[#f8faf9] border border-slate-200 text-xs font-bold text-slate-700 cursor-pointer">
+            <input type="checkbox" id="prod-allowWeightChoice" class="w-4 h-4 accent-emerald-600 rounded">
+            <span>Cliente escolhe o peso</span>
           </label>
-          <label class="flex items-center gap-2.5 p-3 rounded-xl bg-white/5 border border-white/10 cursor-pointer">
-            <input type="checkbox" id="prod-isPopular" class="w-4 h-4 accent-amber-500">
-            <span class="text-xs font-semibold text-slate-200">Destacar como Campeão / Popular</span>
+          <label class="flex items-center gap-2 p-3 rounded-xl bg-[#f8faf9] border border-slate-200 text-xs font-bold text-slate-700 cursor-pointer">
+            <input type="checkbox" id="prod-isPopular" class="w-4 h-4 accent-emerald-600 rounded">
+            <span>Marcar como Destaque</span>
           </label>
-          <label class="flex items-center gap-2.5 p-3 rounded-xl bg-white/5 border border-white/10 cursor-pointer">
-            <input type="checkbox" id="prod-isAvailable" checked class="w-4 h-4 accent-emerald-500">
-            <span class="text-xs font-semibold text-slate-200">Disponível para Venda Hoje</span>
+          <label class="flex items-center gap-2 p-3 rounded-xl bg-[#f8faf9] border border-slate-200 text-xs font-bold text-slate-700 cursor-pointer">
+            <input type="checkbox" id="prod-isAvailable" checked class="w-4 h-4 accent-emerald-600 rounded">
+            <span>Disponível para venda</span>
           </label>
         </div>
 
-        <!-- Imagem -->
-        <div class="space-y-2">
-          <label class="block text-xs font-montserrat font-bold uppercase text-slate-300">Foto do Produto (URL, Caminho ou Upload)</label>
-          <div class="flex items-center gap-2">
-            <input type="text" id="prod-image" placeholder="Ex: ../Fotos/delivery/Arroz.png ou cole link"
-              class="flex-1 bg-black/50 border border-white/15 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-white">
-            <label class="bg-white/10 hover:bg-white/15 border border-white/15 text-xs font-montserrat font-bold px-3.5 py-2.5 rounded-xl cursor-pointer whitespace-nowrap">
-              Enviar Foto
+        <!-- Imagem do Prato -->
+        <div>
+          <label class="block text-xs font-bold uppercase text-slate-700 mb-1">Foto do Prato (Caminho ou URL)</label>
+          <div class="flex gap-2">
+            <input type="text" id="prod-image" placeholder="../Fotos/peixes-fritos/file-de-filhote-frito.webp"
+              class="flex-1 bg-[#f8faf9] border border-slate-200 rounded-xl px-3.5 py-2 text-xs text-slate-800">
+            <label class="px-3 py-2 bg-slate-100 hover:bg-slate-200 border border-slate-300 rounded-xl text-xs font-bold text-slate-700 flex items-center gap-1 cursor-pointer">
+              <i data-lucide="image" class="w-4 h-4"></i>
+              <span>Foto</span>
               <input type="file" id="prod-image-file" accept="image/*" class="hidden">
             </label>
           </div>
         </div>
 
-        <div class="pt-3 border-t border-white/10 flex items-center justify-end gap-3">
-          <button type="button" id="cancel-product-modal" class="px-4 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-xs font-montserrat font-bold text-slate-300 cursor-pointer">
+        <div class="flex items-center justify-end gap-2 pt-4 border-t border-slate-100">
+          <button type="button" id="cancel-product-modal"
+            class="px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-600 hover:bg-slate-100 cursor-pointer">
             Cancelar
           </button>
-          <button type="submit" class="px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#b21818] to-[#d97706] hover:brightness-110 text-xs font-montserrat font-extrabold uppercase text-white shadow-lg cursor-pointer">
-            Salvar Produto
+          <button type="submit"
+            class="px-6 py-2.5 rounded-xl bg-[#072a29] hover:bg-[#0c3f3d] text-white text-xs font-bold uppercase tracking-wider shadow-sm cursor-pointer">
+            Salvar Prato
           </button>
         </div>
       </form>
@@ -544,51 +845,67 @@
   </div>
 
   <!-- ================= MODAL CRIAR / EDITAR CATEGORIA ================= -->
-  <div id="category-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/75 backdrop-blur-sm">
-    <div class="glass-card bg-[#111726] w-full max-w-md rounded-3xl border border-white/15 shadow-2xl overflow-hidden">
-      <div class="bg-gradient-to-r from-[#b21818] to-[#d97706] px-6 py-4 flex items-center justify-between">
-        <h3 id="category-modal-title" class="font-bebas text-2xl tracking-wide text-white uppercase">Nova Categoria</h3>
+  <div id="category-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
+    <div class="bg-white w-full max-w-md rounded-3xl border border-slate-200 shadow-2xl overflow-hidden flex flex-col">
+      <div class="bg-[#072a29] text-white px-6 py-4 flex items-center justify-between">
+        <h3 id="category-modal-title" class="font-bold text-lg text-white">Editar Categoria</h3>
         <button type="button" id="close-category-modal" class="text-white/80 hover:text-white p-1 cursor-pointer">
           <i data-lucide="x" class="w-5 h-5"></i>
         </button>
       </div>
+
       <form id="category-form" class="p-6 space-y-4">
         <input type="hidden" id="cat-id">
         <input type="hidden" id="cat-is-edit" value="false">
+
         <div>
-          <label class="block text-xs font-montserrat font-bold uppercase text-slate-300 mb-1">Título da Categoria *</label>
-          <input type="text" id="cat-title" required placeholder="Ex: PEIXES FRITOS" class="w-full bg-black/50 border border-white/15 rounded-xl px-3.5 py-2.5 text-sm text-white">
+          <label class="block text-xs font-bold uppercase text-slate-700 mb-1">Título da Categoria *</label>
+          <input type="text" id="cat-title" required placeholder="Ex: PEIXES FRITOS"
+            class="w-full bg-[#f8faf9] border border-slate-200 rounded-xl px-3.5 py-2 text-sm text-slate-800">
         </div>
+
         <div>
-          <label class="block text-xs font-montserrat font-bold uppercase text-slate-300 mb-1">Subtítulo</label>
-          <input type="text" id="cat-subtitle" placeholder="Ex: PRODUTOS PESADOS IN NATURA" class="w-full bg-black/50 border border-white/15 rounded-xl px-3.5 py-2.5 text-sm text-white">
+          <label class="block text-xs font-bold uppercase text-slate-700 mb-1">Subtítulo Explicativo</label>
+          <input type="text" id="cat-subtitle" placeholder="Ex: PRODUTOS PESADOS IN NATURA"
+            class="w-full bg-[#f8faf9] border border-slate-200 rounded-xl px-3.5 py-2 text-sm text-slate-800">
         </div>
+
         <div class="grid grid-cols-2 gap-3">
           <div>
-            <label class="block text-xs font-montserrat font-bold uppercase text-slate-300 mb-1">Estilo de Exibição</label>
-            <select id="cat-type" class="w-full bg-black/50 border border-white/15 rounded-xl px-3.5 py-2.5 text-sm text-white">
-              <option value="single">Padrão (Peixes / Unidades)</option>
-              <option value="portion-columns">Porções 250g / 500g</option>
+            <label class="block text-xs font-bold uppercase text-slate-700 mb-1">Tipo de Exibição</label>
+            <select id="cat-type" class="w-full bg-[#f8faf9] border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold text-slate-800">
+              <option value="single">Card Padrão (Preço único)</option>
+              <option value="portion-columns">Colunas de Porção (250g / 500g)</option>
             </select>
           </div>
           <div>
-            <label class="block text-xs font-montserrat font-bold uppercase text-slate-300 mb-1">Ordem</label>
-            <input type="number" id="cat-order" value="1" class="w-full bg-black/50 border border-white/15 rounded-xl px-3.5 py-2.5 text-sm text-white">
+            <label class="block text-xs font-bold uppercase text-slate-700 mb-1">Ordem</label>
+            <input type="number" id="cat-order" min="1" value="1"
+              class="w-full bg-[#f8faf9] border border-slate-200 rounded-xl px-3.5 py-2 text-xs text-slate-800">
           </div>
         </div>
-        <div class="pt-3 flex justify-end gap-2">
-          <button type="button" id="cancel-category-modal" class="px-4 py-2.5 rounded-xl bg-white/5 text-xs font-montserrat font-bold text-slate-300 cursor-pointer">Cancelar</button>
-          <button type="submit" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#b21818] to-[#d97706] text-xs font-montserrat font-extrabold uppercase text-white cursor-pointer">Salvar Categoria</button>
+
+        <div class="flex items-center justify-end gap-2 pt-4 border-t border-slate-100">
+          <button type="button" id="cancel-category-modal"
+            class="px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-600 hover:bg-slate-100 cursor-pointer">
+            Cancelar
+          </button>
+          <button type="submit"
+            class="px-6 py-2.5 rounded-xl bg-[#072a29] hover:bg-[#0c3f3d] text-white text-xs font-bold uppercase tracking-wider shadow-sm cursor-pointer">
+            Salvar Categoria
+          </button>
         </div>
       </form>
     </div>
   </div>
 
-  <!-- Toast Notification -->
-  <div id="toast" class="fixed bottom-5 right-5 z-50 hidden bg-emerald-600 text-white px-5 py-3 rounded-2xl shadow-2xl font-montserrat font-bold text-xs flex items-center gap-2">
-    <span id="toast-text">Salvo com sucesso!</span>
+  <!-- Toast Notificações -->
+  <div id="toast" class="fixed bottom-6 right-6 z-50 hidden px-5 py-3 rounded-2xl shadow-xl font-bold text-xs flex items-center gap-2">
+    <i data-lucide="check" class="w-4 h-4"></i>
+    <span id="toast-text"></span>
   </div>
 
+  <!-- Script da Aplicação -->
   <script src="admin.js"></script>
 </body>
 </html>

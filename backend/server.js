@@ -1,14 +1,12 @@
 require('dotenv').config();
 const express = require('express');
-const mongoose = require('mongoose');
 const cors = require('cors');
-const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const path = require('path');
 const fs = require('fs');
 
-const { DeliveryConfig, Category, Product, Order, AdminUser, formatBRL } = require('./models');
-const { runAutoSeed, INITIAL_CONFIG, INITIAL_CATEGORIES, INITIAL_PRODUCTS } = require('./seed');
+const { formatBRL } = require('./models');
+const { INITIAL_CONFIG, INITIAL_CATEGORIES, INITIAL_PRODUCTS } = require('./seed');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -17,61 +15,68 @@ const JWT_SECRET = process.env.JWT_SECRET || 'peixaria-mancha-secret-key-2026';
 app.use(cors());
 app.use(express.json({ limit: '15mb' }));
 
-// Servir os arquivos estáticos do site inteiro para facilitar uso local/VPS
+// Servir os arquivos estáticos do site inteiro para facilitar uso local
 app.use(express.static(path.join(__dirname, '..')));
 
-// Estado da conexão MongoDB
-let isMongoConnected = false;
-let currentMongoUri = process.env.MONGODB_URI || '';
+// Caminhos dos arquivos locais de banco de dados dentro do projeto
+const LOCAL_DB_PATH = path.join(__dirname, 'local-fallback-db.json');
+const STATIC_CATALOG_PATH = path.join(__dirname, '..', 'cardapio-delivery', 'catalog-data.json');
 
-async function connectToMongo(uri) {
-  if (!uri) {
-    console.log('ℹ️ [MongoDB] Nenhuma MONGODB_URI definida no .env ainda. Rodando em modo Fallback Local até configurar.');
-    return false;
-  }
-  try {
-    if (mongoose.connection.readyState === 1) {
-      await mongoose.disconnect();
+function buildInitialData() {
+  const initialProductsFormatted = INITIAL_PRODUCTS.map(p => ({
+    ...p,
+    priceFormatted: p.price ? formatBRL(p.price) : '',
+    price250mlFormatted: p.price250ml ? formatBRL(p.price250ml) : '',
+    price500mlFormatted: p.price500ml ? formatBRL(p.price500ml) : '',
+    salesCount: 0,
+    revenueGenerated: 0
+  }));
+  return {
+    config: INITIAL_CONFIG,
+    categories: INITIAL_CATEGORIES,
+    products: initialProductsFormatted,
+    orders: [],
+    admin: {
+      email: process.env.ADMIN_EMAIL || 'admin@peixariamancha.com.br',
+      password: process.env.ADMIN_PASSWORD || 'mancha2026'
     }
-    await mongoose.connect(uri, {
-      serverSelectionTimeoutMS: 8000
-    });
-    isMongoConnected = true;
-    currentMongoUri = uri;
-    console.log('🚀 [MongoDB] Conectado com sucesso ao banco de dados!');
-    await runAutoSeed();
-    return true;
+  };
+}
+
+function syncStaticCatalogFile(dbData) {
+  try {
+    const categories = (dbData.categories || [])
+      .filter(c => c.isActive !== false)
+      .sort((a, b) => (a.order || 0) - (b.order || 0));
+
+    const products = (dbData.products || [])
+      .filter(p => p.isAvailable !== false)
+      .sort((a, b) => (a.order || 0) - (b.order || 0));
+
+    const categoriesWithItems = categories.map(cat => ({
+      ...cat,
+      items: products.filter(p => p.categoryId === cat.id)
+    }));
+
+    const catalogPayload = {
+      config: dbData.config || INITIAL_CONFIG,
+      categories: categoriesWithItems,
+      allProducts: dbData.products || [],
+      dbMode: 'local_json',
+      updatedAt: new Date().toISOString()
+    };
+
+    fs.writeFileSync(STATIC_CATALOG_PATH, JSON.stringify(catalogPayload, null, 2), 'utf8');
   } catch (err) {
-    isMongoConnected = false;
-    console.error('❌ [MongoDB] Erro ao conectar:', err.message);
-    return false;
+    console.error('Erro ao sincronizar catalog-data.json:', err.message);
   }
 }
 
-// Armazenamento JSON local de fallback caso o MongoDB ainda não esteja configurado
-const LOCAL_DB_PATH = path.join(__dirname, 'local-fallback-db.json');
-
 function getLocalDb() {
   if (!fs.existsSync(LOCAL_DB_PATH)) {
-    const initialProductsFormatted = INITIAL_PRODUCTS.map(p => ({
-      ...p,
-      priceFormatted: p.price ? formatBRL(p.price) : '',
-      price250mlFormatted: p.price250ml ? formatBRL(p.price250ml) : '',
-      price500mlFormatted: p.price500ml ? formatBRL(p.price500ml) : '',
-      salesCount: 0,
-      revenueGenerated: 0
-    }));
-    const initialData = {
-      config: INITIAL_CONFIG,
-      categories: INITIAL_CATEGORIES,
-      products: initialProductsFormatted,
-      orders: [],
-      admin: {
-        email: process.env.ADMIN_EMAIL || 'admin@peixariamancha.com.br',
-        password: process.env.ADMIN_PASSWORD || 'mancha2026'
-      }
-    };
+    const initialData = buildInitialData();
     fs.writeFileSync(LOCAL_DB_PATH, JSON.stringify(initialData, null, 2), 'utf8');
+    syncStaticCatalogFile(initialData);
     return initialData;
   }
   return JSON.parse(fs.readFileSync(LOCAL_DB_PATH, 'utf8'));
@@ -79,7 +84,12 @@ function getLocalDb() {
 
 function saveLocalDb(data) {
   fs.writeFileSync(LOCAL_DB_PATH, JSON.stringify(data, null, 2), 'utf8');
+  syncStaticCatalogFile(data);
+  notifyCatalogSync(data.config);
 }
+
+// Garantir que o banco local e o arquivo estático do cardápio estejam sincronizados ao iniciar
+syncStaticCatalogFile(getLocalDb());
 
 // Middleware de Autenticação JWT
 function authMiddleware(req, res, next) {
@@ -98,7 +108,7 @@ function authMiddleware(req, res, next) {
 }
 
 // ============================================================================
-// 1. ROTAS DE AUTENTICAÇÃO E CONFIGURAÇÃO DE BANCO
+// 1. ROTAS DE AUTENTICAÇÃO E BACKUP DO BANCO LOCAL
 // ============================================================================
 
 app.post('/api/auth/login', async (req, res) => {
@@ -109,26 +119,27 @@ app.post('/api/auth/login', async (req, res) => {
     }
 
     const cleanEmail = email.trim().toLowerCase();
+    const localDb = getLocalDb();
 
-    if (isMongoConnected) {
-      const admin = await AdminUser.findOne({ email: cleanEmail });
-      if (!admin) {
-        return res.status(401).json({ error: 'Credenciais inválidas.' });
-      }
-      const valid = await bcrypt.compare(password, admin.passwordHash);
-      if (!valid) {
-        return res.status(401).json({ error: 'Credenciais inválidas.' });
-      }
-      const token = jwt.sign({ id: admin._id, email: admin.email }, JWT_SECRET, { expiresIn: '7d' });
-      return res.json({ token, email: admin.email, name: admin.name, dbMode: 'mongodb' });
-    } else {
-      const localDb = getLocalDb();
-      if (cleanEmail === localDb.admin.email.toLowerCase() && password === localDb.admin.password) {
-        const token = jwt.sign({ email: localDb.admin.email }, JWT_SECRET, { expiresIn: '7d' });
-        return res.json({ token, email: localDb.admin.email, name: 'Administrador Mancha', dbMode: 'local_fallback' });
-      }
-      return res.status(401).json({ error: 'E-mail ou senha incorretos.' });
+    const defaultEmail = (process.env.ADMIN_EMAIL || 'admin@peixariamancha.com.br').toLowerCase();
+    const defaultPassword = process.env.ADMIN_PASSWORD || 'mancha2026';
+    const dbEmail = (localDb.admin?.email || '').toLowerCase();
+    const dbPassword = localDb.admin?.password || '';
+
+    const isMatch = (cleanEmail === dbEmail && password === dbPassword) ||
+                    (cleanEmail === defaultEmail && password === defaultPassword);
+
+    if (isMatch) {
+      const activeEmail = cleanEmail === dbEmail ? localDb.admin.email : defaultEmail;
+      const token = jwt.sign({ email: activeEmail }, JWT_SECRET, { expiresIn: '7d' });
+      return res.json({
+        token,
+        email: activeEmail,
+        name: 'Administrador Mancha',
+        dbMode: 'local_json'
+      });
     }
+    return res.status(401).json({ error: 'E-mail ou senha incorretos.' });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -138,8 +149,7 @@ app.get('/api/auth/verify', authMiddleware, (req, res) => {
   res.json({
     valid: true,
     admin: req.admin,
-    dbMode: isMongoConnected ? 'mongodb' : 'local_fallback',
-    mongoConfigured: Boolean(currentMongoUri)
+    dbMode: 'local_json'
   });
 });
 
@@ -148,14 +158,6 @@ app.put('/api/auth/credentials', authMiddleware, async (req, res) => {
     const { newEmail, newPassword } = req.body;
     if (!newEmail || !newPassword || newPassword.length < 4) {
       return res.status(400).json({ error: 'Informe um e-mail válido e senha com pelo menos 4 caracteres.' });
-    }
-    if (isMongoConnected) {
-      const passwordHash = await bcrypt.hash(newPassword, 10);
-      await AdminUser.findOneAndUpdate(
-        {},
-        { email: newEmail.trim().toLowerCase(), passwordHash },
-        { upsert: true }
-      );
     }
     const localDb = getLocalDb();
     localDb.admin.email = newEmail.trim().toLowerCase();
@@ -168,43 +170,42 @@ app.put('/api/auth/credentials', authMiddleware, async (req, res) => {
   }
 });
 
-// Configurar/Testar URI do MongoDB direto pelo Painel Admin
-app.post('/api/admin/database', authMiddleware, async (req, res) => {
+// Exportar backup completo do banco local
+app.get('/api/admin/backup', authMiddleware, (req, res) => {
   try {
-    const { mongoUri } = req.body;
-    if (!mongoUri || !mongoUri.startsWith('mongodb')) {
-      return res.status(400).json({ error: 'URI do MongoDB inválida. Deve começar com mongodb:// ou mongodb+srv://' });
-    }
-    const connected = await connectToMongo(mongoUri.trim());
-    if (!connected) {
-      return res.status(400).json({ error: 'Não foi possível conectar ao MongoDB com a URI informada. Verifique usuário, senha e IP Whitelist.' });
-    }
-
-    // Salvar no arquivo .env para persistir
-    const envPath = path.join(__dirname, '.env');
-    let envContent = '';
-    if (fs.existsSync(envPath)) {
-      envContent = fs.readFileSync(envPath, 'utf8');
-      if (envContent.includes('MONGODB_URI=')) {
-        envContent = envContent.replace(/MONGODB_URI=.*/g, `MONGODB_URI=${mongoUri.trim()}`);
-      } else {
-        envContent += `\nMONGODB_URI=${mongoUri.trim()}\n`;
-      }
-    } else {
-      envContent = `PORT=${PORT}\nMONGODB_URI=${mongoUri.trim()}\nJWT_SECRET=${JWT_SECRET}\n`;
-    }
-    fs.writeFileSync(envPath, envContent, 'utf8');
-
-    // Sincronizar dados locais se houver pedidos/edições feitas antes de conectar o MongoDB
     const localDb = getLocalDb();
-    if (localDb.orders && localDb.orders.length > 0) {
-      const existingOrdersCount = await Order.countDocuments();
-      if (existingOrdersCount === 0) {
-        await Order.insertMany(localDb.orders);
-      }
+    res.json(localDb);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Importar backup ou restaurar padrão de fábrica
+app.post('/api/admin/restore', authMiddleware, (req, res) => {
+  try {
+    const { backupData, resetFactory } = req.body;
+    const currentDb = getLocalDb();
+
+    if (resetFactory) {
+      const fresh = buildInitialData();
+      fresh.admin = currentDb.admin; // preserva login atual
+      saveLocalDb(fresh);
+      return res.json({ message: 'Cardápio restaurado para o padrão original com sucesso!', dbMode: 'local_json' });
     }
 
-    res.json({ message: 'Conectado ao MongoDB com sucesso! Dados sincronizados.', dbMode: 'mongodb' });
+    if (!backupData || !Array.isArray(backupData.categories) || !Array.isArray(backupData.products)) {
+      return res.status(400).json({ error: 'Arquivo de backup inválido. Verifique o formato JSON.' });
+    }
+
+    const merged = {
+      config: backupData.config || currentDb.config || INITIAL_CONFIG,
+      categories: backupData.categories,
+      products: backupData.products,
+      orders: Array.isArray(backupData.orders) ? backupData.orders : (currentDb.orders || []),
+      admin: backupData.admin || currentDb.admin
+    };
+    saveLocalDb(merged);
+    res.json({ message: 'Backup importado e salvo localmente no projeto com sucesso!', dbMode: 'local_json' });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -217,55 +218,102 @@ app.post('/api/admin/database', authMiddleware, async (req, res) => {
 app.get('/api/delivery/catalog', async (req, res) => {
   try {
     const includeUnavailable = req.query.all === 'true';
+    const localDb = getLocalDb();
 
-    if (isMongoConnected) {
-      const config = await DeliveryConfig.findOne({ key: 'main' }).lean() || INITIAL_CONFIG;
-      const catFilter = includeUnavailable ? {} : { isActive: true };
-      const categories = await Category.find(catFilter).sort({ order: 1 }).lean();
-      const prodFilter = includeUnavailable ? {} : { isAvailable: true };
-      const products = await Product.find(prodFilter).sort({ order: 1 }).lean();
+    const categories = localDb.categories
+      .filter(c => includeUnavailable || c.isActive !== false)
+      .sort((a, b) => (a.order || 0) - (b.order || 0));
 
-      const categoriesWithItems = categories.map(cat => ({
-        ...cat,
-        items: products.filter(p => p.categoryId === cat.id)
-      }));
+    const products = localDb.products
+      .filter(p => includeUnavailable || p.isAvailable !== false)
+      .sort((a, b) => (a.order || 0) - (b.order || 0));
 
-      return res.json({
-        config,
-        categories: categoriesWithItems,
-        allProducts: products,
-        dbMode: 'mongodb'
-      });
-    } else {
-      const localDb = getLocalDb();
-      const categories = localDb.categories
-        .filter(c => includeUnavailable || c.isActive !== false)
-        .sort((a, b) => (a.order || 0) - (b.order || 0));
+    const categoriesWithItems = categories.map(cat => ({
+      ...cat,
+      items: products.filter(p => p.categoryId === cat.id)
+    }));
 
-      const products = localDb.products
-        .filter(p => includeUnavailable || p.isAvailable !== false)
-        .sort((a, b) => (a.order || 0) - (b.order || 0));
-
-      const categoriesWithItems = categories.map(cat => ({
-        ...cat,
-        items: products.filter(p => p.categoryId === cat.id)
-      }));
-
-      return res.json({
-        config: localDb.config,
-        categories: categoriesWithItems,
-        allProducts: products,
-        dbMode: 'local_fallback'
-      });
-    }
+    return res.json({
+      config: localDb.config,
+      categories: categoriesWithItems,
+      allProducts: products,
+      dbMode: 'local_json'
+    });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
 // ============================================================================
-// 3. ROTA DE REGISTRO DE PEDIDOS DO DELIVERY (POST /api/delivery/orders)
+// 3. ROTA DE REGISTRO DE PEDIDOS DO DELIVERY & TEMPO REAL (AO VIVO)
 // ============================================================================
+
+const liveOrderClients = new Set();
+const liveSyncClients = new Set();
+
+app.get('/api/admin/live-orders', (req, res) => {
+  res.writeHead(200, {
+    'Content-Type': 'text/event-stream',
+    'Cache-Control': 'no-cache',
+    'Connection': 'keep-alive',
+    'Access-Control-Allow-Origin': '*'
+  });
+  res.write('data: {"type":"CONNECTED"}\n\n');
+
+  liveOrderClients.add(res);
+
+  req.on('close', () => {
+    liveOrderClients.delete(res);
+  });
+});
+
+app.get('/api/delivery/live-sync', (req, res) => {
+  res.writeHead(200, {
+    'Content-Type': 'text/event-stream',
+    'Cache-Control': 'no-cache, no-transform',
+    'Connection': 'keep-alive',
+    'Access-Control-Allow-Origin': '*'
+  });
+  res.write('data: {"type":"CONNECTED"}\n\n');
+
+  liveSyncClients.add(res);
+
+  req.on('close', () => {
+    liveSyncClients.delete(res);
+  });
+});
+
+function notifyLiveOrder(order) {
+  const payload = JSON.stringify({ type: 'NEW_ORDER', order });
+  for (const client of liveOrderClients) {
+    try {
+      client.write(`data: ${payload}\n\n`);
+    } catch {
+      liveOrderClients.delete(client);
+    }
+  }
+}
+
+function notifyCatalogSync(config) {
+  const payload = JSON.stringify({ type: 'CATALOG_SYNC', config: config || {}, timestamp: Date.now() });
+  for (const client of liveSyncClients) {
+    try {
+      client.write(`data: ${payload}\n\n`);
+    } catch {
+      liveSyncClients.delete(client);
+    }
+  }
+}
+
+app.get('/api/admin/orders/latest', authMiddleware, (req, res) => {
+  const localDb = getLocalDb();
+  const latestOrder = localDb.orders && localDb.orders.length > 0 ? localDb.orders[0] : null;
+  res.json({
+    latestId: latestOrder ? (latestOrder._id || latestOrder.orderNumber) : null,
+    totalOrders: localDb.orders ? localDb.orders.length : 0,
+    latestCreatedAt: latestOrder ? latestOrder.createdAt : null
+  });
+});
 
 app.post('/api/delivery/orders', async (req, res) => {
   try {
@@ -274,74 +322,76 @@ app.post('/api/delivery/orders', async (req, res) => {
       return res.status(400).json({ error: 'Dados do pedido incompletos.' });
     }
 
-    const formattedItems = items.map(item => ({
-      productId: item.menuItemId || item.productId || item.id,
-      name: item.name,
-      categoryId: item.categoryId || '',
-      portion: item.portion || '',
-      unitPrice: Number(item.price || item.unitPrice || 0),
-      quantity: Number(item.quantity || 1),
-      subtotal: Number(item.price || item.unitPrice || 0) * Number(item.quantity || 1),
-      notes: item.notes || '',
-      image: item.image || ''
-    }));
+    const localDb = getLocalDb();
+
+    const formattedItems = items.map(item => {
+      const rawId = String(item.menuItemId || item.productId || item.id || '').trim();
+      const rawName = String(item.name || '').trim().toLowerCase();
+
+      // Busca produto no catálogo por id exato, menuItemId, nome ou prefixo
+      const matchedProd = (localDb.products || []).find(p =>
+        p.id === item.menuItemId ||
+        p.id === item.productId ||
+        p.id === item.id ||
+        (rawName && p.name && p.name.trim().toLowerCase() === rawName) ||
+        (rawId && p.id && (rawId === p.id || rawId.startsWith(p.id + '-')))
+      );
+
+      const resolvedId = matchedProd ? matchedProd.id : (rawId || 'prod_' + Date.now());
+      const resolvedName = matchedProd ? matchedProd.name : (item.name || 'Produto');
+      const resolvedCategory = matchedProd ? matchedProd.categoryId : (item.categoryId || 'outros');
+      const unitPrice = Number(item.price || item.unitPrice || (matchedProd ? matchedProd.price : 0));
+      const qty = Math.max(1, Number(item.quantity || 1));
+      const subtotal = Number(item.subtotal || (unitPrice * qty));
+
+      return {
+        productId: resolvedId,
+        name: resolvedName,
+        categoryId: resolvedCategory,
+        portion: item.portion || '',
+        unitPrice,
+        quantity: qty,
+        subtotal,
+        notes: item.notes || '',
+        image: matchedProd?.image || item.image || ''
+      };
+    });
 
     const calculatedTotal = formattedItems.reduce((acc, cur) => acc + cur.subtotal, 0);
 
-    if (isMongoConnected) {
-      const lastOrder = await Order.findOne().sort({ orderNumber: -1 }).lean();
-      const nextNum = (lastOrder && lastOrder.orderNumber) ? lastOrder.orderNumber + 1 : 1001;
-      const orderCode = `#${nextNum}`;
+    const lastNum = localDb.orders.reduce((max, o) => Math.max(max, o.orderNumber || 1000), 1000);
+    const nextNum = lastNum + 1;
+    const newOrder = {
+      _id: 'ord_' + Date.now(),
+      orderNumber: nextNum,
+      orderCode: `#${nextNum}`,
+      customer,
+      payment,
+      items: formattedItems,
+      totalAmount: totalAmount || calculatedTotal,
+      generalNotes: generalNotes || '',
+      status: 'novo',
+      createdAt: new Date().toISOString()
+    };
+    localDb.orders.unshift(newOrder);
 
-      const newOrder = await Order.create({
-        orderNumber: nextNum,
-        orderCode,
-        customer,
-        payment,
-        items: formattedItems,
-        totalAmount: totalAmount || calculatedTotal,
-        generalNotes: generalNotes || '',
-        status: 'novo'
-      });
-
-      // Atualizar contadores de vendas dos produtos
-      for (const it of formattedItems) {
-        await Product.findOneAndUpdate(
-          { id: it.productId },
-          { $inc: { salesCount: it.quantity, revenueGenerated: it.subtotal } }
-        );
+    // Atualizar contadores acumulados nos produtos do catálogo
+    for (const it of formattedItems) {
+      const prod = (localDb.products || []).find(p =>
+        p.id === it.productId ||
+        (it.name && p.name && p.name.trim().toLowerCase() === it.name.trim().toLowerCase())
+      );
+      if (prod) {
+        prod.salesCount = (prod.salesCount || 0) + it.quantity;
+        prod.revenueGenerated = (prod.revenueGenerated || 0) + it.subtotal;
       }
-
-      return res.status(201).json({ order: newOrder });
-    } else {
-      const localDb = getLocalDb();
-      const lastNum = localDb.orders.reduce((max, o) => Math.max(max, o.orderNumber || 1000), 1000);
-      const nextNum = lastNum + 1;
-      const newOrder = {
-        _id: 'ord_' + Date.now(),
-        orderNumber: nextNum,
-        orderCode: `#${nextNum}`,
-        customer,
-        payment,
-        items: formattedItems,
-        totalAmount: totalAmount || calculatedTotal,
-        generalNotes: generalNotes || '',
-        status: 'novo',
-        createdAt: new Date().toISOString()
-      };
-      localDb.orders.unshift(newOrder);
-
-      // Atualizar contadores no localDb
-      for (const it of formattedItems) {
-        const prod = localDb.products.find(p => p.id === it.productId);
-        if (prod) {
-          prod.salesCount = (prod.salesCount || 0) + it.quantity;
-          prod.revenueGenerated = (prod.revenueGenerated || 0) + it.subtotal;
-        }
-      }
-      saveLocalDb(localDb);
-      return res.status(201).json({ order: newOrder });
     }
+    saveLocalDb(localDb);
+
+    // Notificar painel administrativo imediatamente em tempo real (Ao Vivo)
+    notifyLiveOrder(newOrder);
+
+    return res.status(201).json({ order: newOrder });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -365,24 +415,13 @@ app.get('/api/admin/dashboard', authMiddleware, async (req, res) => {
       startDate = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
     }
 
-    let orders = [];
-    let products = [];
-    let categories = [];
-
-    if (isMongoConnected) {
-      const query = startDate ? { createdAt: { $gte: startDate } } : {};
-      orders = await Order.find(query).sort({ createdAt: -1 }).lean();
-      products = await Product.find().lean();
-      categories = await Category.find().lean();
-    } else {
-      const localDb = getLocalDb();
-      orders = (localDb.orders || []).filter(o => {
-        if (!startDate) return true;
-        return new Date(o.createdAt) >= startDate;
-      });
-      products = localDb.products || [];
-      categories = localDb.categories || [];
-    }
+    const localDb = getLocalDb();
+    const orders = (localDb.orders || []).filter(o => {
+      if (!startDate) return true;
+      return new Date(o.createdAt) >= startDate;
+    });
+    const products = localDb.products || [];
+    const categories = localDb.categories || [];
 
     // Filtrar pedidos válidos (não cancelados) para métricas de receita
     const validOrders = orders.filter(o => o.status !== 'cancelado');
@@ -412,13 +451,28 @@ app.get('/api/admin/dashboard', authMiddleware, async (req, res) => {
       byPayment[pay] = (byPayment[pay] || 0) + 1;
 
       (order.items || []).forEach(item => {
-        const pid = item.productId || item.name;
-        if (!productStatsMap[pid]) {
-          const catalogProd = products.find(p => p.id === pid);
-          productStatsMap[pid] = {
-            productId: pid,
-            name: item.name,
-            categoryId: catalogProd?.categoryId || item.categoryId || 'outros',
+        const rawId = String(item.productId || item.menuItemId || item.id || '').trim();
+        const rawName = String(item.name || '').trim().toLowerCase();
+
+        // Encontrar produto correspondente no catálogo
+        const catalogProd = (products || []).find(p =>
+          p.id === rawId ||
+          p.id === item.menuItemId ||
+          p.id === item.productId ||
+          p.id === item.id ||
+          (rawName && p.name && p.name.trim().toLowerCase() === rawName) ||
+          (rawId && p.id && (rawId === p.id || rawId.startsWith(p.id + '-')))
+        );
+
+        const canonicalId = catalogProd ? catalogProd.id : (rawId || rawName || 'prod_desconhecido');
+        const canonicalName = catalogProd ? catalogProd.name : (item.name || 'Produto');
+        const canonicalCat = catalogProd ? catalogProd.categoryId : (item.categoryId || 'outros');
+
+        if (!productStatsMap[canonicalId]) {
+          productStatsMap[canonicalId] = {
+            productId: canonicalId,
+            name: canonicalName,
+            categoryId: canonicalCat,
             unitType: catalogProd?.unitType || '',
             image: catalogProd?.image || item.image || '',
             quantitySold: 0,
@@ -427,18 +481,22 @@ app.get('/api/admin/dashboard', authMiddleware, async (req, res) => {
             portionsBreakdown: {}
           };
         }
-        productStatsMap[pid].quantitySold += Number(item.quantity || 1);
-        productStatsMap[pid].ordersCount += 1;
-        productStatsMap[pid].revenue += Number(item.subtotal || 0);
+
+        const qty = Math.max(1, Number(item.quantity || 1));
+        const subtotal = Number(item.subtotal || (Number(item.unitPrice || 0) * qty));
+
+        productStatsMap[canonicalId].quantitySold += qty;
+        productStatsMap[canonicalId].ordersCount += 1;
+        productStatsMap[canonicalId].revenue += subtotal;
 
         const portionKey = item.portion || 'Padrão';
-        productStatsMap[pid].portionsBreakdown[portionKey] =
-          (productStatsMap[pid].portionsBreakdown[portionKey] || 0) + Number(item.quantity || 1);
+        productStatsMap[canonicalId].portionsBreakdown[portionKey] =
+          (productStatsMap[canonicalId].portionsBreakdown[portionKey] || 0) + qty;
 
-        const catId = productStatsMap[pid].categoryId;
+        const catId = productStatsMap[canonicalId].categoryId;
         if (categoryStatsMap[catId]) {
-          categoryStatsMap[catId].quantity += Number(item.quantity || 1);
-          categoryStatsMap[catId].revenue += Number(item.subtotal || 0);
+          categoryStatsMap[catId].quantity += qty;
+          categoryStatsMap[catId].revenue += subtotal;
         }
       });
     });
@@ -490,33 +548,24 @@ app.patch('/api/admin/orders/:id/status', authMiddleware, async (req, res) => {
   try {
     const { status } = req.body;
     const { id } = req.params;
-    if (isMongoConnected) {
-      const updated = await Order.findByIdAndUpdate(id, { status }, { new: true });
-      return res.json({ order: updated });
-    } else {
-      const localDb = getLocalDb();
-      const order = localDb.orders.find(o => o._id === id || String(o.orderNumber) === String(id));
-      if (!order) return res.status(404).json({ error: 'Pedido não encontrado.' });
-      order.status = status;
-      saveLocalDb(localDb);
-      return res.json({ order });
-    }
+    const localDb = getLocalDb();
+    const order = localDb.orders.find(o => o._id === id || String(o.orderNumber) === String(id));
+    if (!order) return res.status(404).json({ error: 'Pedido não encontrado.' });
+    order.status = status;
+    saveLocalDb(localDb);
+    return res.json({ order });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
-// Excluir pedido de teste
+// Excluir pedido
 app.delete('/api/admin/orders/:id', authMiddleware, async (req, res) => {
   try {
     const { id } = req.params;
-    if (isMongoConnected) {
-      await Order.findByIdAndDelete(id);
-    } else {
-      const localDb = getLocalDb();
-      localDb.orders = localDb.orders.filter(o => o._id !== id && String(o.orderNumber) !== String(id));
-      saveLocalDb(localDb);
-    }
+    const localDb = getLocalDb();
+    localDb.orders = localDb.orders.filter(o => o._id !== id && String(o.orderNumber) !== String(id));
+    saveLocalDb(localDb);
     res.json({ message: 'Pedido removido com sucesso.' });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -556,22 +605,18 @@ app.post('/api/admin/products', authMiddleware, async (req, res) => {
       isAvailable: payload.isAvailable !== undefined ? Boolean(payload.isAvailable) : true,
       serves: payload.serves || '',
       image: payload.image || '',
-      order: Number(payload.order || 99)
+      order: Number(payload.order || 99),
+      salesCount: 0,
+      revenueGenerated: 0
     };
 
-    if (isMongoConnected) {
-      const doc = new Product(productData);
-      await doc.save();
-      return res.status(201).json({ product: doc });
-    } else {
-      const localDb = getLocalDb();
-      productData.priceFormatted = productData.price ? formatBRL(productData.price) : '';
-      productData.price250mlFormatted = productData.price250ml ? formatBRL(productData.price250ml) : '';
-      productData.price500mlFormatted = productData.price500ml ? formatBRL(productData.price500ml) : '';
-      localDb.products.push(productData);
-      saveLocalDb(localDb);
-      return res.status(201).json({ product: productData });
-    }
+    const localDb = getLocalDb();
+    productData.priceFormatted = productData.price ? formatBRL(productData.price) : '';
+    productData.price250mlFormatted = productData.price250ml ? formatBRL(productData.price250ml) : '';
+    productData.price500mlFormatted = productData.price500ml ? formatBRL(productData.price500ml) : '';
+    localDb.products.push(productData);
+    saveLocalDb(localDb);
+    return res.status(201).json({ product: productData });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -582,30 +627,17 @@ app.put('/api/admin/products/:id', authMiddleware, async (req, res) => {
     const { id } = req.params;
     const payload = req.body;
 
-    if (isMongoConnected) {
-      const prod = await Product.findOne({ id });
-      if (!prod) return res.status(404).json({ error: 'Produto não encontrado.' });
+    const localDb = getLocalDb();
+    const idx = localDb.products.findIndex(p => p.id === id);
+    if (idx === -1) return res.status(404).json({ error: 'Produto não encontrado.' });
 
-      Object.keys(payload).forEach(key => {
-        if (key !== '_id' && key !== 'id') {
-          prod[key] = payload[key];
-        }
-      });
-      await prod.save();
-      return res.json({ product: prod });
-    } else {
-      const localDb = getLocalDb();
-      const idx = localDb.products.findIndex(p => p.id === id);
-      if (idx === -1) return res.status(404).json({ error: 'Produto não encontrado.' });
-
-      const updated = { ...localDb.products[idx], ...payload };
-      updated.priceFormatted = updated.price ? formatBRL(updated.price) : '';
-      updated.price250mlFormatted = updated.price250ml ? formatBRL(updated.price250ml) : '';
-      updated.price500mlFormatted = updated.price500ml ? formatBRL(updated.price500ml) : '';
-      localDb.products[idx] = updated;
-      saveLocalDb(localDb);
-      return res.json({ product: updated });
-    }
+    const updated = { ...localDb.products[idx], ...payload };
+    updated.priceFormatted = updated.price ? formatBRL(updated.price) : '';
+    updated.price250mlFormatted = updated.price250ml ? formatBRL(updated.price250ml) : '';
+    updated.price500mlFormatted = updated.price500ml ? formatBRL(updated.price500ml) : '';
+    localDb.products[idx] = updated;
+    saveLocalDb(localDb);
+    return res.json({ product: updated });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -614,13 +646,9 @@ app.put('/api/admin/products/:id', authMiddleware, async (req, res) => {
 app.delete('/api/admin/products/:id', authMiddleware, async (req, res) => {
   try {
     const { id } = req.params;
-    if (isMongoConnected) {
-      await Product.findOneAndDelete({ id });
-    } else {
-      const localDb = getLocalDb();
-      localDb.products = localDb.products.filter(p => p.id !== id);
-      saveLocalDb(localDb);
-    }
+    const localDb = getLocalDb();
+    localDb.products = localDb.products.filter(p => p.id !== id);
+    saveLocalDb(localDb);
     res.json({ message: 'Produto excluído com sucesso.' });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -647,15 +675,10 @@ app.post('/api/admin/categories', authMiddleware, async (req, res) => {
       isActive: isActive !== undefined ? Boolean(isActive) : true
     };
 
-    if (isMongoConnected) {
-      const created = await Category.create(catData);
-      return res.status(201).json({ category: created });
-    } else {
-      const localDb = getLocalDb();
-      localDb.categories.push(catData);
-      saveLocalDb(localDb);
-      return res.status(201).json({ category: catData });
-    }
+    const localDb = getLocalDb();
+    localDb.categories.push(catData);
+    saveLocalDb(localDb);
+    return res.status(201).json({ category: catData });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -665,17 +688,12 @@ app.put('/api/admin/categories/:id', authMiddleware, async (req, res) => {
   try {
     const { id } = req.params;
     const payload = req.body;
-    if (isMongoConnected) {
-      const updated = await Category.findOneAndUpdate({ id }, payload, { new: true });
-      return res.json({ category: updated });
-    } else {
-      const localDb = getLocalDb();
-      const idx = localDb.categories.findIndex(c => c.id === id);
-      if (idx === -1) return res.status(404).json({ error: 'Categoria não encontrada.' });
-      localDb.categories[idx] = { ...localDb.categories[idx], ...payload };
-      saveLocalDb(localDb);
-      return res.json({ category: localDb.categories[idx] });
-    }
+    const localDb = getLocalDb();
+    const idx = localDb.categories.findIndex(c => c.id === id);
+    if (idx === -1) return res.status(404).json({ error: 'Categoria não encontrada.' });
+    localDb.categories[idx] = { ...localDb.categories[idx], ...payload };
+    saveLocalDb(localDb);
+    return res.json({ category: localDb.categories[idx] });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -684,13 +702,9 @@ app.put('/api/admin/categories/:id', authMiddleware, async (req, res) => {
 app.delete('/api/admin/categories/:id', authMiddleware, async (req, res) => {
   try {
     const { id } = req.params;
-    if (isMongoConnected) {
-      await Category.findOneAndDelete({ id });
-    } else {
-      const localDb = getLocalDb();
-      localDb.categories = localDb.categories.filter(c => c.id !== id);
-      saveLocalDb(localDb);
-    }
+    const localDb = getLocalDb();
+    localDb.categories = localDb.categories.filter(c => c.id !== id);
+    saveLocalDb(localDb);
     res.json({ message: 'Categoria removida com sucesso.' });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -700,31 +714,40 @@ app.delete('/api/admin/categories/:id', authMiddleware, async (req, res) => {
 app.put('/api/admin/config', authMiddleware, async (req, res) => {
   try {
     const payload = req.body;
-    if (isMongoConnected) {
-      const config = await DeliveryConfig.findOneAndUpdate(
-        { key: 'main' },
-        { $set: payload },
-        { new: true, upsert: true }
-      );
-      return res.json({ config });
-    } else {
-      const localDb = getLocalDb();
-      localDb.config = { ...localDb.config, ...payload };
-      saveLocalDb(localDb);
-      return res.json({ config: localDb.config });
-    }
+    const localDb = getLocalDb();
+    localDb.config = { ...localDb.config, ...payload };
+    saveLocalDb(localDb);
+    return res.json({ config: localDb.config });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
-// Inicializar servidor
-connectToMongo(currentMongoUri).then(() => {
-  app.listen(PORT, () => {
-    console.log(`=========================================================`);
-    console.log(`🐟 Servidor Peixaria Mancha rodando na porta ${PORT}`);
-    console.log(`👉 Cardápio Delivery: http://localhost:${PORT}/cardapio-delivery/`);
-    console.log(`👉 Painel Admin & Dash: http://localhost:${PORT}/admin-mancha/`);
-    console.log(`=========================================================`);
-  });
+app.post('/api/admin/toggle-status', authMiddleware, async (req, res) => {
+  try {
+    const localDb = getLocalDb();
+    const current = localDb.config?.manualStatus || 'auto';
+    const requested = req.body?.status;
+    let next;
+    if (requested) {
+      next = requested;
+    } else {
+      next = current === 'force_open' ? 'force_closed' : 'force_open';
+    }
+    localDb.config = { ...localDb.config, manualStatus: next };
+    saveLocalDb(localDb);
+    return res.json({ manualStatus: next, config: localDb.config });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Inicializar servidor 100% Local
+app.listen(PORT, () => {
+  console.log(`=========================================================`);
+  console.log(`🐟 Servidor Local Peixaria Mancha rodando na porta ${PORT}`);
+  console.log(`📂 Banco de Dados Local: backend/local-fallback-db.json`);
+  console.log(`👉 Cardápio Delivery: http://localhost:${PORT}/cardapio-delivery/`);
+  console.log(`👉 Painel Admin & Dash: http://localhost:${PORT}/admin-mancha/`);
+  console.log(`=========================================================`);
 });
