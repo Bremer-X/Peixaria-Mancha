@@ -312,8 +312,27 @@ document.addEventListener("DOMContentLoaded", () => {
           productStatsMap[pid].portionsBreakdown[pKey] = (productStatsMap[pid].portionsBreakdown[pKey] || 0) + qty;
 
           // Categoria
-          const prodMatch = (catalogData.allProducts || []).find(p => p.id === pid || p.name === it.name);
-          const catId = it.categoryId || prodMatch?.categoryId;
+          const itemNameNorm = String(it.name || "").trim().toLowerCase();
+          const prodMatch = (catalogData.allProducts || []).find(
+            p =>
+              p.id === pid ||
+              p._uuid === pid ||
+              p.id === it.menuItemId ||
+              p._uuid === it.menuItemId ||
+              String(p.name || "").trim().toLowerCase() === itemNameNorm
+          );
+          let catId = it.categoryId || prodMatch?.categoryId;
+          if (!catId || !catStatsMap[catId]) {
+            const catMatch = (catalogData.categories || []).find(c =>
+              (c.items || []).some(
+                p =>
+                  p.id === pid ||
+                  p._uuid === pid ||
+                  String(p.name || "").trim().toLowerCase() === itemNameNorm
+              )
+            );
+            if (catMatch) catId = catMatch.id;
+          }
           if (catId && catStatsMap[catId]) {
             catStatsMap[catId].quantity += qty;
             catStatsMap[catId].revenue += rev;
@@ -777,10 +796,13 @@ document.addEventListener("DOMContentLoaded", () => {
           return;
         }
 
-        if (check.latestId && check.latestId !== lastKnownLatestId && check.totalOrders > (lastKnownOrderCount || 0)) {
+        if (check.latestId && check.latestId !== lastKnownLatestId) {
           lastKnownLatestId = check.latestId;
           lastKnownOrderCount = check.totalOrders;
-          await loadDashboard(currentPeriod);
+          await Promise.all([
+            loadDashboard(currentPeriod),
+            loadCustomers()
+          ]);
           playOrderAlertSound();
           showToast(`🔔 NOVO PEDIDO RECEBIDO NO SUPABASE! Atualizado ao vivo.`);
         } else {
@@ -972,8 +994,8 @@ document.addEventListener("DOMContentLoaded", () => {
   let customersData = [];
 
   async function loadAllData() {
+    await loadCatalog();
     await Promise.all([
-      loadCatalog(),
       loadDashboard(currentPeriod),
       loadCustomers()
     ]);
@@ -1083,6 +1105,12 @@ document.addEventListener("DOMContentLoaded", () => {
     renderCategoriesTab();
     populateSettingsForm(data.config || {});
 
+    if (dashboardData && dashboardData.kpis) {
+      dashboardData.kpis.activeProductsCount = (catalogData.allProducts || []).filter(p => p.isAvailable !== false).length;
+      dashboardData.kpis.totalProductsCount = (catalogData.allProducts || []).length;
+      renderDashboard();
+    }
+
     try {
       localStorage.setItem("peixaria_mancha_catalog_cache", JSON.stringify(data));
     } catch {}
@@ -1136,21 +1164,35 @@ document.addEventListener("DOMContentLoaded", () => {
     const badgeOrders = document.getElementById("nav-orders-badge");
     if (badgeOrders) badgeOrders.textContent = recentOrders.length;
 
-    // Ajustar Gauge Semi-circular SVG
+    // Ajustar Gauge Semi-circular SVG (de 180° à esquerda até 0° à direita)
     const totalCount = Math.max(kpis.totalProductsCount, 1);
     const activePct = Math.round((kpis.activeProductsCount / totalCount) * 100);
     const gaugeArc = document.getElementById("gauge-arc");
+    const gaugeDot = document.getElementById("gauge-dot");
     if (gaugeArc) {
-      // Cálculo de arco circular aproximado (de 180° a 0°)
-      const angle = Math.PI - (activePct / 100) * Math.PI;
-      const x = 50 - 40 * Math.cos(angle);
-      const y = 50 - 40 * Math.sin(angle);
-      gaugeArc.setAttribute("d", `M 10 50 A 40 40 0 0 1 ${x.toFixed(1)} ${y.toFixed(1)}`);
+      if (activePct <= 0) {
+        gaugeArc.setAttribute("d", "M 10 50 A 40 40 0 0 1 10 50");
+        if (gaugeDot) {
+          gaugeDot.setAttribute("cx", "10");
+          gaugeDot.setAttribute("cy", "50");
+        }
+      } else {
+        const clampedPct = Math.min(activePct, 99.9);
+        const angle = Math.PI - (clampedPct / 100) * Math.PI;
+        const x = 50 + 40 * Math.cos(angle);
+        const y = 50 - 40 * Math.sin(angle);
+        gaugeArc.setAttribute("d", `M 10 50 A 40 40 0 0 1 ${x.toFixed(1)} ${y.toFixed(1)}`);
+        if (gaugeDot) {
+          gaugeDot.setAttribute("cx", x.toFixed(1));
+          gaugeDot.setAttribute("cy", y.toFixed(1));
+        }
+      }
     }
 
     // 2. Mix de Categorias (Card central com bolinhas)
     const catStatsEl = document.getElementById("category-stats-list");
-    const totalCatRev = Math.max(categoryPerformance.reduce((s, c) => s + c.quantity, 0), 1);
+    const totalCatQty = categoryPerformance.reduce((s, c) => s + c.quantity, 0);
+    const totalCatRev = Math.max(totalCatQty, 1);
     const colors = ["bg-emerald-500", "bg-teal-500", "bg-amber-500", "bg-rose-500", "bg-sky-500"];
 
     if (catStatsEl) {
@@ -1158,7 +1200,7 @@ document.addEventListener("DOMContentLoaded", () => {
         catStatsEl.innerHTML = `<span class="text-slate-400 text-xs">Sem categorias registradas.</span>`;
       } else {
         catStatsEl.innerHTML = categoryPerformance.map((cat, idx) => {
-          const pct = Math.round((cat.quantity / totalCatRev) * 100) || 0;
+          const pct = totalCatQty > 0 ? (Math.round((cat.quantity / totalCatRev) * 100) || 0) : 0;
           const dotColor = colors[idx % colors.length];
           return `
             <div class="flex items-center justify-between py-1 border-b border-slate-100 last:border-0">
@@ -1175,7 +1217,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const highlightMix = document.getElementById("mix-highlight-pct");
     if (highlightMix) {
-      highlightMix.textContent = `${activePct}%`;
+      highlightMix.textContent = totalCatQty > 0 ? "100%" : "0%";
     }
 
     // 3. Top Produtos Mais Vendidos (com estética clean)
