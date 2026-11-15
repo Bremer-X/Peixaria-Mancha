@@ -50,6 +50,23 @@ export default function DeliveryCartDrawer({
       return;
     }
 
+    try {
+      const savedProfile = JSON.parse(localStorage.getItem('peixaria_mancha_customer_profile') || 'null');
+      if (savedProfile) {
+        if (!customerName && savedProfile.name) setCustomerName(savedProfile.name);
+        if (!phone && savedProfile.whatsapp) setPhone(savedProfile.whatsapp);
+        if (!address) {
+          const composed = [savedProfile.street || savedProfile.address, savedProfile.number, savedProfile.neighborhood]
+            .filter(Boolean)
+            .join(', ');
+          if (composed) setAddress(composed);
+        }
+        if (!referencePoint && savedProfile.reference) setReferencePoint(savedProfile.reference);
+      }
+    } catch {
+      // ignore
+    }
+
     const timer = window.setTimeout(() => setShowDeliveryNotice(true), 3000);
     return () => window.clearTimeout(timer);
   }, [isOpen]);
@@ -151,6 +168,88 @@ export default function DeliveryCartDrawer({
 
     const encoded = encodeURIComponent(msg);
     const url = `https://wa.me/${DELIVERY_RESTAURANT_INFO.whatsapp}?text=${encoded}`;
+
+    // Registrar pedido automaticamente no Supabase ("Cardápio Digital" / peixaria-mancha)
+    try {
+      const supaKey =
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZybXRzZ293enBqcWd0eHpwcm93Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTMyMjY3OTQsImV4cCI6MjEwODgwMjc5NH0.Jhbt0GFiTAqAEewBUs1eg3trm1fdtaY03e7TIP1LZiU';
+      const orderPayload = {
+        customer: {
+          name: customerName.trim(),
+          whatsapp: phone.trim(),
+          modality: orderType,
+          address: address.trim(),
+          reference: referencePoint.trim(),
+        },
+        payment: {
+          method: paymentMethod,
+          changeFor: cashChangeFor.trim(),
+        },
+        items: cart,
+        totalAmount: subtotal,
+        generalNotes: generalNotes.trim(),
+      };
+
+      // Salvar perfil e histórico local para as abas Perfil e Meus Pedidos
+      try {
+        localStorage.setItem(
+          'peixaria_mancha_customer_profile',
+          JSON.stringify({
+            name: customerName.trim(),
+            whatsapp: phone.trim(),
+            address: address.trim(),
+            reference: referencePoint.trim(),
+          })
+        );
+        const existingOrders = JSON.parse(localStorage.getItem('peixaria_mancha_my_orders') || '[]');
+        existingOrders.unshift({
+          id: 'PED-' + Date.now(),
+          createdAt: new Date().toISOString(),
+          totalAmount: subtotal,
+          modality: orderType,
+          paymentMethod,
+          items: cart.map((i) => ({ name: i.name, portion: i.portion, quantity: i.quantity, price: i.price })),
+        });
+        localStorage.setItem('peixaria_mancha_my_orders', JSON.stringify(existingOrders.slice(0, 15)));
+        window.dispatchEvent(new Event('mancha-orders-updated'));
+      } catch {
+        // ignore
+      }
+
+      fetch('https://vrmtsgowzpjqgtxzprow.supabase.co/rest/v1/rpc/create_delivery_order', {
+        method: 'POST',
+        keepalive: true,
+        headers: {
+          'Content-Type': 'application/json',
+          apikey: supaKey,
+          Authorization: `Bearer ${supaKey}`,
+        },
+        body: JSON.stringify({
+          p_payload: orderPayload,
+          p_store_slug: 'peixaria-mancha',
+        }),
+      }).catch(() => {});
+
+      // Também cadastrar/atualizar cliente em public.store_customers no Supabase
+      fetch('https://vrmtsgowzpjqgtxzprow.supabase.co/rest/v1/rpc/upsert_delivery_customer', {
+        method: 'POST',
+        keepalive: true,
+        headers: {
+          'Content-Type': 'application/json',
+          apikey: supaKey,
+          Authorization: `Bearer ${supaKey}`,
+        },
+        body: JSON.stringify({
+          p_store_slug: 'peixaria-mancha',
+          p_name: customerName.trim(),
+          p_phone: phone.trim(),
+          p_street: address.trim(),
+          p_reference: referencePoint.trim(),
+        }),
+      }).catch(() => {});
+    } catch {
+      // ignore
+    }
 
     if (typeof window !== 'undefined' && typeof (window as any).gtag === 'function') {
       (window as any).gtag('event', 'conversion', {

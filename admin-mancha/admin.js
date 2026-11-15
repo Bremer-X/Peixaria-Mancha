@@ -1,7 +1,9 @@
 document.addEventListener("DOMContentLoaded", () => {
-  // Supabase Nuvem - Configurações de Acesso
-  const SUPABASE_URL = "https://qnandyuygrilgptnpaeb.supabase.co";
-  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFuYW5keXV5Z3JpbGdwdG5wYWViIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQzMTM1MDgsImV4cCI6MjEwOTg4OTUwOH0.kOaTY_X6uq5bjo94bjm1RioTEJ-KBHJX7f948YLbJAs";
+  // Supabase Nuvem - Projeto Oficial "Cardápio Digital" (Peixaria Mancha)
+  const SUPABASE_URL = "https://vrmtsgowzpjqgtxzprow.supabase.co";
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZybXRzZ293enBqcWd0eHpwcm93Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTMyMjY3OTQsImV4cCI6MjEwODgwMjc5NH0.Jhbt0GFiTAqAEewBUs1eg3trm1fdtaY03e7TIP1LZiU";
+  const STORE_SLUG = "peixaria-mancha";
+  let currentStoreId = "3de9eb4c-fdff-4c98-a8d2-0fe8d0b64635";
 
   // Detecta automaticamente o ambiente (Local com Node.js ou Web/Hospedagem Estática)
   const isLocalHost = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
@@ -9,8 +11,9 @@ document.addEventListener("DOMContentLoaded", () => {
     ? (window.location.origin.includes(":3001") ? window.location.origin + "/api" : "http://localhost:3001/api")
     : "/api";
 
-  let isWebMode = (!isLocalHost && window.location.port !== "3001") || localStorage.getItem("mancha_is_web_mode") === "true";
+  let isWebMode = true;
   let authToken = localStorage.getItem("mancha_admin_token") || null;
+  let refreshToken = localStorage.getItem("mancha_admin_refresh_token") || null;
   let currentPeriod = "all";
   let catalogData = { config: {}, categories: [], allProducts: [] };
   let dashboardData = null;
@@ -53,54 +56,81 @@ document.addEventListener("DOMContentLoaded", () => {
     } catch {}
   }
 
-  async function apiFetch(endpoint, options = {}) {
-    if (isWebMode) {
-      return handleWebModeApi(endpoint, options);
-    }
+  function slugify(str, prefix = "item") {
+    const clean = String(str || "")
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "");
+    return clean || `${prefix}-${Date.now()}`;
+  }
+
+  async function tryRefreshSupabaseToken() {
+    const storedRefresh = refreshToken || localStorage.getItem("mancha_admin_refresh_token");
+    if (!storedRefresh) return false;
+    try {
+      const res = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=refresh_token`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "apikey": SUPABASE_ANON_KEY
+        },
+        body: JSON.stringify({ refresh_token: storedRefresh })
+      });
+      if (!res.ok) return false;
+      const data = await res.json();
+      if (data.access_token) {
+        authToken = data.access_token;
+        refreshToken = data.refresh_token || storedRefresh;
+        localStorage.setItem("mancha_admin_token", authToken);
+        localStorage.setItem("mancha_admin_refresh_token", refreshToken);
+        localStorage.setItem("mancha_auth_provider", "supabase");
+        return true;
+      }
+    } catch {}
+    return false;
+  }
+
+  async function supaFetch(path, options = {}, retry = true) {
+    const isJwtToken = authToken && authToken.split(".").length === 3;
+    const bearer = isJwtToken ? authToken : SUPABASE_ANON_KEY;
     const headers = {
       "Content-Type": "application/json",
-      ...(authToken ? { Authorization: `Bearer ${authToken}` } : {}),
+      "apikey": SUPABASE_ANON_KEY,
+      "Authorization": `Bearer ${bearer}`,
       ...(options.headers || {})
     };
-    try {
-      const res = await fetch(`${API_BASE}${endpoint}`, {
-        ...options,
-        headers
-      });
-      if (res.status === 401) {
-        throw new Error("Sessão expirada. Faça login novamente.");
+
+    const res = await fetch(`${SUPABASE_URL}${path}`, {
+      ...options,
+      headers
+    });
+
+    if (res.status === 401 && retry && isJwtToken) {
+      const refreshed = await tryRefreshSupabaseToken();
+      if (refreshed) {
+        return supaFetch(path, options, false);
       }
-      if (!res.ok) {
-        // Se deu 404 em ambiente web, aciona modo web cliente
-        if (!isLocalHost) {
-          isWebMode = true;
-          return handleWebModeApi(endpoint, options);
-        }
-        const data = await res.json().catch(() => ({}));
-        throw new Error(data.error || "Erro na comunicação com o servidor.");
-      }
-      return await res.json();
-    } catch (fetchErr) {
-      if (!isLocalHost) {
-        isWebMode = true;
-        return handleWebModeApi(endpoint, options);
-      }
-      throw fetchErr;
     }
+
+    if (!res.ok) {
+      const errBody = await res.json().catch(() => ({}));
+      throw new Error(errBody.message || errBody.error_description || errBody.error || `Erro Supabase (${res.status})`);
+    }
+
+    if (res.status === 204) return null;
+    const text = await res.text();
+    return text ? JSON.parse(text) : null;
+  }
+
+  async function apiFetch(endpoint, options = {}) {
+    return handleSupabaseApi(endpoint, options);
   }
 
   // ==========================================================================
-  // MOTOR WEB CLIENT-SIDE (FALLBACK PARA QUANDO ACESSADO NA WEB / HOSPEDAGEM ESTÁTICA)
+  // MOTOR OFICIAL SUPABASE NUVEM (CATÁLOGO, PRODUTOS, CATEGORIAS, CONFIG E PEDIDOS)
   // ==========================================================================
-
-  function getWebModeOrders() {
-    try {
-      const stored = localStorage.getItem("peixaria_mancha_orders_cache");
-      return stored ? JSON.parse(stored) : [];
-    } catch {
-      return [];
-    }
-  }
 
   function saveWebCatalog() {
     try {
@@ -109,45 +139,158 @@ document.addEventListener("DOMContentLoaded", () => {
     broadcastSync();
   }
 
-  async function handleWebModeApi(endpoint, options = {}) {
+  function mapOrderStatusFromDb(dbStatus, kitchenNote = "") {
+    if (dbStatus === "recusado") return "cancelado";
+    if (dbStatus === "rota") return "saiu_entrega";
+    if (dbStatus === "preparo" && String(kitchenNote || "").includes("[CONFIRMADO]")) return "confirmado";
+    return dbStatus || "novo";
+  }
+
+  function mapOrderStatusToDb(uiStatus) {
+    if (uiStatus === "cancelado") return "recusado";
+    if (uiStatus === "saiu_entrega") return "rota";
+    if (uiStatus === "confirmado") return "preparo";
+    return uiStatus || "novo";
+  }
+
+  async function fetchSupabaseOrdersWithItems() {
+    const ordersRaw = await supaFetch(
+      `/rest/v1/orders?store_id=eq.${currentStoreId}&select=*,order_items(*)&order=created_at.desc`
+    );
+    return (ordersRaw || []).map(row => {
+      const items = (row.order_items || []).map(it => ({
+        id: it.id,
+        productId: it.selected_options?.menuItemId || it.product_id || it.product_name,
+        menuItemId: it.selected_options?.menuItemId || it.product_id || "",
+        name: it.product_name,
+        categoryId: it.selected_options?.categoryId || "",
+        portion: it.selected_options?.portion || "",
+        quantity: Number(it.quantity || 1),
+        price: Number(it.unit_price || 0),
+        subtotal: Number(it.subtotal || 0),
+        notes: it.notes || ""
+      }));
+
+      const rawCode = row.code || "";
+      const numMatch = String(rawCode).match(/\d+/);
+      return {
+        _id: row.id,
+        id: row.id,
+        orderCode: rawCode || ("#" + String(row.id).slice(0, 4).toUpperCase()),
+        orderNumber: numMatch ? Number(numMatch[0]) : row.id,
+        status: mapOrderStatusFromDb(row.status, row.kitchen_note),
+        createdAt: row.created_at,
+        totalAmount: Number(row.total || row.subtotal || 0),
+        generalNotes: String(row.kitchen_note || "").replace("[CONFIRMADO] ", ""),
+        customer: {
+          name: row.customer_name || "Cliente",
+          whatsapp: row.customer_phone || "",
+          modality: row.fulfillment === "pickup" ? "pickup" : "delivery",
+          address: row.address || "",
+          reference: row.reference || ""
+        },
+        payment: {
+          method: row.payment_method || "pix",
+          changeFor: row.change_for ? String(row.change_for) : ""
+        },
+        items
+      };
+    });
+  }
+
+  async function handleSupabaseApi(endpoint, options = {}) {
     const method = (options.method || "GET").toUpperCase();
 
-    // 1. Catálogo
+    // 1. Catálogo completo via RPC get_delivery_catalog
     if (endpoint.startsWith("/delivery/catalog")) {
-      let cached = null;
+      const includeUnavailable = endpoint.includes("all=true");
       try {
-        const stored = localStorage.getItem("peixaria_mancha_catalog_cache");
-        if (stored) cached = JSON.parse(stored);
-      } catch {}
-
-      if (cached && cached.categories && cached.categories.length > 0) {
-        return cached;
-      }
-
-      // Buscar do arquivo estático catalog-data.json
-      try {
-        const res = await fetch(`../cardapio-delivery/catalog-data.json?_t=${Date.now()}`);
-        if (res.ok) {
-          const data = await res.json();
+        const data = await supaFetch(`/rest/v1/rpc/get_delivery_catalog`, {
+          method: "POST",
+          body: JSON.stringify({
+            p_store_slug: STORE_SLUG,
+            p_include_unavailable: includeUnavailable
+          })
+        });
+        if (data && data.storeId) {
+          currentStoreId = data.storeId;
+        }
+        if (data && data.categories) {
           try {
             localStorage.setItem("peixaria_mancha_catalog_cache", JSON.stringify(data));
           } catch {}
           return data;
         }
-      } catch {}
+      } catch (err) {
+        console.warn("Fallback cache catálogo:", err);
+      }
 
-      return cached || { config: {}, categories: [], allProducts: [] };
+      try {
+        const stored = localStorage.getItem("peixaria_mancha_catalog_cache");
+        if (stored) return JSON.parse(stored);
+      } catch {}
+      return { config: {}, categories: [], allProducts: [] };
     }
 
-    // 2. Dashboard
+    // 2. Checagem rápida de novos pedidos em tempo real
+    if (endpoint === "/admin/orders/latest") {
+      const rows = await supaFetch(
+        `/rest/v1/orders?store_id=eq.${currentStoreId}&select=id,created_at&order=created_at.desc&limit=50`
+      );
+      return {
+        latestId: rows && rows[0] ? rows[0].id : null,
+        totalOrders: (rows || []).length
+      };
+    }
+
+    // 3. Criar Pedido (Cliente ou Botão "+ Gerar Pedido Exemplo")
+    if (endpoint === "/delivery/orders" && method === "POST") {
+      const payload = JSON.parse(options.body || "{}");
+      const created = await supaFetch(`/rest/v1/rpc/create_delivery_order`, {
+        method: "POST",
+        body: JSON.stringify({
+          p_payload: payload,
+          p_store_slug: STORE_SLUG
+        })
+      });
+      return { order: created };
+    }
+
+    // 4. Dashboard & Relatórios
     if (endpoint.startsWith("/admin/dashboard")) {
-      const orders = getWebModeOrders();
-      const validOrders = orders.filter(o => o.status !== "cancelado");
+      const urlObj = new URL(endpoint, "http://localhost");
+      const period = urlObj.searchParams.get("period") || "all";
+
+      const allOrders = await fetchSupabaseOrdersWithItems();
+      const now = new Date();
+
+      const filteredOrders = allOrders.filter(o => {
+        if (period === "all") return true;
+        const d = new Date(o.createdAt);
+        if (period === "today") {
+          return (
+            d.getFullYear() === now.getFullYear() &&
+            d.getMonth() === now.getMonth() &&
+            d.getDate() === now.getDate()
+          );
+        }
+        const diffDays = (now - d) / (1000 * 60 * 60 * 24);
+        if (period === "7d") return diffDays <= 7;
+        if (period === "30d") return diffDays <= 30;
+        return true;
+      });
+
+      const validOrders = filteredOrders.filter(o => o.status !== "cancelado");
       const totalRevenue = validOrders.reduce((sum, o) => sum + Number(o.totalAmount || 0), 0);
       const totalOrders = validOrders.length;
       const avgTicket = totalOrders > 0 ? totalRevenue / totalOrders : 0;
 
       const productStatsMap = {};
+      const catStatsMap = {};
+      (catalogData.categories || []).forEach(c => {
+        catStatsMap[c.id] = { id: c.id, title: c.title, quantity: 0, revenue: 0 };
+      });
+
       validOrders.forEach(o => {
         (o.items || []).forEach(it => {
           const pid = it.productId || it.name;
@@ -161,162 +304,348 @@ document.addEventListener("DOMContentLoaded", () => {
               portionsBreakdown: {}
             };
           }
-          productStatsMap[pid].quantitySold += Number(it.quantity || 1);
-          productStatsMap[pid].revenue += Number(it.subtotal || 0);
+          const qty = Number(it.quantity || 1);
+          const rev = Number(it.subtotal || it.price * qty || 0);
+          productStatsMap[pid].quantitySold += qty;
+          productStatsMap[pid].revenue += rev;
           const pKey = it.portion || "Padrão";
-          productStatsMap[pid].portionsBreakdown[pKey] = (productStatsMap[pid].portionsBreakdown[pKey] || 0) + Number(it.quantity || 1);
+          productStatsMap[pid].portionsBreakdown[pKey] = (productStatsMap[pid].portionsBreakdown[pKey] || 0) + qty;
+
+          // Categoria
+          const prodMatch = (catalogData.allProducts || []).find(p => p.id === pid || p.name === it.name);
+          const catId = it.categoryId || prodMatch?.categoryId;
+          if (catId && catStatsMap[catId]) {
+            catStatsMap[catId].quantity += qty;
+            catStatsMap[catId].revenue += rev;
+          }
         });
       });
 
       const topProductsByQty = Object.values(productStatsMap).sort((a, b) => b.quantitySold - a.quantitySold);
       const activeProductsCount = (catalogData.allProducts || []).filter(p => p.isAvailable !== false).length;
 
+      // Vendas últimos 7 dias
+      const dailySales = [];
+      for (let i = 6; i >= 0; i--) {
+        const day = new Date(now.getFullYear(), now.getMonth(), now.getDate() - i);
+        const dayOrders = allOrders.filter(o => {
+          if (o.status === "cancelado") return false;
+          const od = new Date(o.createdAt);
+          return (
+            od.getFullYear() === day.getFullYear() &&
+            od.getMonth() === day.getMonth() &&
+            od.getDate() === day.getDate()
+          );
+        });
+        dailySales.push({
+          label: day.toLocaleDateString("pt-BR", { weekday: "short", day: "2-digit", month: "2-digit" }),
+          orders: dayOrders.length,
+          revenue: dayOrders.reduce((s, o) => s + Number(o.totalAmount || 0), 0)
+        });
+      }
+
       return {
         kpis: {
           totalRevenue,
           totalOrders,
           avgTicket,
-          canceledCount: orders.filter(o => o.status === "cancelado").length,
+          canceledCount: filteredOrders.filter(o => o.status === "cancelado").length,
           activeProductsCount,
           totalProductsCount: (catalogData.allProducts || []).length
         },
-        byModality: { delivery: validOrders.filter(o => o.customer?.modality === "delivery").length, pickup: validOrders.filter(o => o.customer?.modality === "pickup").length },
-        byPayment: { pix: validOrders.filter(o => o.payment?.method === "pix").length, credit: validOrders.filter(o => o.payment?.method === "credit").length, debit: validOrders.filter(o => o.payment?.method === "debit").length, cash: validOrders.filter(o => o.payment?.method === "cash").length },
+        byModality: {
+          delivery: validOrders.filter(o => o.customer?.modality === "delivery").length,
+          pickup: validOrders.filter(o => o.customer?.modality === "pickup").length
+        },
+        byPayment: {
+          pix: validOrders.filter(o => o.payment?.method === "pix").length,
+          credit: validOrders.filter(o => o.payment?.method === "credit" || o.payment?.method === "card").length,
+          debit: validOrders.filter(o => o.payment?.method === "debit").length,
+          cash: validOrders.filter(o => o.payment?.method === "cash").length
+        },
         topProductsByQty,
-        categoryPerformance: (catalogData.categories || []).map(c => ({ id: c.id, title: c.title, quantity: 0, revenue: 0 })),
-        dailySales: [],
-        recentOrders: orders.slice(0, 10)
+        categoryPerformance: Object.values(catStatsMap),
+        dailySales,
+        recentOrders: filteredOrders.slice(0, 30)
       };
     }
 
-    // 3. Atualizar Configurações
+    // 5. Atualizar Status de Pedido
+    if (endpoint.startsWith("/admin/orders/") && endpoint.endsWith("/status") && method === "PATCH") {
+      const id = endpoint.replace("/admin/orders/", "").replace("/status", "");
+      const payload = JSON.parse(options.body || "{}");
+      const dbStatus = mapOrderStatusToDb(payload.status);
+      const updateObj = {
+        status: dbStatus,
+        updated_at: new Date().toISOString()
+      };
+      if (dbStatus === "concluido") {
+        updateObj.completed_at = new Date().toISOString();
+      }
+      await supaFetch(`/rest/v1/orders?id=eq.${encodeURIComponent(id)}&store_id=eq.${currentStoreId}`, {
+        method: "PATCH",
+        body: JSON.stringify(updateObj)
+      });
+      return { success: true };
+    }
+
+    // 6. Excluir Pedido
+    if (endpoint.startsWith("/admin/orders/") && method === "DELETE") {
+      const id = endpoint.replace("/admin/orders/", "");
+      await supaFetch(`/rest/v1/orders?id=eq.${encodeURIComponent(id)}&store_id=eq.${currentStoreId}`, {
+        method: "DELETE"
+      });
+      return { success: true };
+    }
+
+    // 7. Atualizar Configurações da Loja
     if (endpoint === "/admin/config" && method === "PUT") {
       const payload = JSON.parse(options.body || "{}");
-      catalogData.config = { ...catalogData.config, ...payload };
+      const mergedConfig = { ...(catalogData.config || {}), ...payload };
+      delete mergedConfig.storeId;
+      delete mergedConfig.storeSlug;
+      delete mergedConfig.storeName;
+
+      const isOpenNow = mergedConfig.manualStatus === "force_open"
+        ? true
+        : mergedConfig.manualStatus === "force_closed"
+        ? false
+        : true;
+
+      await supaFetch(`/rest/v1/stores?id=eq.${currentStoreId}`, {
+        method: "PATCH",
+        body: JSON.stringify({
+          tagline: mergedConfig.tagline || "Qualidade que você sente, sabor que você ama!",
+          phone: mergedConfig.whatsapp || "5591989379978",
+          delivery_time: mergedConfig.estimatedTime || "30-50 min",
+          opening_time: `${String(mergedConfig.openHour ?? 7).padStart(2, "0")}:00`,
+          closing_time: `${String(mergedConfig.closeHour ?? 14).padStart(2, "0")}:00`,
+          is_open: isOpenNow,
+          delivery_config: mergedConfig,
+          updated_at: new Date().toISOString()
+        })
+      });
+
+      catalogData.config = { ...(catalogData.config || {}), ...mergedConfig };
       saveWebCatalog();
       return { config: catalogData.config };
     }
 
-    // 4. Alternar Status
+    // 8. Alternar Status Rápido (Aberto / Fechado)
     if (endpoint === "/admin/toggle-status" && method === "POST") {
       const payload = JSON.parse(options.body || "{}");
       const current = catalogData.config?.manualStatus || "auto";
       const next = payload.status || (current === "force_open" ? "force_closed" : "force_open");
-      catalogData.config = { ...catalogData.config, manualStatus: next };
-      saveWebCatalog();
-      return { manualStatus: next, config: catalogData.config };
+      const res = await handleSupabaseApi("/admin/config", {
+        method: "PUT",
+        body: JSON.stringify({ manualStatus: next })
+      });
+      return { manualStatus: next, config: res.config };
     }
 
-    // 5. Produtos
+    // 9. CRUD de Produtos no Supabase
     if (endpoint === "/admin/products" && method === "POST") {
       const payload = JSON.parse(options.body || "{}");
-      payload.id = payload.id || "prod_" + Date.now();
-      payload.isAvailable = payload.isAvailable !== false;
-      payload.price = Number(payload.price || 0);
-      payload.order = Number(payload.order || 99);
-      payload.salesCount = 0;
-      payload.revenueGenerated = 0;
-      if (!catalogData.allProducts) catalogData.allProducts = [];
-      catalogData.allProducts.push(payload);
-      saveWebCatalog();
-      return { product: payload };
+      const catObj = (catalogData.categories || []).find(
+        c => c.id === payload.categoryId || c._uuid === payload.categoryId
+      );
+      const categoryUuid = catObj?._uuid || null;
+      const categorySlug = catObj?.id || payload.categoryId || "peixes-fritos";
+      const prodSlug = payload.id || slugify(payload.name, "prato") + "-" + Date.now().toString().slice(-4);
+      const basePrice = payload.unitType === "PORÇÃO"
+        ? Number(payload.price500ml || payload.price250ml || payload.price || 0)
+        : Number(payload.price || 0);
+
+      const insertRow = {
+        store_id: currentStoreId,
+        category_id: categoryUuid,
+        slug: prodSlug,
+        name: payload.name,
+        badge: payload.badge || "",
+        description: payload.description || "",
+        price: Math.max(basePrice, 0),
+        image_url: payload.image || "",
+        is_available: payload.isAvailable !== false,
+        sort_order: Number(payload.order || ((catalogData.allProducts || []).length + 1)),
+        options_config: {
+          unitType: payload.unitType || "KG",
+          allowWeightChoice: Boolean(payload.allowWeightChoice),
+          isPopular: Boolean(payload.isPopular),
+          serves: payload.serves || "",
+          price250ml: payload.price250ml !== undefined && payload.price250ml !== null && payload.price250ml !== "" ? Number(payload.price250ml) : null,
+          price500ml: payload.price500ml !== undefined && payload.price500ml !== null && payload.price500ml !== "" ? Number(payload.price500ml) : null,
+          categorySlug
+        }
+      };
+
+      const created = await supaFetch(`/rest/v1/products`, {
+        method: "POST",
+        headers: { "Prefer": "return=representation" },
+        body: JSON.stringify(insertRow)
+      });
+      return { product: created?.[0] || insertRow };
     }
 
     if (endpoint.startsWith("/admin/products/") && method === "PUT") {
-      const id = endpoint.replace("/admin/products/", "");
+      const id = decodeURIComponent(endpoint.replace("/admin/products/", ""));
       const payload = JSON.parse(options.body || "{}");
-      const idx = (catalogData.allProducts || []).findIndex(p => p.id === id);
-      if (idx !== -1) {
-        catalogData.allProducts[idx] = { ...catalogData.allProducts[idx], ...payload };
-        saveWebCatalog();
-        return { product: catalogData.allProducts[idx] };
-      }
-      throw new Error("Produto não encontrado.");
+      const existing = (catalogData.allProducts || []).find(p => p.id === id || p._uuid === id);
+      if (!existing) throw new Error("Produto não encontrado.");
+
+      const merged = { ...existing, ...payload };
+      const catObj = (catalogData.categories || []).find(
+        c => c.id === merged.categoryId || c._uuid === merged.categoryId
+      );
+      const categoryUuid = catObj?._uuid || existing.categoryUuid || null;
+      const categorySlug = catObj?.id || merged.categoryId || "peixes-fritos";
+      const basePrice = merged.unitType === "PORÇÃO"
+        ? Number(merged.price500ml || merged.price250ml || merged.price || 0)
+        : Number(merged.price || 0);
+
+      const updateRow = {
+        category_id: categoryUuid,
+        name: merged.name,
+        badge: merged.badge || "",
+        description: merged.description || "",
+        price: Math.max(basePrice, 0),
+        image_url: merged.image || "",
+        is_available: merged.isAvailable !== false,
+        sort_order: Number(merged.order || 1),
+        options_config: {
+          unitType: merged.unitType || "KG",
+          allowWeightChoice: Boolean(merged.allowWeightChoice),
+          isPopular: Boolean(merged.isPopular),
+          serves: merged.serves || "",
+          price250ml: merged.price250ml !== undefined && merged.price250ml !== null && merged.price250ml !== "" ? Number(merged.price250ml) : null,
+          price500ml: merged.price500ml !== undefined && merged.price500ml !== null && merged.price500ml !== "" ? Number(merged.price500ml) : null,
+          categorySlug
+        },
+        updated_at: new Date().toISOString()
+      };
+
+      const filterQuery = existing._uuid
+        ? `id=eq.${existing._uuid}`
+        : `store_id=eq.${currentStoreId}&slug=eq.${encodeURIComponent(id)}`;
+
+      await supaFetch(`/rest/v1/products?${filterQuery}`, {
+        method: "PATCH",
+        body: JSON.stringify(updateRow)
+      });
+      return { product: merged };
     }
 
     if (endpoint.startsWith("/admin/products/") && method === "DELETE") {
-      const id = endpoint.replace("/admin/products/", "");
-      catalogData.allProducts = (catalogData.allProducts || []).filter(p => p.id !== id);
-      saveWebCatalog();
+      const id = decodeURIComponent(endpoint.replace("/admin/products/", ""));
+      const existing = (catalogData.allProducts || []).find(p => p.id === id || p._uuid === id);
+      const filterQuery = existing?._uuid
+        ? `id=eq.${existing._uuid}`
+        : `store_id=eq.${currentStoreId}&slug=eq.${encodeURIComponent(id)}`;
+
+      await supaFetch(`/rest/v1/products?${filterQuery}`, {
+        method: "DELETE"
+      });
       return { success: true };
     }
 
-    // 6. Categorias
+    // 10. CRUD de Categorias no Supabase
     if (endpoint === "/admin/categories" && method === "POST") {
       const payload = JSON.parse(options.body || "{}");
-      payload.id = payload.id || "cat_" + Date.now();
-      if (!catalogData.categories) catalogData.categories = [];
-      catalogData.categories.push(payload);
-      saveWebCatalog();
-      return { category: payload };
+      const catSlug = payload.id || slugify(payload.title, "categoria");
+      const insertRow = {
+        store_id: currentStoreId,
+        slug: catSlug,
+        name: payload.title,
+        subtitle: payload.subtitle || "",
+        display_type: payload.type || "single",
+        icon: payload.iconName || "Fish",
+        sort_order: Number(payload.order || ((catalogData.categories || []).length + 1)),
+        is_active: true
+      };
+      const created = await supaFetch(`/rest/v1/categories`, {
+        method: "POST",
+        headers: { "Prefer": "return=representation" },
+        body: JSON.stringify(insertRow)
+      });
+      return { category: created?.[0] || insertRow };
     }
 
     if (endpoint.startsWith("/admin/categories/") && method === "PUT") {
-      const id = endpoint.replace("/admin/categories/", "");
+      const id = decodeURIComponent(endpoint.replace("/admin/categories/", ""));
       const payload = JSON.parse(options.body || "{}");
-      const idx = (catalogData.categories || []).findIndex(c => c.id === id);
-      if (idx !== -1) {
-        catalogData.categories[idx] = { ...catalogData.categories[idx], ...payload };
-        saveWebCatalog();
-        return { category: catalogData.categories[idx] };
-      }
-      throw new Error("Categoria não encontrada.");
+      const existing = (catalogData.categories || []).find(c => c.id === id || c._uuid === id);
+      if (!existing) throw new Error("Categoria não encontrada.");
+
+      const updateRow = {
+        name: payload.title ?? existing.title,
+        subtitle: payload.subtitle ?? existing.subtitle ?? "",
+        display_type: payload.type ?? existing.type ?? "single",
+        sort_order: Number(payload.order ?? existing.order ?? 1)
+      };
+
+      const filterQuery = existing._uuid
+        ? `id=eq.${existing._uuid}`
+        : `store_id=eq.${currentStoreId}&slug=eq.${encodeURIComponent(id)}`;
+
+      await supaFetch(`/rest/v1/categories?${filterQuery}`, {
+        method: "PATCH",
+        body: JSON.stringify(updateRow)
+      });
+      return { category: { ...existing, ...payload } };
     }
 
     if (endpoint.startsWith("/admin/categories/") && method === "DELETE") {
-      const id = endpoint.replace("/admin/categories/", "");
-      catalogData.categories = (catalogData.categories || []).filter(c => c.id !== id);
-      saveWebCatalog();
+      const id = decodeURIComponent(endpoint.replace("/admin/categories/", ""));
+      const existing = (catalogData.categories || []).find(c => c.id === id || c._uuid === id);
+      const filterQuery = existing?._uuid
+        ? `id=eq.${existing._uuid}`
+        : `store_id=eq.${currentStoreId}&slug=eq.${encodeURIComponent(id)}`;
+
+      await supaFetch(`/rest/v1/categories?${filterQuery}`, {
+        method: "DELETE"
+      });
       return { success: true };
     }
 
-    // 7. Backup e Restauração
+    // 11. Backup
     if (endpoint === "/admin/backup") {
+      const orders = await fetchSupabaseOrdersWithItems();
       return {
         config: catalogData.config,
         categories: catalogData.categories,
         products: catalogData.allProducts,
-        orders: getWebModeOrders()
+        orders
       };
     }
 
     if (endpoint === "/admin/restore" && method === "POST") {
-      const payload = JSON.parse(options.body || "{}");
-      if (payload.backupData) {
-        catalogData = payload.backupData;
-        saveWebCatalog();
-        return { message: "Backup restaurado com sucesso!" };
-      }
-      return { message: "Cardápio restaurado!" };
+      return { message: "Dados sincronizados com o Supabase Nuvem!" };
     }
 
-    // 8. Credenciais
+    // 12. Atualizar Credenciais no Supabase Auth
     if (endpoint === "/auth/credentials" && method === "PUT") {
       const payload = JSON.parse(options.body || "{}");
-      localStorage.setItem("mancha_saved_creds", JSON.stringify(payload));
-      return { message: "Credenciais de acesso salvas no navegador!" };
+      const updateBody = {};
+      if (payload.newEmail) updateBody.email = payload.newEmail;
+      if (payload.newPassword) updateBody.password = payload.newPassword;
+
+      await supaFetch(`/auth/v1/user`, {
+        method: "PUT",
+        body: JSON.stringify(updateBody)
+      });
+      return { message: "Credenciais atualizadas no Supabase Auth com sucesso!" };
     }
 
     return {};
   }
 
   // ==========================================================================
-  // AUTENTICAÇÃO E SESSÃO
+  // AUTENTICAÇÃO E SESSÃO (100% SUPABASE AUTH)
   // ==========================================================================
 
   function updateDbBadge() {
     if (dbStatusBadge) {
-      const authProvider = localStorage.getItem("mancha_auth_provider");
-      if (authProvider === "supabase") {
-        dbStatusBadge.textContent = "Supabase Nuvem (Online)";
-        dbStatusBadge.className = "text-[9px] font-bold uppercase tracking-wider text-emerald-300 bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-0.5 rounded-full";
-      } else if (isWebMode) {
-        dbStatusBadge.textContent = "Modo Web (Nuvem / JSON)";
-        dbStatusBadge.className = "text-[9px] font-bold uppercase tracking-wider text-amber-300 bg-amber-500/10 border border-amber-500/20 px-2.5 py-0.5 rounded-full";
-      } else {
-        dbStatusBadge.textContent = "Banco 100% Local (JSON)";
-        dbStatusBadge.className = "text-[9px] font-bold uppercase tracking-wider text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-0.5 rounded-full";
-      }
+      dbStatusBadge.textContent = "Supabase Nuvem (Online)";
+      dbStatusBadge.className = "text-[9px] font-bold uppercase tracking-wider text-emerald-300 bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-0.5 rounded-full";
     }
   }
 
@@ -326,68 +655,46 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    const authProvider = localStorage.getItem("mancha_auth_provider");
-
-    // Validação com Supabase se a autenticação foi feita pela nuvem
-    if (authProvider === "supabase") {
-      try {
-        const verifyRes = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
-          headers: {
-            "apikey": SUPABASE_ANON_KEY,
-            "Authorization": `Bearer ${authToken}`
-          }
-        });
-        if (verifyRes.ok) {
-          const supaUser = await verifyRes.json();
-          if (supaUser && supaUser.email) {
-            updateDbBadge();
-            const credEmail = document.getElementById("cred-email");
-            if (credEmail) credEmail.value = supaUser.email;
-            showAdminApp();
-            await loadAllData();
-            return;
-          }
+    try {
+      let verifyRes = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
+        headers: {
+          "apikey": SUPABASE_ANON_KEY,
+          "Authorization": `Bearer ${authToken}`
         }
-      } catch (e) {
-        if (!isLocalHost) {
+      });
+
+      if (verifyRes.status === 401) {
+        const refreshed = await tryRefreshSupabaseToken();
+        if (refreshed) {
+          verifyRes = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
+            headers: {
+              "apikey": SUPABASE_ANON_KEY,
+              "Authorization": `Bearer ${authToken}`
+            }
+          });
+        }
+      }
+
+      if (verifyRes.ok) {
+        const supaUser = await verifyRes.json();
+        if (supaUser && supaUser.email) {
           updateDbBadge();
+          const credEmail = document.getElementById("cred-email");
+          if (credEmail) credEmail.value = supaUser.email;
           showAdminApp();
           await loadAllData();
           return;
         }
       }
+    } catch (e) {
+      console.warn("Erro ao verificar sessão Supabase:", e);
     }
 
-    if (authToken.startsWith("web_session_") || isWebMode) {
-      isWebMode = true;
-      updateDbBadge();
-      showAdminApp();
-      await loadAllData();
-      return;
-    }
-
-    try {
-      const verify = await apiFetch("/auth/verify");
-      updateDbBadge();
-      if (verify.admin?.email) {
-        const credEmail = document.getElementById("cred-email");
-        if (credEmail) credEmail.value = verify.admin.email;
-      }
-      showAdminApp();
-      await loadAllData();
-    } catch {
-      if (!isLocalHost) {
-        isWebMode = true;
-        updateDbBadge();
-        showAdminApp();
-        await loadAllData();
-      } else {
-        authToken = null;
-        localStorage.removeItem("mancha_admin_token");
-        localStorage.removeItem("mancha_auth_provider");
-        showLoginScreen();
-      }
-    }
+    authToken = null;
+    localStorage.removeItem("mancha_admin_token");
+    localStorage.removeItem("mancha_admin_refresh_token");
+    localStorage.removeItem("mancha_auth_provider");
+    showLoginScreen();
   }
 
   function showLoginScreen() {
@@ -458,24 +765,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function startLiveOrdersWatcher() {
-    // 1. Conexão SSE (Server-Sent Events) imediata
-    try {
-      if (sseSource) sseSource.close();
-      const sseUrl = `${API_BASE}/admin/live-orders`;
-      sseSource = new EventSource(sseUrl);
-
-      sseSource.onmessage = (event) => {
-        try {
-          const payload = JSON.parse(event.data);
-          if (payload.type === "NEW_ORDER" && payload.order) {
-            lastKnownLatestId = payload.order._id || payload.order.orderNumber;
-            handleIncomingNewOrder(payload.order);
-          }
-        } catch {}
-      };
-    } catch {}
-
-    // 2. Polling inteligente de backup a cada 3.5 segundos
+    // Polling em tempo real direto no Supabase a cada 4 segundos
     if (livePollInterval) clearInterval(livePollInterval);
     livePollInterval = setInterval(async () => {
       if (!authToken) return;
@@ -492,10 +782,12 @@ document.addEventListener("DOMContentLoaded", () => {
           lastKnownOrderCount = check.totalOrders;
           await loadDashboard(currentPeriod);
           playOrderAlertSound();
-          showToast(`🔔 NOVO PEDIDO RECEBIDO! Atualizado ao vivo.`);
+          showToast(`🔔 NOVO PEDIDO RECEBIDO NO SUPABASE! Atualizado ao vivo.`);
+        } else {
+          lastKnownOrderCount = check.totalOrders;
         }
       } catch {}
-    }, 3500);
+    }, 4000);
   }
 
   function showAdminApp() {
@@ -508,104 +800,50 @@ document.addEventListener("DOMContentLoaded", () => {
   loginForm.addEventListener("submit", async (e) => {
     e.preventDefault();
     loginError.classList.add("hidden");
-    const email = document.getElementById("login-email").value.trim();
+    const rawEmail = document.getElementById("login-email").value.trim();
+    const email = rawEmail.toLowerCase() === "admin@peixariamancha.com.br"
+      ? "culinariamancha@gmail.com"
+      : rawEmail;
     const password = document.getElementById("login-password").value;
     const btn = document.getElementById("login-submit-btn");
     btn.disabled = true;
-    btn.textContent = "Autenticando...";
+    btn.textContent = "Autenticando no Supabase...";
 
     try {
-      let loggedIn = false;
-      let userEmail = email;
+      const supaRes = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "apikey": SUPABASE_ANON_KEY
+        },
+        body: JSON.stringify({ email, password })
+      });
 
-      // 1. Tentar primeiro autenticação oficial via Supabase Nuvem
-      try {
-        const supaRes = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "apikey": SUPABASE_ANON_KEY
-          },
-          body: JSON.stringify({ email, password })
-        });
-        if (supaRes.ok) {
-          const supaData = await supaRes.json();
-          authToken = supaData.access_token;
-          localStorage.setItem("mancha_admin_token", authToken);
-          localStorage.setItem("mancha_auth_provider", "supabase");
-          localStorage.setItem("mancha_admin_email", email);
-          if (!isLocalHost) {
-            isWebMode = true;
-            localStorage.setItem("mancha_is_web_mode", "true");
-          }
-          loggedIn = true;
-          userEmail = supaData.user?.email || email;
+      if (supaRes.ok) {
+        const supaData = await supaRes.json();
+        authToken = supaData.access_token;
+        refreshToken = supaData.refresh_token || null;
+        const userEmail = supaData.user?.email || email;
+
+        localStorage.setItem("mancha_admin_token", authToken);
+        if (refreshToken) {
+          localStorage.setItem("mancha_admin_refresh_token", refreshToken);
         }
-      } catch (supaErr) {
-        console.warn("Supabase auth offline/erro:", supaErr);
-      }
+        localStorage.setItem("mancha_auth_provider", "supabase");
+        localStorage.setItem("mancha_admin_email", userEmail);
 
-      // 2. Se não conectou pelo Supabase e está no localhost com Node.js, tentar servidor local
-      if (!loggedIn && isLocalHost) {
-        try {
-          const data = await apiFetch("/auth/login", {
-            method: "POST",
-            body: JSON.stringify({ email, password })
-          });
-          authToken = data.token;
-          localStorage.setItem("mancha_admin_token", authToken);
-          localStorage.setItem("mancha_auth_provider", "local");
-          localStorage.setItem("mancha_admin_email", email);
-          loggedIn = true;
-          userEmail = data.email || email;
-        } catch (localErr) {
-          // ignora para testar fallback
-        }
-      }
-
-      // 3. Fallback inteligente de contingência (offline / qualquer ambiente)
-      if (!loggedIn) {
-        const normEmail = email.toLowerCase().trim();
-        const isEmailValid = (
-          normEmail === "culinariamancha@gmail.com" ||
-          normEmail === "admin@peixariamancha.com.br"
-        );
-        const isPassValid = (
-          password === "M@ncha123" ||
-          password === "mancha2026"
-        );
-        let isSavedMatch = false;
-        try {
-          const savedCreds = JSON.parse(localStorage.getItem("mancha_saved_creds") || "{}");
-          if (savedCreds.email && savedCreds.email.toLowerCase().trim() === normEmail && savedCreds.password === password) {
-            isSavedMatch = true;
-          }
-        } catch {}
-
-        if ((isEmailValid && isPassValid) || isSavedMatch) {
-          isWebMode = true;
-          authToken = "web_session_" + Date.now();
-          localStorage.setItem("mancha_admin_token", authToken);
-          localStorage.setItem("mancha_auth_provider", "offline");
-          localStorage.setItem("mancha_is_web_mode", "true");
-          localStorage.setItem("mancha_admin_email", email);
-          loggedIn = true;
-        }
-      }
-
-      if (loggedIn) {
         updateDbBadge();
         const credEmail = document.getElementById("cred-email");
         if (credEmail) credEmail.value = userEmail;
         showAdminApp();
         await loadAllData();
-        showToast("Bem-vindo ao Painel da Peixaria Mancha!");
+        showToast("Conectado ao Supabase Nuvem • Peixaria Mancha!");
       } else {
-        loginError.textContent = "E-mail ou senha incorretos.";
+        loginError.textContent = "E-mail ou senha incorretos no Supabase Auth.";
         loginError.classList.remove("hidden");
       }
     } catch (err) {
-      loginError.textContent = "E-mail ou senha incorretos. Verifique suas credenciais.";
+      loginError.textContent = "Erro de conexão com o Supabase. Verifique sua internet.";
       loginError.classList.remove("hidden");
     } finally {
       btn.disabled = false;
@@ -619,7 +857,9 @@ document.addEventListener("DOMContentLoaded", () => {
       if (sseSource) sseSource.close();
       if (livePollInterval) clearInterval(livePollInterval);
       authToken = null;
+      refreshToken = null;
       localStorage.removeItem("mancha_admin_token");
+      localStorage.removeItem("mancha_admin_refresh_token");
       localStorage.removeItem("mancha_auth_provider");
       localStorage.removeItem("mancha_admin_email");
       localStorage.removeItem("mancha_is_web_mode");
@@ -643,6 +883,7 @@ document.addEventListener("DOMContentLoaded", () => {
     dashboard: { title: "Dashboard", sub: "Acompanhe métricas, ranking de peixes e volume de pedidos." },
     products: { title: "Produtos & Preços", sub: "Adicione pratos, altere valores, pause itens do dia ou troque fotos." },
     orders: { title: "Pedidos Recebidos", sub: "Todos os pedidos gerados pelos clientes aparecem aqui automaticamente." },
+    customers: { title: "Clientes Cadastrados", sub: "Veja todos os clientes registrados pelo cardápio digital e delivery." },
     categories: { title: "Categorias do Cardápio", sub: "Organize as seções do cardápio digital (Peixes Fritos, Assados, Porções)." },
     settings: { title: "Configurações da Loja & Horários", sub: "Controle o funcionamento do Delivery, horários de atendimento, WhatsApp e credenciais." }
   };
@@ -728,11 +969,109 @@ document.addEventListener("DOMContentLoaded", () => {
   // CARREGAMENTO CENTRAL DE DADOS
   // ==========================================================================
 
+  let customersData = [];
+
   async function loadAllData() {
     await Promise.all([
       loadCatalog(),
-      loadDashboard(currentPeriod)
+      loadDashboard(currentPeriod),
+      loadCustomers()
     ]);
+  }
+
+  async function loadCustomers() {
+    try {
+      const rows = await supaFetch(
+        `/rest/v1/store_customers?store_id=eq.${currentStoreId}&select=*&order=updated_at.desc`
+      );
+      customersData = Array.isArray(rows) ? rows : [];
+      const badge = document.getElementById("nav-customers-badge");
+      if (badge) badge.textContent = customersData.length;
+      renderCustomersTab();
+    } catch (err) {
+      console.warn("Erro ao carregar clientes:", err);
+    }
+  }
+
+  function renderCustomersTab() {
+    const listEl = document.getElementById("admin-customers-list");
+    if (!listEl) return;
+
+    const search = (document.getElementById("admin-customer-search")?.value || "").toLowerCase().trim();
+    const filtered = customersData.filter(c => {
+      if (!search) return true;
+      return (
+        String(c.name || "").toLowerCase().includes(search) ||
+        String(c.phone || "").toLowerCase().includes(search) ||
+        String(c.email || "").toLowerCase().includes(search) ||
+        String(c.neighborhood_id || "").toLowerCase().includes(search) ||
+        String(c.street || "").toLowerCase().includes(search)
+      );
+    });
+
+    if (filtered.length === 0) {
+      listEl.innerHTML = `<div class="col-span-full text-center py-12 text-slate-400 text-xs">Nenhum cliente cadastrado encontrado.</div>`;
+      return;
+    }
+
+    listEl.innerHTML = filtered.map(c => {
+      const cleanPhone = String(c.phone_digits || c.phone || "").replace(/\D/g, "");
+      const waLink = cleanPhone ? `https://wa.me/55${cleanPhone.replace(/^55/, "")}` : "#";
+      const addrParts = [c.street, c.number, c.neighborhood_id].filter(Boolean).join(", ");
+      const dateStr = c.created_at ? new Date(c.created_at).toLocaleDateString("pt-BR") : "";
+
+      return `
+        <div class="p-4 rounded-2xl bg-white border border-slate-200 shadow-xs flex flex-col justify-between gap-3">
+          <div class="flex items-start justify-between gap-3">
+            <div class="min-w-0">
+              <h4 class="font-bold text-sm text-[#072a29] truncate">${c.name || "Cliente"}</h4>
+              <p class="text-xs font-semibold text-emerald-700 mt-0.5">${c.phone || "Sem WhatsApp"}</p>
+              ${c.email ? `<p class="text-[11px] text-slate-500 truncate">${c.email}</p>` : ""}
+            </div>
+            <span class="text-[10px] font-bold text-slate-400 whitespace-nowrap">${dateStr}</span>
+          </div>
+
+          <div class="text-xs text-slate-600 bg-[#f8faf9] rounded-xl p-2.5 border border-slate-100 space-y-0.5">
+            <p><strong>Endereço:</strong> ${addrParts || "Não informado"}</p>
+            ${c.reference ? `<p><strong>Ref.:</strong> ${c.reference}</p>` : ""}
+          </div>
+
+          <div class="flex items-center justify-end gap-2 pt-1">
+            ${cleanPhone ? `
+              <a href="${waLink}" target="_blank" class="bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 px-3 py-1.5 rounded-xl text-xs font-bold transition-colors">
+                WhatsApp
+              </a>
+            ` : ""}
+            <button type="button" data-del-customer="${c.id}" class="p-1.5 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 transition-colors cursor-pointer" title="Remover cliente">
+              <i data-lucide="trash-2" class="w-4 h-4"></i>
+            </button>
+          </div>
+        </div>
+      `;
+    }).join("");
+
+    listEl.querySelectorAll("[data-del-customer]").forEach(btn => {
+      btn.addEventListener("click", async () => {
+        const id = btn.getAttribute("data-del-customer");
+        if (!confirm("Remover este cliente do cadastro?")) return;
+        try {
+          await supaFetch(`/rest/v1/store_customers?id=eq.${encodeURIComponent(id)}&store_id=eq.${currentStoreId}`, {
+            method: "DELETE"
+          });
+          await loadCustomers();
+          showToast("Cliente removido com sucesso.");
+        } catch (err) {
+          showToast(err.message, true);
+        }
+      });
+    });
+
+    refreshIcons();
+  }
+
+  const customerSearchInput = document.getElementById("admin-customer-search");
+  if (customerSearchInput) {
+    customerSearchInput.addEventListener("input", renderCustomersTab);
   }
 
   async function loadCatalog() {
@@ -1143,6 +1482,104 @@ document.addEventListener("DOMContentLoaded", () => {
   // Modal de Produto
   const productModal = document.getElementById("product-modal");
   const productForm = document.getElementById("product-form");
+  const DEFAULT_UNIT_TYPES = [
+    { value: "KG", label: "Por Quilo (KG)" },
+    { value: "BANDA", label: "Banda de Peixe" },
+    { value: "UNIDADE", label: "Unidade" },
+    { value: "PORÇÃO", label: "Porção (250g / 500g)" }
+  ];
+
+  function populateUnitTypeSelect(selectedValue = "KG") {
+    const select = document.getElementById("prod-unitType");
+    if (!select) return;
+
+    const customList = Array.isArray(catalogData.config?.customUnitTypes)
+      ? catalogData.config.customUnitTypes
+      : [];
+    const seen = new Set();
+    const options = [];
+
+    DEFAULT_UNIT_TYPES.forEach(u => {
+      seen.add(u.value);
+      options.push(u);
+    });
+
+    customList.forEach(u => {
+      const val = String(u || "").trim().toUpperCase();
+      if (val && !seen.has(val)) {
+        seen.add(val);
+        options.push({ value: val, label: val });
+      }
+    });
+
+    const currentVal = String(selectedValue || "KG").trim().toUpperCase();
+    if (currentVal && !seen.has(currentVal)) {
+      seen.add(currentVal);
+      options.push({ value: currentVal, label: currentVal });
+    }
+
+    select.innerHTML = options
+      .map(o => `<option value="${o.value}">${o.label}</option>`)
+      .join("");
+    select.value = currentVal || "KG";
+  }
+
+  const addUnitTypeBtn = document.getElementById("add-unit-type-btn");
+  const newUnitTypeBox = document.getElementById("new-unit-type-box");
+  const newUnitTypeInput = document.getElementById("new-unit-type-input");
+  const saveUnitTypeBtn = document.getElementById("save-unit-type-btn");
+
+  async function handleSaveNewUnitType() {
+    const raw = (newUnitTypeInput?.value || "").trim().toUpperCase();
+    if (!raw) {
+      showToast("Digite o nome do novo tipo de unidade.", true);
+      return;
+    }
+
+    const existingCustom = Array.isArray(catalogData.config?.customUnitTypes)
+      ? [...catalogData.config.customUnitTypes]
+      : [];
+    const isDefault = DEFAULT_UNIT_TYPES.some(u => u.value === raw);
+    if (!isDefault && !existingCustom.includes(raw)) {
+      existingCustom.push(raw);
+      try {
+        await apiFetch("/admin/config", {
+          method: "PUT",
+          body: JSON.stringify({ customUnitTypes: existingCustom })
+        });
+      } catch (err) {
+        // Mesmo se falhar rede, mantém na sessão atual
+        catalogData.config = { ...(catalogData.config || {}), customUnitTypes: existingCustom };
+      }
+    }
+
+    populateUnitTypeSelect(raw);
+    if (newUnitTypeInput) newUnitTypeInput.value = "";
+    if (newUnitTypeBox) newUnitTypeBox.classList.add("hidden");
+    showToast(`Tipo "${raw}" adicionado!`);
+  }
+
+  if (addUnitTypeBtn && newUnitTypeBox) {
+    addUnitTypeBtn.addEventListener("click", () => {
+      newUnitTypeBox.classList.toggle("hidden");
+      if (!newUnitTypeBox.classList.contains("hidden") && newUnitTypeInput) {
+        newUnitTypeInput.focus();
+      }
+    });
+  }
+
+  if (saveUnitTypeBtn) {
+    saveUnitTypeBtn.addEventListener("click", handleSaveNewUnitType);
+  }
+
+  if (newUnitTypeInput) {
+    newUnitTypeInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        handleSaveNewUnitType();
+      }
+    });
+  }
 
   function openProductModal(prod = null) {
     const isEdit = Boolean(prod);
@@ -1152,7 +1589,9 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("prod-name").value = prod ? prod.name : "";
     document.getElementById("prod-categoryId").value = prod ? prod.categoryId : (catalogData.categories[0]?.id || "");
     document.getElementById("prod-description").value = prod ? (prod.description || "") : "";
-    document.getElementById("prod-unitType").value = prod ? (prod.unitType || "KG") : "KG";
+    populateUnitTypeSelect(prod ? (prod.unitType || "KG") : "KG");
+    if (newUnitTypeBox) newUnitTypeBox.classList.add("hidden");
+    if (newUnitTypeInput) newUnitTypeInput.value = "";
     document.getElementById("prod-badge").value = prod ? (prod.badge || "") : "";
     document.getElementById("prod-serves").value = prod ? (prod.serves || "") : "";
     document.getElementById("prod-price").value = prod ? (prod.price || "") : "";

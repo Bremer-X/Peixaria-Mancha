@@ -1,4 +1,4 @@
-import { Plus, Fish, Flame, Utensils, Users, Sparkles } from 'lucide-react';
+import { ShoppingCart, Fish, Flame, Utensils, ChevronRight, Plus } from 'lucide-react';
 import { DeliveryCategory, DeliveryMenuItem } from '../../data/deliveryMenuData';
 
 interface DeliveryMenuSectionProps {
@@ -13,241 +13,162 @@ export default function DeliveryMenuSection({
 }: DeliveryMenuSectionProps) {
   const isPortions = category.type === 'portion-columns';
 
-  // Category Icon Resolver
-  const renderCategoryIcon = () => {
+  const renderCategoryIcon = (className = 'w-4 h-4 text-[#FF5000]') => {
     switch (category.iconName) {
-      case 'Fish':
-        return <Fish className="w-5 h-5 text-[var(--color-acai-gold)]" />;
       case 'Flame':
-        return <Flame className="w-5 h-5 text-[var(--color-tucuma)]" />;
+        return <Flame className={className} />;
       case 'Utensils':
-        return <Utensils className="w-5 h-5 text-[var(--color-acai-gold)]" />;
+        return <Utensils className={className} />;
+      case 'Fish':
       default:
-        return <Fish className="w-5 h-5 text-[var(--color-acai-gold)]" />;
+        return <Fish className={className} />;
     }
   };
 
   return (
     <section
       id={`delivery-section-${category.id}`}
-      className="scroll-mt-14 mb-5 transition-all"
+      className="scroll-mt-[335px] mb-6 transition-all"
     >
-      {/* Category Header Banner */}
-      <div className="bg-[var(--color-forest)] text-white rounded-2xl py-3 px-4 shadow-sm flex items-center justify-between gap-2">
-        <div className="flex items-center gap-2.5">
-          <div className="bg-white/10 p-2 rounded-xl backdrop-blur-xs">
-            {renderCategoryIcon()}
+      {/* Cabeçalho limpo da seção (semelhante à imagem de referência) */}
+      <div className="flex items-center justify-between gap-2 mb-3 px-1">
+        <div className="flex items-center gap-2 min-w-0">
+          <div className="w-7 h-7 rounded-lg bg-[#FF5000]/10 flex items-center justify-center flex-shrink-0">
+            {renderCategoryIcon('w-4 h-4 text-[#FF5000]')}
           </div>
-          <div>
-            <h2 className="font-bebas text-lg sm:text-xl tracking-tight uppercase font-extrabold leading-tight">
+          <div className="min-w-0">
+            <h2 className="font-heading text-base sm:text-lg font-extrabold text-[#172B35] tracking-tight truncate">
               {category.title}
             </h2>
-            {category.subtitle && (
-              <p className="text-[11px] sm:text-xs font-montserrat font-medium text-[var(--color-sand)]">
-                {category.subtitle}
-              </p>
-            )}
           </div>
         </div>
 
-        <span className="bg-white/15 text-white font-montserrat font-bold text-[11px] px-3 py-1 rounded-full whitespace-nowrap">
-          {category.items.length} {category.items.length === 1 ? 'item' : 'opções'}
+        <span className="inline-flex items-center gap-0.5 text-xs font-bold text-[#FF5000] whitespace-nowrap flex-shrink-0">
+          {category.items.length} {category.items.length === 1 ? 'item' : 'itens'}
+          <ChevronRight className="w-3.5 h-3.5" />
         </span>
       </div>
 
-      {/* Category Items Container */}
-      <div className="mt-2.5 space-y-2.5">
-        {isPortions ? (
-          /* Acompanhamentos Section */
-          <div className="space-y-2.5">
-            {category.items.map((item) => {
-              const hasImage = Boolean(item.image);
+      {/* Lista de Cards de Produto */}
+      <div className="space-y-3">
+        {category.items.map((item) => {
+          const hasImage = Boolean(item.image);
+          const isUnavailable = item.isAvailable === false;
 
-              return (
-                <div
-                  key={item.id}
-                  id={`item-row-${item.id}`}
-                  className="bg-white border border-stone-200/90 hover:border-[var(--color-forest)]/40 rounded-2xl p-3 sm:p-4 shadow-2xs hover:shadow-xs transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3 group"
-                >
-                  {/* Photo & Item Details */}
-                  <div className="flex items-center gap-3 flex-1 min-w-0">
-                    {hasImage && (
-                      <div
-                        onClick={() => onSelectItem(item)}
-                        className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden flex-shrink-0 bg-stone-100 border border-stone-200 shadow-2xs cursor-pointer group-hover:border-[var(--color-forest)] transition-colors"
-                        title={`Ver detalhes de ${item.name}`}
-                      >
-                        <img
-                          src={item.image}
-                          alt={item.name}
-                          className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-300"
-                          loading="lazy"
-                        />
-                      </div>
-                    )}
-
-                    <div className="flex-1 min-w-0">
-                      <h3
-                        onClick={() => onSelectItem(item)}
-                        className="font-bebas font-bold text-[var(--color-river)] text-sm sm:text-base uppercase tracking-tight group-hover:text-[var(--color-forest)] transition-colors cursor-pointer"
-                      >
-                        {item.name}
-                      </h3>
-                      {item.description && (
-                        <p className="text-xs text-[var(--color-river)]/70 font-medium mt-0.5 leading-snug">
-                          {item.description}
-                        </p>
-                      )}
-                    </div>
+          return (
+            <div
+              key={item.id}
+              id={`delivery-item-${item.id}`}
+              onClick={() => !isUnavailable && onSelectItem(item)}
+              className={`bg-white border border-stone-200/80 rounded-2xl p-3 sm:p-3.5 shadow-2xs transition-all flex items-center gap-3.5 ${
+                isUnavailable
+                  ? 'opacity-70 cursor-not-allowed'
+                  : 'hover:border-[#FF5000]/40 hover:shadow-sm cursor-pointer active:scale-[0.99]'
+              }`}
+            >
+              {/* Miniatura à esquerda */}
+              <div className="relative w-20 h-20 sm:w-22 sm:h-22 rounded-xl overflow-hidden flex-shrink-0 bg-[#F8F6F0] border border-[#E8D8B8]/70 flex items-center justify-center">
+                {hasImage ? (
+                  <img
+                    src={item.image}
+                    alt={item.name}
+                    className={`w-full h-full object-cover ${isUnavailable ? 'grayscale' : ''}`}
+                    loading="lazy"
+                  />
+                ) : (
+                  <div className="flex flex-col items-center justify-center text-[#FF5000]/70">
+                    {renderCategoryIcon('w-7 h-7 text-[#FF5000]/70')}
                   </div>
+                )}
 
-                  {/* Portion Selector Buttons (250g & 500g) */}
-                  <div className="flex items-center gap-2 flex-shrink-0 self-end sm:self-center">
-                    {item.price250mlFormatted && (
-                      <button
-                        type="button"
-                        onClick={() => onSelectItem(item, '250g')}
-                        className="inline-flex items-center gap-1.5 bg-[var(--color-sand)]/35 hover:bg-[var(--color-sand)]/60 active:scale-95 text-[var(--color-river)] border border-[var(--color-acai-gold)]/40 py-2 px-3 min-h-[42px] rounded-xl transition-all font-montserrat text-xs cursor-pointer group/btn"
-                        title="Adicionar porção 250g"
-                      >
-                        <span className="font-bold text-[10px] text-[var(--color-forest)] bg-white px-1.5 py-0.5 rounded">
-                          250g
-                        </span>
-                        <span className="font-extrabold text-[var(--color-river)]">
-                          {item.price250mlFormatted}
-                        </span>
-                        <Plus className="w-3.5 h-3.5 text-[var(--color-tucuma)] group-hover/btn:scale-110 transition-transform" />
-                      </button>
-                    )}
+                {isUnavailable && (
+                  <span className="absolute inset-x-1.5 bottom-1.5 bg-[#F15A24] text-white text-[9px] font-extrabold uppercase text-center py-0.5 rounded-full shadow">
+                    Esgotado
+                  </span>
+                )}
+              </div>
 
-                    {item.price500mlFormatted && (
-                      <button
-                        type="button"
-                        onClick={() => onSelectItem(item, '500g')}
-                        className="inline-flex items-center gap-1.5 bg-[var(--color-forest)]/10 hover:bg-[var(--color-forest)]/15 active:scale-95 text-[var(--color-river)] border border-[var(--color-forest)]/25 py-2 px-3 min-h-[42px] rounded-xl transition-all font-montserrat text-xs cursor-pointer group/btn"
-                        title="Adicionar porção 500g"
-                      >
-                        <span className="font-bold text-[10px] text-white bg-[var(--color-forest)] px-1.5 py-0.5 rounded">
-                          500g
-                        </span>
-                        <span className="font-extrabold text-[var(--color-forest)]">
-                          {item.price500mlFormatted}
-                        </span>
-                        <Plus className="w-3.5 h-3.5 text-[var(--color-tucuma)] group-hover/btn:scale-110 transition-transform" />
-                      </button>
-                    )}
-                  </div>
+              {/* Conteúdo central */}
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  <h3 className="font-heading font-bold text-sm sm:text-base text-[#172B35] leading-snug line-clamp-1">
+                    {item.name}
+                  </h3>
+                  {item.badge && (
+                    <span className="text-[9px] font-bold uppercase px-2 py-0.5 rounded-full bg-[#FF5000]/10 text-[#FF5000]">
+                      {item.badge}
+                    </span>
+                  )}
                 </div>
-              );
-            })}
-          </div>
-        ) : (
-          /* Peixes Fritos & Assados - Rich Dish Cards */
-          <div className="space-y-2.5">
-            {category.items.map((item) => {
-              const hasImage = Boolean(item.image);
-              const isPopular = Boolean(item.isPopular);
 
-              return (
-                <div
-                  key={item.id}
-                  id={`delivery-item-${item.id}`}
-                  onClick={() => onSelectItem(item)}
-                  className={`bg-white border rounded-2xl p-3 sm:p-4 shadow-2xs hover:shadow-md transition-all cursor-pointer group relative overflow-hidden ${
-                    isPopular
-                      ? 'border-[var(--color-acai-gold)] ring-1 ring-[var(--color-acai-gold)]/20'
-                      : 'border-stone-200/90 hover:border-[var(--color-forest)]/40'
-                  }`}
-                >
-                  <div className="flex items-start sm:items-center justify-between gap-3">
-                    {/* Optional Dish Thumbnail */}
-                    {hasImage && (
-                      <div className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-xl overflow-hidden flex-shrink-0 bg-stone-100 border border-stone-200 shadow-2xs">
-                        <img
-                          src={item.image}
-                          alt={item.name}
-                          className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-300"
-                          loading="lazy"
-                        />
-                        {isPopular && (
-                          <div className="absolute top-1 left-1 bg-[var(--color-forest)] text-white p-1 rounded-full shadow-xs" title="Destaque">
-                            <Sparkles className="w-3 h-3 text-[var(--color-acai-gold)]" />
-                          </div>
-                        )}
-                      </div>
-                    )}
+                {item.description && (
+                  <p className="text-xs text-stone-500 leading-relaxed line-clamp-2 mt-0.5">
+                    {item.description}
+                  </p>
+                )}
 
-                    {/* Dish Text Content */}
-                    <div className="flex-1 min-w-0 pr-1">
-                      <div className="flex items-center gap-1.5 flex-wrap mb-0.5">
-                        <h3 className="font-bebas font-bold text-[var(--color-river)] text-sm sm:text-base uppercase tracking-tight group-hover:text-[var(--color-forest)] transition-colors">
-                          {item.name}
-                        </h3>
-
-                        {item.badge && (
-                          <span
-                            className={`text-[9px] sm:text-[10px] font-montserrat font-extrabold uppercase px-2 py-0.5 rounded-full ${
-                              item.badge === 'MAIS PEDIDO' || item.badge === 'BRASA PARAENSE'
-                                ? 'bg-[var(--color-tucuma)] text-white shadow-2xs'
-                                : item.badge === 'PETISCO CAMPEÃO'
-                                ? 'bg-[var(--color-forest)] text-white'
-                                : item.badge.includes('SAZONAL')
-                                ? 'bg-[var(--color-sand)]/50 text-[var(--color-forest)] border border-[var(--color-acai-gold)]/50'
-                                : 'bg-stone-100 text-stone-700 border border-stone-200'
-                            }`}
-                          >
-                            {item.badge}
-                          </span>
-                        )}
-                      </div>
-
-                      {item.description && (
-                        <p className="text-xs text-[var(--color-river)]/70 font-medium leading-relaxed">
-                          {item.description}
-                        </p>
-                      )}
-
-                      {/* Yield indicator / Serves */}
-                      {item.serves && (
-                        <div className="flex items-center gap-1 text-[11px] text-[var(--color-forest)] font-semibold mt-1">
-                          <Users className="w-3 h-3 text-[var(--color-acai-gold)]" />
-                          <span>{item.serves}</span>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Price and Add Button */}
-                    <div className="flex flex-col sm:flex-row items-end sm:items-center gap-2 sm:gap-3 flex-shrink-0 self-center">
-                      <div className="text-right">
-                        <span className="font-bebas text-lg sm:text-xl font-extrabold text-[var(--color-forest)] leading-none block">
-                          {item.priceFormatted}
-                        </span>
-                        {item.unitType && (
-                          <span className="text-[10px] font-montserrat font-bold text-stone-400 block -mt-0.5">
-                            por {item.unitType}
-                          </span>
-                        )}
-                      </div>
-
+                {isPortions ? (
+                  <div className="flex items-center flex-wrap gap-1.5 mt-2">
+                    {item.price250mlFormatted && (
                       <button
                         type="button"
                         onClick={(e) => {
                           e.stopPropagation();
-                          onSelectItem(item);
+                          if (!isUnavailable) onSelectItem(item, '250g');
                         }}
-                        className="inline-flex items-center justify-center gap-1.5 bg-[var(--color-tucuma)] hover:opacity-95 active:scale-95 text-white font-montserrat font-bold text-xs py-2.5 px-4 rounded-xl shadow-xs transition-all cursor-pointer min-h-[44px] min-w-[44px]"
-                        title={`Adicionar ${item.name}`}
+                        className="inline-flex items-center gap-1 bg-[#F8F6F0] hover:bg-[#E8D8B8]/50 border border-[#E8D8B8] text-[#172B35] text-[11px] font-bold px-2.5 py-1 rounded-lg cursor-pointer transition-colors"
                       >
-                        <Plus className="w-4 h-4 text-white" />
-                        <span className="hidden xs:inline">Pedir</span>
+                        <span className="text-stone-500">250g</span>
+                        <span className="text-[#FF5000] font-extrabold">{item.price250mlFormatted}</span>
+                        <Plus className="w-3 h-3 text-[#FF5000]" />
                       </button>
-                    </div>
+                    )}
+                    {item.price500mlFormatted && (
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (!isUnavailable) onSelectItem(item, '500g');
+                        }}
+                        className="inline-flex items-center gap-1 bg-[#FF5000]/10 hover:bg-[#FF5000]/15 border border-[#FF5000]/25 text-[#FF5000] text-[11px] font-bold px-2.5 py-1 rounded-lg cursor-pointer transition-colors"
+                      >
+                        <span>500g</span>
+                        <span className="font-extrabold">{item.price500mlFormatted}</span>
+                        <Plus className="w-3 h-3 text-[#FF5000]" />
+                      </button>
+                    )}
                   </div>
-                </div>
-              );
-            })}
-          </div>
-        )}
+                ) : (
+                  <div className="flex items-baseline gap-1.5 mt-1.5">
+                    <span className="font-heading text-base sm:text-lg font-extrabold text-[#FF5000]">
+                      {item.priceFormatted || `R$ ${Number(item.price || 0).toFixed(2).replace('.', ',')}`}
+                    </span>
+                    {item.unitType && (
+                      <span className="text-[11px] font-semibold text-stone-400">
+                        / {item.unitType.toLowerCase()}
+                      </span>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {/* Botão circular à direita */}
+              {!isUnavailable && (
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onSelectItem(item);
+                  }}
+                  className="w-10 h-10 rounded-full bg-[#FF5000] hover:bg-[#E04600] active:scale-90 text-white flex items-center justify-center shadow-sm flex-shrink-0 transition-all cursor-pointer"
+                  title={`Adicionar ${item.name}`}
+                >
+                  <ShoppingCart className="w-4 h-4" />
+                </button>
+              )}
+            </div>
+          );
+        })}
       </div>
     </section>
   );

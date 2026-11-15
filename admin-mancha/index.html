@@ -178,6 +178,14 @@
             <span id="nav-orders-badge" class="ml-auto bg-emerald-500 text-[#072a29] text-[10px] font-black px-2 py-0.5 rounded-full flex-shrink-0">0</span>
           </button>
 
+          <button data-tab="customers" class="tab-btn nav-pill w-full flex items-center gap-3.5 px-3.5 py-3 rounded-2xl text-xs sm:text-[13px] font-semibold text-left transition-all cursor-pointer">
+            <span class="nav-icon-box w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 bg-white/5 transition-colors">
+              <i data-lucide="users" class="w-4 h-4"></i>
+            </span>
+            <span class="truncate whitespace-nowrap">Clientes</span>
+            <span id="nav-customers-badge" class="ml-auto bg-white/15 text-white text-[10px] font-black px-2 py-0.5 rounded-full flex-shrink-0">0</span>
+          </button>
+
           <button data-tab="categories" class="tab-btn nav-pill w-full flex items-center gap-3.5 px-3.5 py-3 rounded-2xl text-xs sm:text-[13px] font-semibold text-left transition-all cursor-pointer">
             <span class="nav-icon-box w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 bg-white/5 transition-colors">
               <i data-lucide="layers" class="w-4 h-4"></i>
@@ -590,6 +598,27 @@
           </div>
         </section>
 
+        <!-- ================= ABA 3B: CLIENTES CADASTRADOS ================= -->
+        <section id="tab-customers" class="tab-panel hidden space-y-6">
+          <div class="dash-card p-6">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-slate-100">
+              <div>
+                <h3 class="font-extrabold text-xl text-[#072a29]">Clientes Cadastrados</h3>
+                <p class="text-xs text-slate-500">Clientes salvos no Supabase pelo cardápio digital ou ao realizar pedidos.</p>
+              </div>
+              <div class="relative w-full sm:w-72">
+                <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+                <input type="text" id="admin-customer-search" placeholder="Buscar por nome, WhatsApp ou bairro..."
+                  class="w-full bg-[#f8faf9] border border-slate-200 rounded-xl pl-10 pr-4 py-2.5 text-xs text-slate-800 focus:outline-none focus:border-emerald-500">
+              </div>
+            </div>
+
+            <div id="admin-customers-list" class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+              <!-- Renderizado via JS -->
+            </div>
+          </div>
+        </section>
+
         <!-- ================= ABA 4: CATEGORIAS ================= -->
         <section id="tab-categories" class="tab-panel hidden space-y-6">
           <div class="dash-card p-6">
@@ -756,13 +785,27 @@
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <div>
             <label class="block text-xs font-bold uppercase text-slate-700 mb-1">Tipo de Unidade</label>
-            <select id="prod-unitType"
-              class="w-full bg-[#f8faf9] border border-slate-200 rounded-xl px-3.5 py-2 text-sm text-slate-800 font-semibold">
-              <option value="KG">Por Quilo (KG)</option>
-              <option value="BANDA">Banda de Peixe</option>
-              <option value="UNIDADE">Unidade</option>
-              <option value="PORÇÃO">Porção (250g / 500g)</option>
-            </select>
+            <div class="flex items-center gap-1.5">
+              <select id="prod-unitType"
+                class="flex-1 min-w-0 bg-[#f8faf9] border border-slate-200 rounded-xl px-3.5 py-2 text-sm text-slate-800 font-semibold">
+                <option value="KG">Por Quilo (KG)</option>
+                <option value="BANDA">Banda de Peixe</option>
+                <option value="UNIDADE">Unidade</option>
+                <option value="PORÇÃO">Porção (250g / 500g)</option>
+              </select>
+              <button type="button" id="add-unit-type-btn" title="Adicionar novo tipo de unidade"
+                class="w-9 h-9 flex-shrink-0 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 font-extrabold text-base flex items-center justify-center transition-colors cursor-pointer">
+                +
+              </button>
+            </div>
+            <div id="new-unit-type-box" class="hidden mt-1.5 flex items-center gap-1.5">
+              <input type="text" id="new-unit-type-input" placeholder="Ex: LITRO, COMBO, CAIXA"
+                class="flex-1 min-w-0 bg-white border border-emerald-300 rounded-xl px-3 py-1.5 text-xs text-slate-800 font-semibold focus:outline-none focus:border-emerald-500">
+              <button type="button" id="save-unit-type-btn"
+                class="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-colors cursor-pointer">
+                Add
+              </button>
+            </div>
           </div>
           <div>
             <label class="block text-xs font-bold uppercase text-slate-700 mb-1">Selo / Badge</label>

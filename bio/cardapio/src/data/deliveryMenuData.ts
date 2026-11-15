@@ -10,11 +10,12 @@ export interface DeliveryMenuItem {
   price250mlFormatted?: string;
   price500ml?: number;
   price500mlFormatted?: string;
-  unitType?: 'KG' | 'UNIDADE' | 'BANDA' | 'PORÇÃO';
+  unitType?: string;
   /** Quando true, o modal exibe a escolha entre 1 KG e 500g */
   allowWeightChoice?: boolean;
   image?: string;
   isPopular?: boolean;
+  isAvailable?: boolean;
   serves?: string;
 }
 
@@ -24,6 +25,7 @@ export interface DeliveryCategory {
   subtitle?: string;
   type: 'single' | 'portion-columns';
   iconName?: 'Fish' | 'Flame' | 'Utensils';
+  isActive?: boolean;
   items: DeliveryMenuItem[];
 }
 
@@ -38,16 +40,41 @@ export interface DeliveryCartItem {
   image?: string;
 }
 
+export const SUPABASE_CONFIG = {
+  url: 'https://vrmtsgowzpjqgtxzprow.supabase.co',
+  anonKey:
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZybXRzZ293enBqcWd0eHpwcm93Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTMyMjY3OTQsImV4cCI6MjEwODgwMjc5NH0.Jhbt0GFiTAqAEewBUs1eg3trm1fdtaY03e7TIP1LZiU',
+  storeSlug: 'peixaria-mancha',
+};
+
 export const DELIVERY_HOURS = {
   openHour: 7,
   closeHour: 14,
   label: 'Todos os dias das 07h às 14h',
+  manualStatus: 'auto' as 'auto' | 'force_open' | 'force_closed',
+  estimatedTime: '30-50 min',
 };
 
 export function getDeliveryAvailability() {
+  if (DELIVERY_HOURS.manualStatus === 'force_open') {
+    return {
+      isOpen: true,
+      statusText: 'Aberto agora',
+      subText: DELIVERY_HOURS.estimatedTime || '30-50 min',
+      scheduleText: DELIVERY_HOURS.label,
+    };
+  }
+  if (DELIVERY_HOURS.manualStatus === 'force_closed') {
+    return {
+      isOpen: false,
+      statusText: 'Fechado agora',
+      subText: DELIVERY_HOURS.label,
+      scheduleText: DELIVERY_HOURS.label,
+    };
+  }
+
   try {
     const now = new Date();
-    // Timezone Belém (UTC-3)
     const formatter = new Intl.DateTimeFormat('pt-BR', {
       timeZone: 'America/Belem',
       hour: 'numeric',
@@ -59,25 +86,24 @@ export function getDeliveryAvailability() {
     const minute = parseInt(parts.find((p) => p.type === 'minute')?.value || '0', 10);
     const currentMinutes = hour * 60 + minute;
 
-    const openMinutes = DELIVERY_HOURS.openHour * 60; // 07:00 (420 min)
-    const closeMinutes = DELIVERY_HOURS.closeHour * 60; // 14:00 (840 min)
-
+    const openMinutes = DELIVERY_HOURS.openHour * 60;
+    const closeMinutes = DELIVERY_HOURS.closeHour * 60;
     const isOpen = currentMinutes >= openMinutes && currentMinutes < closeMinutes;
 
     return {
       isOpen,
-      statusText: isOpen ? 'Aberto para Pedidos' : 'Fechado no momento',
-      subText: isOpen ? '30-50 min' : 'Disponível das 07h às 14h',
-      scheduleText: 'Todos os dias das 07h às 14h',
+      statusText: isOpen ? 'Aberto agora' : 'Fechado agora',
+      subText: isOpen ? DELIVERY_HOURS.estimatedTime || '30-50 min' : DELIVERY_HOURS.label,
+      scheduleText: DELIVERY_HOURS.label,
     };
   } catch {
     const hour = new Date().getHours();
-    const isOpen = hour >= 7 && hour < 14;
+    const isOpen = hour >= DELIVERY_HOURS.openHour && hour < DELIVERY_HOURS.closeHour;
     return {
       isOpen,
-      statusText: isOpen ? 'Aberto para Pedidos' : 'Fechado no momento',
-      subText: isOpen ? '30-50 min' : 'Disponível das 07h às 14h',
-      scheduleText: 'Todos os dias das 07h às 14h',
+      statusText: isOpen ? 'Aberto agora' : 'Fechado agora',
+      subText: isOpen ? DELIVERY_HOURS.estimatedTime || '30-50 min' : DELIVERY_HOURS.label,
+      scheduleText: DELIVERY_HOURS.label,
     };
   }
 }
