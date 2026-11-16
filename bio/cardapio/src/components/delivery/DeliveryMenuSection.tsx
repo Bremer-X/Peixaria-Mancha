@@ -67,7 +67,11 @@ export default function DeliveryMenuSection({
               }`}
             >
               {/* Miniatura à esquerda */}
-              <div className="relative w-20 h-20 sm:w-22 sm:h-22 rounded-xl overflow-hidden flex-shrink-0 bg-[#F8F6F0] border border-[#E8D8B8]/70 flex items-center justify-center">
+              <div
+                className={`relative w-20 h-20 sm:w-22 sm:h-22 rounded-xl overflow-hidden flex-shrink-0 border border-[#E8D8B8]/70 flex items-center justify-center ${
+                  hasImage ? 'bg-[#F8F6F0]' : `fish-pattern-bg ${isUnavailable ? 'grayscale' : ''}`
+                }`}
+              >
                 {hasImage ? (
                   <img
                     src={item.image}
@@ -76,8 +80,8 @@ export default function DeliveryMenuSection({
                     loading="lazy"
                   />
                 ) : (
-                  <div className="flex flex-col items-center justify-center text-[#FF5000]/70">
-                    {renderCategoryIcon('w-7 h-7 text-[#FF5000]/70')}
+                  <div className="flex flex-col items-center justify-center w-10 h-10 rounded-full bg-white/80 shadow-2xs text-[#FF5000]/80">
+                    {renderCategoryIcon('w-5 h-5 text-[#FF5000]/85')}
                   </div>
                 )}
 

@@ -1496,8 +1496,8 @@ document.addEventListener("DOMContentLoaded", () => {
             ${prod.image ? `
               <img src="${prod.image}" alt="${prod.name}" class="w-16 h-16 rounded-xl object-cover border border-slate-200 flex-shrink-0 bg-slate-100">
             ` : `
-              <div class="w-16 h-16 rounded-xl bg-[#f0f5f3] border border-slate-200 flex items-center justify-center flex-shrink-0 text-emerald-800 font-bold text-xs">
-                ${prod.unitType || "PEIXE"}
+              <div class="w-16 h-16 rounded-xl fish-pattern-bg border border-slate-200 flex items-center justify-center flex-shrink-0 text-[#072a29] font-extrabold text-[11px]">
+                <span class="bg-white/85 px-1.5 py-0.5 rounded-md shadow-2xs">${prod.unitType || "PEIXE"}</span>
               </div>
             `}
             <div class="flex-1 min-w-0">
