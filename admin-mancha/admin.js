@@ -12,6 +12,12 @@ document.addEventListener("DOMContentLoaded", () => {
     : "/api";
 
   let isWebMode = true;
+  if (localStorage.getItem("mancha_supabase_ref") !== "qnandyuygrilgptnpaeb") {
+    localStorage.removeItem("mancha_admin_token");
+    localStorage.removeItem("mancha_admin_refresh_token");
+    localStorage.removeItem("peixaria_mancha_catalog_cache");
+    localStorage.setItem("mancha_supabase_ref", "qnandyuygrilgptnpaeb");
+  }
   let authToken = localStorage.getItem("mancha_admin_token") || null;
   let refreshToken = localStorage.getItem("mancha_admin_refresh_token") || null;
   let currentPeriod = "all";
@@ -112,6 +118,9 @@ document.addEventListener("DOMContentLoaded", () => {
       if (refreshed) {
         return supaFetch(path, options, false);
       }
+      authToken = null;
+      localStorage.removeItem("mancha_admin_token");
+      return supaFetch(path, options, false);
     }
 
     if (!res.ok) {
@@ -227,7 +236,23 @@ document.addEventListener("DOMContentLoaded", () => {
 
       try {
         const stored = localStorage.getItem("peixaria_mancha_catalog_cache");
-        if (stored) return JSON.parse(stored);
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          if (parsed && Array.isArray(parsed.categories) && parsed.categories.length > 0) {
+            return parsed;
+          }
+        }
+      } catch {}
+
+      try {
+        const res = await fetch("../cardapio-delivery/catalog-data.json");
+        if (res.ok) {
+          const fallback = await res.json();
+          if (fallback && Array.isArray(fallback.categories)) {
+            fallback.allProducts = fallback.products || fallback.allProducts || fallback.categories.flatMap(c => c.items || []);
+            return fallback;
+          }
+        }
       } catch {}
       return { config: {}, categories: [], allProducts: [] };
     }
@@ -851,7 +876,7 @@ document.addEventListener("DOMContentLoaded", () => {
     btn.textContent = "Autenticando no Supabase...";
 
     try {
-      const supaRes = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`, {
+      let supaRes = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -859,6 +884,17 @@ document.addEventListener("DOMContentLoaded", () => {
         },
         body: JSON.stringify({ email, password })
       });
+
+      if (!supaRes.ok && rawEmail.toLowerCase() !== email.toLowerCase()) {
+        supaRes = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "apikey": SUPABASE_ANON_KEY
+          },
+          body: JSON.stringify({ email: rawEmail, password })
+        });
+      }
 
       if (supaRes.ok) {
         const supaData = await supaRes.json();
