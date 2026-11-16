@@ -109,6 +109,7 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
     const res = await fetch(`${SUPABASE_URL}${path}`, {
+      cache: "no-store",
       ...options,
       headers
     });
@@ -141,10 +142,26 @@ document.addEventListener("DOMContentLoaded", () => {
   // MOTOR OFICIAL SUPABASE NUVEM (CATÁLOGO, PRODUTOS, CATEGORIAS, CONFIG E PEDIDOS)
   // ==========================================================================
 
-  function saveWebCatalog() {
+  function savePublicAndAdminCache(dataObj) {
+    if (!dataObj) return;
     try {
-      localStorage.setItem("peixaria_mancha_catalog_cache", JSON.stringify(catalogData));
+      localStorage.setItem("peixaria_mancha_admin_catalog_cache", JSON.stringify(dataObj));
+      const publicCopy = {
+        ...dataObj,
+        categories: (dataObj.categories || [])
+          .filter(c => c.isActive !== false)
+          .map(c => ({
+            ...c,
+            items: (c.items || []).filter(it => it.isAvailable !== false)
+          })),
+        allProducts: (dataObj.allProducts || []).filter(p => p.isAvailable !== false)
+      };
+      localStorage.setItem("peixaria_mancha_catalog_cache", JSON.stringify(publicCopy));
     } catch {}
+  }
+
+  function saveWebCatalog() {
+    savePublicAndAdminCache(catalogData);
     broadcastSync();
   }
 
@@ -225,9 +242,7 @@ document.addEventListener("DOMContentLoaded", () => {
           currentStoreId = data.storeId;
         }
         if (data && Array.isArray(data.categories) && data.categories.length > 0) {
-          try {
-            localStorage.setItem("peixaria_mancha_catalog_cache", JSON.stringify(data));
-          } catch {}
+          savePublicAndAdminCache(data);
           return data;
         }
       } catch (err) {
@@ -235,7 +250,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       try {
-        const stored = localStorage.getItem("peixaria_mancha_catalog_cache");
+        const stored = localStorage.getItem("peixaria_mancha_admin_catalog_cache") || localStorage.getItem("peixaria_mancha_catalog_cache");
         if (stored) {
           const parsed = JSON.parse(stored);
           if (parsed && Array.isArray(parsed.categories) && parsed.categories.length > 0) {
@@ -576,10 +591,24 @@ document.addEventListener("DOMContentLoaded", () => {
         ? `id=eq.${existing._uuid}`
         : `store_id=eq.${currentStoreId}&slug=eq.${encodeURIComponent(id)}`;
 
-      await supaFetch(`/rest/v1/products?${filterQuery}`, {
+      let updated = await supaFetch(`/rest/v1/products?${filterQuery}`, {
         method: "PATCH",
+        headers: { "Prefer": "return=representation" },
         body: JSON.stringify(updateRow)
       });
+
+      if ((!Array.isArray(updated) || updated.length === 0) && existing._uuid) {
+        updated = await supaFetch(`/rest/v1/products?store_id=eq.${currentStoreId}&slug=eq.${encodeURIComponent(existing.id || id)}`, {
+          method: "PATCH",
+          headers: { "Prefer": "return=representation" },
+          body: JSON.stringify(updateRow)
+        });
+      }
+
+      if (!Array.isArray(updated) || updated.length === 0) {
+        throw new Error("Não foi possível atualizar o produto no banco. Recarregue a página ou faça login novamente.");
+      }
+
       return { product: merged };
     }
 
@@ -1166,9 +1195,7 @@ document.addEventListener("DOMContentLoaded", () => {
       renderDashboard();
     }
 
-    try {
-      localStorage.setItem("peixaria_mancha_catalog_cache", JSON.stringify(data));
-    } catch {}
+    savePublicAndAdminCache(data);
   }
 
   async function loadDashboard(period = "all") {
@@ -1525,20 +1552,25 @@ document.addEventListener("DOMContentLoaded", () => {
     // Ações dos botões da lista de produtos
     grid.querySelectorAll("[data-toggle-avail]").forEach(btn => {
       btn.addEventListener("click", async () => {
+        if (btn.disabled) return;
         const id = btn.getAttribute("data-toggle-avail");
         const prod = catalogData.allProducts.find(p => p.id === id);
         if (!prod) return;
+        btn.disabled = true;
         try {
+          const nextAvail = prod.isAvailable === false;
           await apiFetch(`/admin/products/${id}`, {
             method: "PUT",
-            body: JSON.stringify({ isAvailable: prod.isAvailable === false })
+            body: JSON.stringify({ isAvailable: nextAvail })
           });
           await loadCatalog();
           await loadDashboard(currentPeriod);
           broadcastSync();
-          showToast(`Status de "${prod.name}" atualizado!`);
+          showToast(`"${prod.name}" ${nextAvail ? "ativado" : "pausado"} no cardápio!`);
         } catch (err) {
           showToast(err.message, true);
+        } finally {
+          btn.disabled = false;
         }
       });
     });

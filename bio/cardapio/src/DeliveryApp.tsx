@@ -41,11 +41,20 @@ interface LocalOrderHistoryItem {
 export default function DeliveryApp() {
   const [categories, setCategories] = useState<DeliveryCategory[]>(() => {
     try {
+      if (localStorage.getItem('mancha_supabase_ref') !== 'qnandyuygrilgptnpaeb') {
+        localStorage.removeItem('peixaria_mancha_catalog_cache');
+        localStorage.setItem('mancha_supabase_ref', 'qnandyuygrilgptnpaeb');
+      }
       const cached = localStorage.getItem('peixaria_mancha_catalog_cache');
       if (cached) {
         const parsed = JSON.parse(cached);
         if (Array.isArray(parsed.categories) && parsed.categories.length > 0) {
-          return parsed.categories.filter((c: DeliveryCategory) => c.isActive !== false);
+          return parsed.categories
+            .filter((c: DeliveryCategory) => c.isActive !== false)
+            .map((c: DeliveryCategory) => ({
+              ...c,
+              items: (c.items || []).filter((it: DeliveryMenuItem) => it.isAvailable !== false),
+            }));
         }
       }
     } catch {
@@ -154,6 +163,7 @@ export default function DeliveryApp() {
     const fetchCatalog = () => {
       fetch(`${SUPABASE_CONFIG.url}/rest/v1/rpc/get_delivery_catalog`, {
         method: 'POST',
+        cache: 'no-store',
         headers: {
           'Content-Type': 'application/json',
           apikey: SUPABASE_CONFIG.anonKey,
@@ -189,6 +199,13 @@ export default function DeliveryApp() {
       // ignore
     }
 
+    const onStorageSync = (e: StorageEvent) => {
+      if (!e.key || e.key.includes('mancha')) {
+        fetchCatalog();
+      }
+    };
+    window.addEventListener('storage', onStorageSync);
+
     const onOrdersUpdated = () => {
       try {
         setMyOrders(JSON.parse(localStorage.getItem('peixaria_mancha_my_orders') || '[]'));
@@ -200,6 +217,7 @@ export default function DeliveryApp() {
 
     return () => {
       window.clearInterval(pollTimer);
+      window.removeEventListener('storage', onStorageSync);
       window.removeEventListener('mancha-orders-updated', onOrdersUpdated);
       try {
         if (bc) bc.close();

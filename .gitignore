@@ -7,3 +7,6 @@ test_git.py
 *.pyc
 __pycache__/
 **/node_modules/
+.env
+**/.env
+*.env.local
