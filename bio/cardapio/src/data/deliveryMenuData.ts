@@ -41,9 +41,9 @@ export interface DeliveryCartItem {
 }
 
 export const SUPABASE_CONFIG = {
-  url: 'https://vrmtsgowzpjqgtxzprow.supabase.co',
+  url: 'https://qnandyuygrilgptnpaeb.supabase.co',
   anonKey:
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZybXRzZ293enBqcWd0eHpwcm93Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTMyMjY3OTQsImV4cCI6MjEwODgwMjc5NH0.Jhbt0GFiTAqAEewBUs1eg3trm1fdtaY03e7TIP1LZiU',
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFuYW5keXV5Z3JpbGdwdG5wYWViIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQzMTM1MDgsImV4cCI6MjEwOTg4OTUwOH0.kOaTY_X6uq5bjo94bjm1RioTEJ-KBHJX7f948YLbJAs',
   storeSlug: 'peixaria-mancha',
 };
 

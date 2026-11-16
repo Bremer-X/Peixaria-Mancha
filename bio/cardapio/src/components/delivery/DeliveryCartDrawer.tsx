@@ -216,7 +216,7 @@ export default function DeliveryCartDrawer({
         // ignore
       }
 
-      fetch('https://vrmtsgowzpjqgtxzprow.supabase.co/rest/v1/rpc/create_delivery_order', {
+      fetch('https://qnandyuygrilgptnpaeb.supabase.co/rest/v1/rpc/create_delivery_order', {
         method: 'POST',
         keepalive: true,
         headers: {
@@ -231,7 +231,7 @@ export default function DeliveryCartDrawer({
       }).catch(() => {});
 
       // Também cadastrar/atualizar cliente em public.store_customers no Supabase
-      fetch('https://vrmtsgowzpjqgtxzprow.supabase.co/rest/v1/rpc/upsert_delivery_customer', {
+      fetch('https://qnandyuygrilgptnpaeb.supabase.co/rest/v1/rpc/upsert_delivery_customer', {
         method: 'POST',
         keepalive: true,
         headers: {

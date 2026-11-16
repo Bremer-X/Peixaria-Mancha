@@ -1,9 +1,9 @@
 document.addEventListener("DOMContentLoaded", () => {
-  // Supabase Nuvem - Projeto Oficial "Cardápio Digital" (Peixaria Mancha)
-  const SUPABASE_URL = "https://vrmtsgowzpjqgtxzprow.supabase.co";
-  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZybXRzZ293enBqcWd0eHpwcm93Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTMyMjY3OTQsImV4cCI6MjEwODgwMjc5NH0.Jhbt0GFiTAqAEewBUs1eg3trm1fdtaY03e7TIP1LZiU";
+  // Supabase Nuvem - Projeto Dedicado Peixaria Mancha (qnandyuygrilgptnpaeb)
+  const SUPABASE_URL = "https://qnandyuygrilgptnpaeb.supabase.co";
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFuYW5keXV5Z3JpbGdwdG5wYWViIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQzMTM1MDgsImV4cCI6MjEwOTg4OTUwOH0.kOaTY_X6uq5bjo94bjm1RioTEJ-KBHJX7f948YLbJAs";
   const STORE_SLUG = "peixaria-mancha";
-  let currentStoreId = "3de9eb4c-fdff-4c98-a8d2-0fe8d0b64635";
+  let currentStoreId = "a08c08d0-8768-44bc-9160-0c679beb89a2";
 
   // Detecta automaticamente o ambiente (Local com Node.js ou Web/Hospedagem Estática)
   const isLocalHost = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
@@ -215,7 +215,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (data && data.storeId) {
           currentStoreId = data.storeId;
         }
-        if (data && data.categories) {
+        if (data && Array.isArray(data.categories) && data.categories.length > 0) {
           try {
             localStorage.setItem("peixaria_mancha_catalog_cache", JSON.stringify(data));
           } catch {}
@@ -394,8 +394,13 @@ document.addEventListener("DOMContentLoaded", () => {
       const id = endpoint.replace("/admin/orders/", "").replace("/status", "");
       const payload = JSON.parse(options.body || "{}");
       const dbStatus = mapOrderStatusToDb(payload.status);
+      const existingOrder = (dashboardData?.recentOrders || []).find(o => String(o._id || o.id) === String(id));
+      const baseNote = String(existingOrder?.generalNotes || "").replace(/^\[CONFIRMADO\]\s*/i, "").trim();
       const updateObj = {
         status: dbStatus,
+        kitchen_note: payload.status === "confirmado"
+          ? (baseNote ? `[CONFIRMADO] ${baseNote}` : "[CONFIRMADO]")
+          : baseNote,
         updated_at: new Date().toISOString()
       };
       if (dbStatus === "concluido") {
@@ -637,7 +642,21 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     if (endpoint === "/admin/restore" && method === "POST") {
-      return { message: "Dados sincronizados com o Supabase Nuvem!" };
+      const payload = JSON.parse(options.body || "{}");
+      let backupToRestore = payload.backupData || null;
+      if (payload.resetFactory || !backupToRestore) {
+        const res = await fetch("../cardapio-delivery/catalog-data.json");
+        if (!res.ok) throw new Error("Não foi possível carregar o catálogo padrão de fábrica.");
+        backupToRestore = await res.json();
+      }
+      const rpcRes = await supaFetch(`/rest/v1/rpc/restore_delivery_catalog`, {
+        method: "POST",
+        body: JSON.stringify({
+          p_store_slug: STORE_SLUG,
+          p_backup: backupToRestore
+        })
+      });
+      return { message: rpcRes?.message || "Dados sincronizados com o Supabase Nuvem!" };
     }
 
     // 12. Atualizar Credenciais no Supabase Auth
