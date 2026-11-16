@@ -49,12 +49,7 @@ export default function DeliveryApp() {
       if (cached) {
         const parsed = JSON.parse(cached);
         if (Array.isArray(parsed.categories) && parsed.categories.length > 0) {
-          return parsed.categories
-            .filter((c: DeliveryCategory) => c.isActive !== false)
-            .map((c: DeliveryCategory) => ({
-              ...c,
-              items: (c.items || []).filter((it: DeliveryMenuItem) => it.isAvailable !== false),
-            }));
+          return parsed.categories.filter((c: DeliveryCategory) => c.isActive !== false);
         }
       }
     } catch {
@@ -146,12 +141,9 @@ export default function DeliveryApp() {
       }
 
       if (Array.isArray(data.categories) && data.categories.length > 0) {
-        const activeCats: DeliveryCategory[] = data.categories
-          .filter((c: any) => c.isActive !== false)
-          .map((c: any) => ({
-            ...c,
-            items: (c.items || []).filter((it: any) => it.isAvailable !== false),
-          }));
+        const activeCats: DeliveryCategory[] = data.categories.filter(
+          (c: any) => c.isActive !== false
+        );
         setCategories(activeCats);
         setActiveCategoryId((prev) =>
           activeCats.some((c) => c.id === prev) ? prev : activeCats[0]?.id || ''
@@ -171,7 +163,7 @@ export default function DeliveryApp() {
         },
         body: JSON.stringify({
           p_store_slug: SUPABASE_CONFIG.storeSlug,
-          p_include_unavailable: false,
+          p_include_unavailable: true,
         }),
       })
         .then((r) => (r.ok ? r.json() : null))

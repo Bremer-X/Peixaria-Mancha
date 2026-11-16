@@ -148,13 +148,8 @@ document.addEventListener("DOMContentLoaded", () => {
       localStorage.setItem("peixaria_mancha_admin_catalog_cache", JSON.stringify(dataObj));
       const publicCopy = {
         ...dataObj,
-        categories: (dataObj.categories || [])
-          .filter(c => c.isActive !== false)
-          .map(c => ({
-            ...c,
-            items: (c.items || []).filter(it => it.isAvailable !== false)
-          })),
-        allProducts: (dataObj.allProducts || []).filter(p => p.isAvailable !== false)
+        categories: (dataObj.categories || []).filter(c => c.isActive !== false),
+        allProducts: dataObj.allProducts || []
       };
       localStorage.setItem("peixaria_mancha_catalog_cache", JSON.stringify(publicCopy));
     } catch {}
