@@ -110,6 +110,15 @@ export default function DeliveryApp() {
   });
   const [profileSaving, setProfileSaving] = useState(false);
   const [profileError, setProfileError] = useState('');
+  const [isRegistered, setIsRegistered] = useState<boolean>(() => {
+    try {
+      const saved = JSON.parse(localStorage.getItem('peixaria_mancha_customer_profile') || 'null');
+      return Boolean(saved && saved.registered !== false && saved.name && saved.whatsapp);
+    } catch {
+      return false;
+    }
+  });
+  const [isEditingProfile, setIsEditingProfile] = useState(false);
 
   const [cart, setCart] = useState<DeliveryCartItem[]>(() => {
     try {
@@ -327,6 +336,7 @@ export default function DeliveryApp() {
       setIsOrdersOpen(true);
     } else if (tab === 'perfil') {
       setIsOrdersOpen(false);
+      setIsEditingProfile(false);
       setIsProfileOpen(true);
     }
   };
@@ -369,19 +379,43 @@ export default function DeliveryApp() {
         throw new Error('Não foi possível salvar seu cadastro no momento.');
       }
 
+      const savedData = { ...profile, registered: true };
       try {
-        localStorage.setItem('peixaria_mancha_customer_profile', JSON.stringify(profile));
+        localStorage.setItem('peixaria_mancha_customer_profile', JSON.stringify(savedData));
       } catch {
         // ignore
       }
-      setIsProfileOpen(false);
-      setToastMessage('✓ Cadastro salvo com sucesso!');
+      setIsRegistered(true);
+      setIsEditingProfile(false);
+      setToastMessage('✓ Cadastro salvo! Seja bem-vindo novamente.');
     } catch (err: any) {
       setProfileError(err?.message || 'Erro ao salvar cadastro.');
     } finally {
       setProfileSaving(false);
     }
   };
+
+  const handleClearProfile = () => {
+    try {
+      localStorage.removeItem('peixaria_mancha_customer_profile');
+    } catch {
+      // ignore
+    }
+    setProfile({
+      name: '',
+      whatsapp: '',
+      email: '',
+      neighborhood: '',
+      street: '',
+      number: '',
+      reference: '',
+    });
+    setIsRegistered(false);
+    setIsEditingProfile(false);
+    setToastMessage('Cadastro removido deste aparelho.');
+  };
+
+  const firstName = profile.name.trim().split(/\s+/)[0] || 'Cliente';
 
   const renderCategoryTileIcon = (iconName?: string, isActive?: boolean) => {
     const cls = `w-6 h-6 ${isActive ? 'text-white' : 'text-[#FF5000]'}`;
@@ -406,6 +440,7 @@ export default function DeliveryApp() {
             onSearchChange={setSearchQuery}
             onOpenProfile={() => handleBottomTab('perfil')}
             catalogRevision={catalogRevision}
+            customerName={isRegistered ? firstName : undefined}
           />
 
           {/* Carrossel Horizontal de Categorias em Cards com Ícone */}
@@ -587,115 +622,200 @@ export default function DeliveryApp() {
           <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50 backdrop-blur-xs p-0 sm:p-4">
             <div className="bg-[#F8F6F0] w-full max-w-md rounded-t-3xl sm:rounded-3xl shadow-2xl overflow-hidden max-h-[88vh] flex flex-col">
               <div className="bg-[#FF5000] text-white px-5 py-4 flex items-center justify-between flex-shrink-0">
-                <div className="flex items-center gap-2">
-                  <User className="w-5 h-5 text-orange-100" />
+                <div className="flex items-center gap-2.5">
+                  <div className="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
+                    <User className="w-5 h-5 text-white" />
+                  </div>
                   <div>
-                    <h3 className="font-heading font-extrabold text-base leading-tight">Cadastro do Cliente</h3>
-                    <span className="text-[10px] text-orange-100 block">Agilize seus pedidos na Peixaria Mancha</span>
+                    <h3 className="font-heading font-extrabold text-base leading-tight">
+                      {isRegistered && !isEditingProfile
+                        ? `Seja bem-vindo novamente, ${firstName}!`
+                        : isEditingProfile
+                        ? 'Atualizar Meu Perfil'
+                        : 'Cadastro do Cliente'}
+                    </h3>
+                    <span className="text-[11px] text-orange-100 block">
+                      {isRegistered && !isEditingProfile
+                        ? 'Seu endereço já está salvo para pedidos rápidos'
+                        : 'Agilize seus pedidos na Peixaria Mancha'}
+                    </span>
                   </div>
                 </div>
                 <button
                   type="button"
-                  onClick={() => setIsProfileOpen(false)}
+                  onClick={() => {
+                    setIsEditingProfile(false);
+                    setIsProfileOpen(false);
+                  }}
                   className="p-1 rounded-full hover:bg-white/15 cursor-pointer"
                 >
                   <X className="w-5 h-5" />
                 </button>
               </div>
-              <div className="p-4 space-y-3 overflow-y-auto">
-                <div>
-                  <label className="text-[11px] font-bold uppercase text-stone-500 block mb-1">Nome Completo *</label>
-                  <input
-                    type="text"
-                    value={profile.name}
-                    onChange={(e) => setProfile((p) => ({ ...p, name: e.target.value }))}
-                    placeholder="Seu nome completo"
-                    className="w-full bg-white border border-stone-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-[#FF5000]"
-                  />
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                  <div>
-                    <label className="text-[11px] font-bold uppercase text-stone-500 block mb-1">WhatsApp *</label>
-                    <input
-                      type="tel"
-                      value={profile.whatsapp}
-                      onChange={(e) => setProfile((p) => ({ ...p, whatsapp: e.target.value }))}
-                      placeholder="(91) 98888-8888"
-                      className="w-full bg-white border border-stone-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-[#FF5000]"
-                    />
+
+              {isRegistered && !isEditingProfile ? (
+                <div className="p-4 space-y-3 overflow-y-auto">
+                  <div className="bg-emerald-50 border border-emerald-200 rounded-2xl px-3.5 py-2.5 flex items-center gap-2 text-emerald-800 text-xs font-bold">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600 flex-shrink-0" />
+                    <span>Cliente cadastrado • Endereço preenchido automaticamente no carrinho</span>
                   </div>
-                  <div>
-                    <label className="text-[11px] font-bold uppercase text-stone-500 block mb-1">E-mail (Opcional)</label>
-                    <input
-                      type="email"
-                      value={profile.email}
-                      onChange={(e) => setProfile((p) => ({ ...p, email: e.target.value }))}
-                      placeholder="seu@email.com"
-                      className="w-full bg-white border border-stone-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-[#FF5000]"
-                    />
+
+                  <div className="bg-white rounded-2xl border border-stone-200/80 p-4 space-y-2.5 text-sm">
+                    <div>
+                      <span className="text-[10px] font-bold uppercase text-stone-400 block">Nome</span>
+                      <p className="font-bold text-[#172B35]">{profile.name}</p>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-2 border-t border-stone-100">
+                      <div>
+                        <span className="text-[10px] font-bold uppercase text-stone-400 block">WhatsApp</span>
+                        <p className="font-semibold text-[#172B35]">{profile.whatsapp}</p>
+                      </div>
+                      {profile.email && (
+                        <div>
+                          <span className="text-[10px] font-bold uppercase text-stone-400 block">E-mail</span>
+                          <p className="font-medium text-stone-600 truncate">{profile.email}</p>
+                        </div>
+                      )}
+                    </div>
+                    <div className="pt-2 border-t border-stone-100">
+                      <span className="text-[10px] font-bold uppercase text-stone-400 block">Endereço Salvo</span>
+                      <p className="font-semibold text-[#172B35]">
+                        {[profile.street, profile.number, profile.neighborhood].filter(Boolean).join(', ') || 'Não informado'}
+                      </p>
+                      {profile.reference && (
+                        <p className="text-xs text-stone-500 mt-0.5">Ref.: {profile.reference}</p>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col sm:flex-row gap-2 pt-1">
+                    <button
+                      type="button"
+                      onClick={() => setIsEditingProfile(true)}
+                      className="flex-1 bg-[#FF5000] hover:bg-[#E04600] text-white font-bold text-sm py-3 rounded-xl cursor-pointer transition-all"
+                    >
+                      Editar Meus Dados
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleClearProfile}
+                      className="px-4 py-3 rounded-xl border border-stone-300 bg-white hover:bg-stone-100 text-stone-600 font-bold text-xs cursor-pointer transition-all"
+                    >
+                      Sair / Trocar
+                    </button>
                   </div>
                 </div>
-                <div>
-                  <label className="text-[11px] font-bold uppercase text-stone-500 block mb-1">
-                    <MapPin className="w-3 h-3 inline mr-1" />
-                    Bairro (Belém / Ananindeua)
-                  </label>
-                  <input
-                    type="text"
-                    value={profile.neighborhood}
-                    onChange={(e) => setProfile((p) => ({ ...p, neighborhood: e.target.value }))}
-                    placeholder="Ex: Marco, Batista Campos, Cidade Nova..."
-                    className="w-full bg-white border border-stone-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-[#FF5000]"
-                  />
-                </div>
-                <div className="grid grid-cols-3 gap-2.5">
-                  <div className="col-span-2">
-                    <label className="text-[11px] font-bold uppercase text-stone-500 block mb-1">Rua / Avenida</label>
+              ) : (
+                <div className="p-4 space-y-3 overflow-y-auto">
+                  <div>
+                    <label className="text-[11px] font-bold uppercase text-stone-500 block mb-1">Nome Completo *</label>
                     <input
                       type="text"
-                      value={profile.street}
-                      onChange={(e) => setProfile((p) => ({ ...p, street: e.target.value }))}
-                      placeholder="Nome da rua ou travessa"
+                      value={profile.name}
+                      onChange={(e) => setProfile((p) => ({ ...p, name: e.target.value }))}
+                      placeholder="Seu nome completo"
                       className="w-full bg-white border border-stone-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-[#FF5000]"
                     />
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                    <div>
+                      <label className="text-[11px] font-bold uppercase text-stone-500 block mb-1">WhatsApp *</label>
+                      <input
+                        type="tel"
+                        value={profile.whatsapp}
+                        onChange={(e) => setProfile((p) => ({ ...p, whatsapp: e.target.value }))}
+                        placeholder="(91) 98888-8888"
+                        className="w-full bg-white border border-stone-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-[#FF5000]"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-[11px] font-bold uppercase text-stone-500 block mb-1">E-mail (Opcional)</label>
+                      <input
+                        type="email"
+                        value={profile.email}
+                        onChange={(e) => setProfile((p) => ({ ...p, email: e.target.value }))}
+                        placeholder="seu@email.com"
+                        className="w-full bg-white border border-stone-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-[#FF5000]"
+                      />
+                    </div>
                   </div>
                   <div>
-                    <label className="text-[11px] font-bold uppercase text-stone-500 block mb-1">Número</label>
+                    <label className="text-[11px] font-bold uppercase text-stone-500 block mb-1">
+                      <MapPin className="w-3 h-3 inline mr-1" />
+                      Bairro (Belém / Ananindeua)
+                    </label>
                     <input
                       type="text"
-                      value={profile.number}
-                      onChange={(e) => setProfile((p) => ({ ...p, number: e.target.value }))}
-                      placeholder="Ex: 123"
+                      value={profile.neighborhood}
+                      onChange={(e) => setProfile((p) => ({ ...p, neighborhood: e.target.value }))}
+                      placeholder="Ex: Marco, Batista Campos, Cidade Nova..."
                       className="w-full bg-white border border-stone-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-[#FF5000]"
                     />
                   </div>
-                </div>
-                <div>
-                  <label className="text-[11px] font-bold uppercase text-stone-500 block mb-1">Ponto de Referência</label>
-                  <input
-                    type="text"
-                    value={profile.reference}
-                    onChange={(e) => setProfile((p) => ({ ...p, reference: e.target.value }))}
-                    placeholder="Ex: Próximo à praça, portão branco"
-                    className="w-full bg-white border border-stone-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-[#FF5000]"
-                  />
-                </div>
+                  <div className="grid grid-cols-3 gap-2.5">
+                    <div className="col-span-2">
+                      <label className="text-[11px] font-bold uppercase text-stone-500 block mb-1">Rua / Avenida</label>
+                      <input
+                        type="text"
+                        value={profile.street}
+                        onChange={(e) => setProfile((p) => ({ ...p, street: e.target.value }))}
+                        placeholder="Nome da rua ou travessa"
+                        className="w-full bg-white border border-stone-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-[#FF5000]"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-[11px] font-bold uppercase text-stone-500 block mb-1">Número</label>
+                      <input
+                        type="text"
+                        value={profile.number}
+                        onChange={(e) => setProfile((p) => ({ ...p, number: e.target.value }))}
+                        placeholder="Ex: 123"
+                        className="w-full bg-white border border-stone-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-[#FF5000]"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="text-[11px] font-bold uppercase text-stone-500 block mb-1">Ponto de Referência</label>
+                    <input
+                      type="text"
+                      value={profile.reference}
+                      onChange={(e) => setProfile((p) => ({ ...p, reference: e.target.value }))}
+                      placeholder="Ex: Próximo à praça, portão branco"
+                      className="w-full bg-white border border-stone-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-[#FF5000]"
+                    />
+                  </div>
 
-                {profileError && (
-                  <p className="text-xs font-bold text-[#F15A24] bg-[#F15A24]/10 border border-[#F15A24]/30 rounded-xl px-3 py-2">
-                    {profileError}
-                  </p>
-                )}
+                  {profileError && (
+                    <p className="text-xs font-bold text-[#F15A24] bg-[#F15A24]/10 border border-[#F15A24]/30 rounded-xl px-3 py-2">
+                      {profileError}
+                    </p>
+                  )}
 
-                <button
-                  type="button"
-                  disabled={profileSaving}
-                  onClick={handleSaveProfile}
-                  className="w-full bg-[#FF5000] hover:bg-[#E04600] disabled:opacity-60 text-white font-bold text-sm py-3 rounded-xl cursor-pointer transition-all"
-                >
-                  {profileSaving ? 'Salvando no sistema...' : 'Cadastrar / Salvar Meus Dados'}
-                </button>
-              </div>
+                  <div className="flex gap-2">
+                    {isEditingProfile && (
+                      <button
+                        type="button"
+                        onClick={() => setIsEditingProfile(false)}
+                        className="px-4 py-3 rounded-xl border border-stone-300 bg-white hover:bg-stone-100 text-stone-700 font-bold text-sm cursor-pointer transition-all"
+                      >
+                        Cancelar
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      disabled={profileSaving}
+                      onClick={handleSaveProfile}
+                      className="flex-1 bg-[#FF5000] hover:bg-[#E04600] disabled:opacity-60 text-white font-bold text-sm py-3 rounded-xl cursor-pointer transition-all"
+                    >
+                      {profileSaving
+                        ? 'Salvando no sistema...'
+                        : isEditingProfile
+                        ? 'Salvar Alterações'
+                        : 'Cadastrar / Salvar Meus Dados'}
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         )}

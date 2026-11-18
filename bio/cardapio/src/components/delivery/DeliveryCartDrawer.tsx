@@ -43,6 +43,7 @@ export default function DeliveryCartDrawer({
   const [generalNotes, setGeneralNotes] = useState('');
   const [validationError, setValidationError] = useState('');
   const [showDeliveryNotice, setShowDeliveryNotice] = useState(false);
+  const [isRegisteredCustomer, setIsRegisteredCustomer] = useState(false);
 
   useEffect(() => {
     if (!isOpen) {
@@ -52,19 +53,29 @@ export default function DeliveryCartDrawer({
 
     try {
       const savedProfile = JSON.parse(localStorage.getItem('peixaria_mancha_customer_profile') || 'null');
-      if (savedProfile) {
-        if (!customerName && savedProfile.name) setCustomerName(savedProfile.name);
-        if (!phone && savedProfile.whatsapp) setPhone(savedProfile.whatsapp);
-        if (!address) {
-          const composed = [savedProfile.street || savedProfile.address, savedProfile.number, savedProfile.neighborhood]
-            .filter(Boolean)
-            .join(', ');
-          if (composed) setAddress(composed);
-        }
-        if (!referencePoint && savedProfile.reference) setReferencePoint(savedProfile.reference);
+      const registered = Boolean(
+        savedProfile &&
+          savedProfile.registered !== false &&
+          savedProfile.name &&
+          savedProfile.whatsapp
+      );
+      setIsRegisteredCustomer(registered);
+      if (registered) {
+        if (savedProfile.name) setCustomerName(savedProfile.name);
+        if (savedProfile.whatsapp) setPhone(savedProfile.whatsapp);
+        const composed = [savedProfile.street || savedProfile.address, savedProfile.number, savedProfile.neighborhood]
+          .filter(Boolean)
+          .join(', ');
+        if (composed) setAddress(composed);
+        if (savedProfile.reference) setReferencePoint(savedProfile.reference);
+      } else {
+        setCustomerName('');
+        setPhone('');
+        setAddress('');
+        setReferencePoint('');
       }
     } catch {
-      // ignore
+      setIsRegisteredCustomer(false);
     }
 
     const timer = window.setTimeout(() => setShowDeliveryNotice(true), 3000);
@@ -172,7 +183,7 @@ export default function DeliveryCartDrawer({
     // Registrar pedido automaticamente no Supabase ("Cardápio Digital" / peixaria-mancha)
     try {
       const supaKey =
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZybXRzZ293enBqcWd0eHpwcm93Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTMyMjY3OTQsImV4cCI6MjEwODgwMjc5NH0.Jhbt0GFiTAqAEewBUs1eg3trm1fdtaY03e7TIP1LZiU';
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFuYW5keXV5Z3JpbGdwdG5wYWViIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQzMTM1MDgsImV4cCI6MjEwOTg4OTUwOH0.kOaTY_X6uq5bjo94bjm1RioTEJ-KBHJX7f948YLbJAs';
       const orderPayload = {
         customer: {
           name: customerName.trim(),
@@ -448,6 +459,12 @@ export default function DeliveryCartDrawer({
                   </button>
                 </div>
               </div>
+
+              {isRegisteredCustomer && (
+                <div className="bg-emerald-50 border border-emerald-200 rounded-xl px-3 py-2 text-[11px] font-bold text-emerald-800">
+                  ✓ Seja bem-vindo novamente! Seus dados e endereço foram preenchidos automaticamente.
+                </div>
+              )}
 
               {/* Name */}
               <div className="space-y-1">

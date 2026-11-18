@@ -8,6 +8,7 @@ interface DeliveryHeaderProps {
   onSearchChange: (query: string) => void;
   onOpenProfile?: () => void;
   catalogRevision?: number;
+  customerName?: string;
 }
 
 export default function DeliveryHeader({
@@ -15,6 +16,7 @@ export default function DeliveryHeader({
   onSearchChange,
   onOpenProfile,
   catalogRevision,
+  customerName,
 }: DeliveryHeaderProps) {
   const [availability, setAvailability] = useState(getDeliveryAvailability);
 
@@ -50,7 +52,9 @@ export default function DeliveryHeader({
               Peixaria Mancha
             </h1>
             <p className="text-xs sm:text-sm font-medium text-orange-100 truncate mt-0.5">
-              {DELIVERY_RESTAURANT_INFO.tagline || 'Cardápio Digital & Delivery'}
+              {customerName
+                ? `Seja bem-vindo novamente, ${customerName}!`
+                : DELIVERY_RESTAURANT_INFO.tagline || 'Cardápio Digital & Delivery'}
             </p>
           </div>
         </div>
